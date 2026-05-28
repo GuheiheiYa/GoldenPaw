@@ -33,7 +33,7 @@ function onTap(value: string) {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/design-system' as *;
+@use '../styles/design-system' as *;
 
 .segmented {
   display: flex;

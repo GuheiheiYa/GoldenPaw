@@ -57,8 +57,8 @@ function onClose() {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/design-system' as *;
-@use '@/styles/mixins' as *;
+@use '../styles/design-system' as *;
+@use '../styles/mixins' as *;
 
 .overlay {
   position: fixed;

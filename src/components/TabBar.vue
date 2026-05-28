@@ -50,7 +50,7 @@ function onFabTap() {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/design-system' as *;
+@use '../styles/design-system' as *;
 
 .tabbar-wrapper {
   position: fixed;

@@ -20,8 +20,8 @@ function goBack() {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/design-system' as *;
-@use '@/styles/mixins' as *;
+@use '../../styles/design-system' as *;
+@use '../../styles/mixins' as *;
 
 .app {
   min-height: 100vh;
