@@ -1,0 +1,18 @@
+[  608156ms] Object
+[  608822ms] Object
+[  608972ms] Object
+[  609106ms] Object
+[  609238ms] Object
+[  609555ms] Object
+[  609738ms] Object
+[  609905ms] Object
+[  610088ms] Object
+[  610338ms] Object
+[  612228ms] [WARNING] [vue-router]: importing from 'vue-router/dist/vue-router.esm-bundler.js' is deprecated. Use 'vue-router' directly. @ http://localhost:5174/node_modules/@dcloudio/uni-h5/node_modules/vue-router/dist/vue-router.esm-bundler.js:0
+[  612240ms] [LOG] GoldenPaw App Launched @ http://localhost:5174/src/App.vue:8
+[  613238ms] Object
+[  613588ms] Object
+[  613783ms] Object
+[  613838ms] Object
+[  614038ms] Object
+[  614205ms] Object

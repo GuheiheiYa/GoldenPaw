@@ -1,0 +1,16 @@
+[   16343ms] [WARNING] [vue-router]: importing from 'vue-router/dist/vue-router.esm-bundler.js' is deprecated. Use 'vue-router' directly. @ http://localhost:5174/node_modules/@dcloudio/uni-h5/node_modules/vue-router/dist/vue-router.esm-bundler.js:0
+[   16353ms] [LOG] GoldenPaw App Launched @ http://localhost:5174/src/App.vue:8
+[   26485ms] Object
+[  186441ms] [LOG] 调整目标: 应急备用金 @ http://localhost:5174/src/pages/goals/goals.vue:17
+[  187050ms] [LOG] 存入金额: 应急备用金 @ http://localhost:5174/src/pages/goals/goals.vue:14
+[  187650ms] [LOG] 存入金额: 换新手机 @ http://localhost:5174/src/pages/goals/goals.vue:14
+[  188366ms] [LOG] 调整目标: 换新手机 @ http://localhost:5174/src/pages/goals/goals.vue:17
+[  189216ms] [LOG] 存入金额: 年底旅行基金 @ http://localhost:5174/src/pages/goals/goals.vue:14
+[  189474ms] [LOG] 调整目标: 年底旅行基金 @ http://localhost:5174/src/pages/goals/goals.vue:17
+[  196386ms] Object
+[  196974ms] Object
+[  197115ms] Object
+[  197254ms] Object
+[  197406ms] Object
+[  198550ms] Object
+[  198683ms] Object

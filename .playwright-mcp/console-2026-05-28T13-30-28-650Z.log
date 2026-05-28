@@ -1,0 +1,3 @@
+[     106ms] [WARNING] [vue-router]: importing from 'vue-router/dist/vue-router.esm-bundler.js' is deprecated. Use 'vue-router' directly. @ http://localhost:5174/node_modules/@dcloudio/uni-h5/node_modules/vue-router/dist/vue-router.esm-bundler.js:0
+[     129ms] [LOG] GoldenPaw App Launched @ http://localhost:5174/src/App.vue:8
+[     169ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5174/favicon.ico:0

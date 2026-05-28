@@ -18,8 +18,8 @@
 const actions = [
   { icon: '📊', label: '报表', cls: 'capsule-green', path: '/pages/report/report' },
   { icon: '📋', label: '明细', cls: 'capsule-blue', path: '/pages/detail/detail' },
-  { icon: '💰', label: '存钱', cls: 'capsule-warm', path: '/pages/goal/goal' },
-  { icon: '⚡', label: '待确认', cls: 'capsule-gold', path: '/pages/confirm/confirm', badge: 3 },
+  { icon: '💰', label: '存钱', cls: 'capsule-warm', path: '/pages/goals/goals' },
+  { icon: '⚡', label: '待确认', cls: 'capsule-gold', path: '/pages/pending/pending', badge: 3 },
 ]
 
 /** 导航到对应页面 */

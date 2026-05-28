@@ -1,0 +1,26 @@
+[   33327ms] Object
+[   33799ms] Object
+[   33960ms] Object
+[   51425ms] [LOG] 点击菜单: 导出数据 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   51963ms] [LOG] 点击菜单: 导入数据 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   52244ms] [LOG] 点击菜单: 云同步 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   52459ms] [LOG] 点击菜单: 清空数据 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   53389ms] [LOG] 点击菜单: 主题颜色 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   53641ms] [LOG] 点击菜单: 提醒设置 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   53862ms] [LOG] 点击菜单: 密码/指纹锁 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   54050ms] [LOG] 点击菜单: 密码/指纹锁 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   54849ms] [LOG] 点击菜单: 币种设置 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   55063ms] [LOG] 点击菜单: 账户管理 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   55265ms] [LOG] 点击菜单: 分类管理 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   55545ms] [LOG] 点击菜单: 记账周期 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   55710ms] [LOG] 点击菜单: 记账周期 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   56431ms] [LOG] 点击菜单: 评分鼓励 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   56633ms] [LOG] 点击菜单: 帮助中心 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   56787ms] [LOG] 点击菜单: 帮助中心 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   57027ms] [LOG] 点击菜单: 用户协议 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   57179ms] [LOG] 点击菜单: 用户协议 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   57348ms] [LOG] 点击菜单: GoldenPaw @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   57510ms] [LOG] 点击菜单: GoldenPaw @ http://localhost:5174/src/pages/profile/profile.vue:14
+[   75230ms] Object
+[   75543ms] Object
+[   75684ms] Object

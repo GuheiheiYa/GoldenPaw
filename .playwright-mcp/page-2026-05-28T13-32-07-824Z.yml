@@ -1,0 +1,244 @@
+- generic [ref=e3]:
+  - generic [ref=e23]:
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - generic [ref=e29]: 🐾
+            - generic [ref=e30]: GoldenPaw
+          - generic [ref=e31]:
+            - generic [ref=e33] [cursor=pointer]: 🔍
+            - generic [ref=e35] [cursor=pointer]: 🔔
+        - generic [ref=e36]:
+          - generic [ref=e37]: 本月结余
+          - generic [ref=e38]: ¥251,886.00
+          - generic [ref=e39]:
+            - generic [ref=e40]:
+              - generic [ref=e41]: 收入
+              - generic [ref=e42]: +¥253,000.00
+            - generic [ref=e43]:
+              - generic [ref=e44]: 支出
+              - generic [ref=e45]: "-¥1,114.00"
+      - generic [ref=e46]:
+        - generic [ref=e47] [cursor=pointer]:
+          - generic [ref=e48]: 📊
+          - generic [ref=e49]: 报表
+        - generic [ref=e50] [cursor=pointer]:
+          - generic [ref=e51]: 📋
+          - generic [ref=e52]: 明细
+        - generic [ref=e53] [cursor=pointer]:
+          - generic [ref=e54]: 💰
+          - generic [ref=e55]: 存钱
+        - generic [ref=e56] [cursor=pointer]:
+          - generic [ref=e57]: ⚡
+          - generic [ref=e58]: 待确认
+      - generic [ref=e59]:
+        - generic [ref=e60] [cursor=pointer]:
+          - generic [ref=e61]: 日
+          - generic [ref=e62]: "25"
+        - generic [ref=e63] [cursor=pointer]:
+          - generic [ref=e64]: 一
+          - generic [ref=e65]: "26"
+        - generic [ref=e66] [cursor=pointer]:
+          - generic [ref=e67]: 二
+          - generic [ref=e68]: "27"
+        - generic [ref=e69] [cursor=pointer]:
+          - generic [ref=e70]: 三
+          - generic [ref=e71]: "28"
+        - generic [ref=e72] [cursor=pointer]:
+          - generic [ref=e73]: 四
+          - generic [ref=e74]: "29"
+        - generic [ref=e75] [cursor=pointer]:
+          - generic [ref=e76]: 五
+          - generic [ref=e77]: "30"
+        - generic [ref=e78] [cursor=pointer]:
+          - generic [ref=e79]: 六
+          - generic [ref=e80]: "31"
+      - generic [ref=e81]:
+        - generic [ref=e82]: 本月预算
+        - generic [ref=e83]: 管理
+      - generic [ref=e87]:
+        - generic [ref=e88]:
+          - generic [ref=e89]: 🍜
+          - generic [ref=e90]: 餐饮美食
+          - generic [ref=e91]: ¥1,200
+          - generic [ref=e92]: 剩余 ¥800 / ¥2,000
+        - generic [ref=e95]:
+          - generic [ref=e96]: 🚇
+          - generic [ref=e97]: 交通出行
+          - generic [ref=e98]: ¥480
+          - generic [ref=e99]: 剩余 ¥20 / ¥500
+        - generic [ref=e102]:
+          - generic [ref=e103]: 🛍️
+          - generic [ref=e104]: 购物消费
+          - generic [ref=e105]: ¥320
+          - generic [ref=e106]: 剩余 ¥1,180 / ¥1,500
+      - generic [ref=e109]:
+        - generic [ref=e110]: 存钱目标
+        - generic [ref=e111]: 全部
+      - generic [ref=e112]:
+        - generic [ref=e114]: ✈️
+        - generic [ref=e115]:
+          - generic [ref=e116]: 年底旅行基金
+          - generic [ref=e117]: ¥13,000 / ¥20,000 · 还剩 218 天
+          - generic [ref=e121]: 65%
+      - generic [ref=e122]:
+        - generic [ref=e124]: 📱
+        - generic [ref=e125]:
+          - generic [ref=e126]: 换新手机
+          - generic [ref=e127]: ¥3,200 / ¥8,000 · 还剩 90 天
+          - generic [ref=e131]: 40%
+      - generic [ref=e132]:
+        - generic [ref=e134]: 🎁
+        - generic [ref=e135]:
+          - generic [ref=e136]: 应急备用金
+          - generic [ref=e137]: ¥5,000 / ¥50,000 · 长期目标
+          - generic [ref=e141]: 10%
+      - generic [ref=e142]:
+        - generic [ref=e143]: 最近流水
+        - generic [ref=e144]: 查看全部
+      - generic [ref=e145]:
+        - generic [ref=e146] [cursor=pointer]:
+          - generic [ref=e148]: 🍜
+          - generic [ref=e149]:
+            - generic [ref=e150]: 朋友生日聚餐AA
+            - generic [ref=e151]: 05-22 19:00 · 餐饮
+          - generic [ref=e153]: "-¥42.00"
+        - generic [ref=e154] [cursor=pointer]:
+          - generic [ref=e156]: 💊
+          - generic [ref=e157]:
+            - generic [ref=e158]: 感冒看诊 + 药费
+            - generic [ref=e159]: 05-22 11:20 · 医疗
+          - generic [ref=e161]: "-¥150.00"
+        - generic [ref=e162] [cursor=pointer]:
+          - generic [ref=e164]: 📈
+          - generic [ref=e165]:
+            - generic [ref=e166]: 基金分红
+            - generic [ref=e167]: 05-22 09:00 · 投资
+          - generic [ref=e169]: +¥3,000.00
+        - generic [ref=e170] [cursor=pointer]:
+          - generic [ref=e172]: 🍜
+          - generic [ref=e173]:
+            - generic [ref=e174]: 便利店零食
+            - generic [ref=e175]: 05-23 20:30 · 餐饮
+          - generic [ref=e177]: "-¥28.00"
+        - generic [ref=e178] [cursor=pointer]:
+          - generic [ref=e180]: 🛍️
+          - generic [ref=e181]:
+            - generic [ref=e182]: AirPods Pro
+            - generic [ref=e183]: 05-23 14:00 · 购物
+          - generic [ref=e185]: "-¥350.00"
+        - generic [ref=e186] [cursor=pointer]:
+          - generic [ref=e188]: 🚕
+          - generic [ref=e189]:
+            - generic [ref=e190]: 共享单车月卡
+            - generic [ref=e191]: 05-24 08:40 · 交通
+          - generic [ref=e193]: "-¥15.00"
+        - generic [ref=e194] [cursor=pointer]:
+          - generic [ref=e196]: 🍜
+          - generic [ref=e197]:
+            - generic [ref=e198]: 周末早茶
+            - generic [ref=e199]: 05-24 10:30 · 餐饮
+          - generic [ref=e201]: "-¥38.00"
+        - generic [ref=e202] [cursor=pointer]:
+          - generic [ref=e204]: 🎬
+          - generic [ref=e205]:
+            - generic [ref=e206]: 电影票 x2 + 爆米花
+            - generic [ref=e207]: 05-24 19:00 · 娱乐
+          - generic [ref=e209]: "-¥89.00"
+    - generic [ref=e210]:
+      - generic [ref=e211] [cursor=pointer]:
+        - generic [ref=e212]: +
+        - generic [ref=e213]: 记账
+      - generic [ref=e214] [cursor=pointer]:
+        - generic [ref=e215]: 🏠
+        - generic [ref=e216]: 首页
+      - generic [ref=e217] [cursor=pointer]:
+        - generic [ref=e218]: 🤖
+        - generic [ref=e219]: AI记账
+      - generic [ref=e221] [cursor=pointer]:
+        - generic [ref=e222]: 💰
+        - generic [ref=e223]: 资产
+      - generic [ref=e224] [cursor=pointer]:
+        - generic [ref=e225]: 👤
+        - generic [ref=e226]: 我的
+    - generic [ref=e720]:
+      - generic [ref=e722]:
+        - generic [ref=e724] [cursor=pointer]: 支出
+        - generic [ref=e726] [cursor=pointer]: 收入
+        - generic [ref=e728] [cursor=pointer]: 转账
+      - generic [ref=e729]:
+        - generic [ref=e730]: ¥
+        - generic [ref=e731]: "0.00"
+      - generic [ref=e737]:
+        - generic [ref=e738] [cursor=pointer]:
+          - generic [ref=e740]: 🍜
+          - generic [ref=e741]: 餐饮
+        - generic [ref=e742] [cursor=pointer]:
+          - generic [ref=e744]: 🚕
+          - generic [ref=e745]: 交通
+        - generic [ref=e746] [cursor=pointer]:
+          - generic [ref=e748]: 🏠
+          - generic [ref=e749]: 居住
+        - generic [ref=e750] [cursor=pointer]:
+          - generic [ref=e752]: 🛍️
+          - generic [ref=e753]: 购物
+        - generic [ref=e754] [cursor=pointer]:
+          - generic [ref=e756]: 🎬
+          - generic [ref=e757]: 娱乐
+        - generic [ref=e758] [cursor=pointer]:
+          - generic [ref=e760]: 📱
+          - generic [ref=e761]: 通讯
+        - generic [ref=e762] [cursor=pointer]:
+          - generic [ref=e764]: 💊
+          - generic [ref=e765]: 医疗
+        - generic [ref=e766] [cursor=pointer]:
+          - generic [ref=e768]: 📚
+          - generic [ref=e769]: 学习
+        - generic [ref=e770] [cursor=pointer]:
+          - generic [ref=e772]: 🎁
+          - generic [ref=e773]: 人情
+        - generic [ref=e774] [cursor=pointer]:
+          - generic [ref=e776]: 🐱
+          - generic [ref=e777]: 宠物
+        - generic [ref=e778] [cursor=pointer]:
+          - generic [ref=e780]: 💰
+          - generic [ref=e781]: 其他
+      - generic [ref=e782]:
+        - generic [ref=e783] [cursor=pointer]:
+          - generic [ref=e784]: 📅
+          - generic [ref=e785]: 今天
+        - generic [ref=e786] [cursor=pointer]:
+          - generic [ref=e787]: 💳
+          - generic [ref=e788]: 储蓄卡
+        - generic [ref=e789] [cursor=pointer]:
+          - generic [ref=e790]: 🏷️
+          - generic [ref=e791]: 标签
+      - generic [ref=e794]:
+        - generic: 添加备注...
+        - textbox [ref=e795]
+      - generic [ref=e796]:
+        - generic [ref=e797]:
+          - generic [ref=e799] [cursor=pointer]: "7"
+          - generic [ref=e801] [cursor=pointer]: "8"
+          - generic [ref=e803] [cursor=pointer]: "9"
+          - generic [ref=e805] [cursor=pointer]: ←
+        - generic [ref=e806]:
+          - generic [ref=e808] [cursor=pointer]: "4"
+          - generic [ref=e810] [cursor=pointer]: "5"
+          - generic [ref=e812] [cursor=pointer]: "6"
+          - generic [ref=e814] [cursor=pointer]: +
+        - generic [ref=e815]:
+          - generic [ref=e817] [cursor=pointer]: "1"
+          - generic [ref=e819] [cursor=pointer]: "2"
+          - generic [ref=e821] [cursor=pointer]: "3"
+          - generic [ref=e823] [cursor=pointer]: "-"
+        - generic [ref=e824]:
+          - generic [ref=e826] [cursor=pointer]: "0"
+          - generic [ref=e828] [cursor=pointer]: .
+          - generic [ref=e830] [cursor=pointer]: 完成
+  - generic [ref=e7]:
+    - generic [ref=e11] [cursor=pointer]: 首页
+    - generic [ref=e14] [cursor=pointer]: AI记账
+    - generic [ref=e17] [cursor=pointer]: 资产
+    - generic [ref=e20] [cursor=pointer]: 我的

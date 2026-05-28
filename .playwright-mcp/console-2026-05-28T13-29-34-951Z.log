@@ -1,0 +1,3 @@
+[     101ms] [LOG] [CanvasRenderer] 初始化完成, canvas size: 26 x 22 @ http://localhost:5173/src/renderer/canvas/canvas-renderer.ts:29
+[     101ms] [LOG] [Vibe Notch] Renderer process started in development mode @ http://localhost:5173/src/main.ts:10
+[     217ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/favicon.ico:0

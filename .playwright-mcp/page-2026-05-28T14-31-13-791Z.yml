@@ -1,0 +1,149 @@
+- generic [ref=e984]:
+  - generic [ref=e985]:
+    - generic [ref=e987] [cursor=pointer]: ←
+    - generic [ref=e988]: 明细
+    - generic [ref=e989]:
+      - generic [ref=e991] [cursor=pointer]: 🔍
+      - generic [ref=e993] [cursor=pointer]: ⚙
+  - generic [ref=e995]:
+    - generic [ref=e997] [cursor=pointer]: 全部
+    - generic [ref=e999] [cursor=pointer]: 支出
+    - generic [ref=e1001] [cursor=pointer]: 收入
+    - generic [ref=e1003] [cursor=pointer]: 转账
+  - generic [ref=e1004]:
+    - generic [ref=e1005]:
+      - generic [ref=e1006]: 2026年5月
+      - generic [ref=e1007]: 支出 ¥1,114.00
+    - generic [ref=e1008]:
+      - generic [ref=e1009] [cursor=pointer]:
+        - generic [ref=e1011]: 🍜
+        - generic [ref=e1012]:
+          - generic [ref=e1013]: 午餐 - 黄焖鸡
+          - generic [ref=e1014]: 05-28 12:30 · 餐饮
+        - generic [ref=e1015]:
+          - generic [ref=e1016]: "-¥35.00"
+          - generic [ref=e1018]: 预算内
+      - generic [ref=e1019] [cursor=pointer]:
+        - generic [ref=e1021]: 🍜
+        - generic [ref=e1022]:
+          - generic [ref=e1023]: 瑞幸咖啡
+          - generic [ref=e1024]: 05-28 09:15 · 餐饮
+        - generic [ref=e1025]:
+          - generic [ref=e1026]: "-¥18.00"
+          - generic [ref=e1028]: 预算内
+      - generic [ref=e1029] [cursor=pointer]:
+        - generic [ref=e1031]: 🚕
+        - generic [ref=e1032]:
+          - generic [ref=e1033]: 地铁充值
+          - generic [ref=e1034]: 05-28 08:00 · 交通
+        - generic [ref=e1035]:
+          - generic [ref=e1036]: "-¥50.00"
+          - generic [ref=e1038]: 预算内
+      - generic [ref=e1039] [cursor=pointer]:
+        - generic [ref=e1041]: 🍜
+        - generic [ref=e1042]:
+          - generic [ref=e1043]: 晚餐 - 海底捞
+          - generic [ref=e1044]: 05-27 18:45 · 餐饮
+        - generic [ref=e1045]:
+          - generic [ref=e1046]: "-¥68.00"
+          - generic [ref=e1048]: 预算内
+      - generic [ref=e1049] [cursor=pointer]:
+        - generic [ref=e1051]: 🍜
+        - generic [ref=e1052]:
+          - generic [ref=e1053]: 早餐 + 午餐外卖
+          - generic [ref=e1054]: 05-27 07:50 · 餐饮
+        - generic [ref=e1055]:
+          - generic [ref=e1056]: "-¥25.00"
+          - generic [ref=e1058]: 预算内
+      - generic [ref=e1059] [cursor=pointer]:
+        - generic [ref=e1061]: 🚕
+        - generic [ref=e1062]:
+          - generic [ref=e1063]: 打车回家
+          - generic [ref=e1064]: 05-26 22:10 · 交通
+        - generic [ref=e1065]:
+          - generic [ref=e1066]: "-¥32.00"
+          - generic [ref=e1068]: 预算内
+      - generic [ref=e1069] [cursor=pointer]:
+        - generic [ref=e1071]: 🛍️
+        - generic [ref=e1072]:
+          - generic [ref=e1073]: 优衣库换季衣服
+          - generic [ref=e1074]: 05-26 15:20 · 购物
+        - generic [ref=e1075]:
+          - generic [ref=e1076]: "-¥129.00"
+          - generic [ref=e1078]: 预算内
+      - generic [ref=e1079] [cursor=pointer]:
+        - generic [ref=e1081]: 🍜
+        - generic [ref=e1082]:
+          - generic [ref=e1083]: 菜市场买菜
+          - generic [ref=e1084]: 05-25 17:30 · 餐饮
+        - generic [ref=e1085]:
+          - generic [ref=e1086]: "-¥45.00"
+          - generic [ref=e1088]: 预算内
+      - generic [ref=e1089] [cursor=pointer]:
+        - generic [ref=e1091]: 💰
+        - generic [ref=e1092]:
+          - generic [ref=e1093]: 5月工资
+          - generic [ref=e1094]: 05-25 10:00 · 工资
+        - generic [ref=e1096]: +¥250,000.00
+      - generic [ref=e1097] [cursor=pointer]:
+        - generic [ref=e1099]: 🎬
+        - generic [ref=e1100]:
+          - generic [ref=e1101]: 电影票 x2 + 爆米花
+          - generic [ref=e1102]: 05-24 19:00 · 娱乐
+        - generic [ref=e1103]:
+          - generic [ref=e1104]: "-¥89.00"
+          - generic [ref=e1106]: 预算内
+      - generic [ref=e1107] [cursor=pointer]:
+        - generic [ref=e1109]: 🍜
+        - generic [ref=e1110]:
+          - generic [ref=e1111]: 周末早茶
+          - generic [ref=e1112]: 05-24 10:30 · 餐饮
+        - generic [ref=e1113]:
+          - generic [ref=e1114]: "-¥38.00"
+          - generic [ref=e1116]: 预算内
+      - generic [ref=e1117] [cursor=pointer]:
+        - generic [ref=e1119]: 🚕
+        - generic [ref=e1120]:
+          - generic [ref=e1121]: 共享单车月卡
+          - generic [ref=e1122]: 05-24 08:40 · 交通
+        - generic [ref=e1123]:
+          - generic [ref=e1124]: "-¥15.00"
+          - generic [ref=e1126]: 预算内
+      - generic [ref=e1127] [cursor=pointer]:
+        - generic [ref=e1129]: 🍜
+        - generic [ref=e1130]:
+          - generic [ref=e1131]: 便利店零食
+          - generic [ref=e1132]: 05-23 20:30 · 餐饮
+        - generic [ref=e1133]:
+          - generic [ref=e1134]: "-¥28.00"
+          - generic [ref=e1136]: 预算内
+      - generic [ref=e1137] [cursor=pointer]:
+        - generic [ref=e1139]: 🛍️
+        - generic [ref=e1140]:
+          - generic [ref=e1141]: AirPods Pro
+          - generic [ref=e1142]: 05-23 14:00 · 购物
+        - generic [ref=e1143]:
+          - generic [ref=e1144]: "-¥350.00"
+          - generic [ref=e1146]: 预算内
+      - generic [ref=e1147] [cursor=pointer]:
+        - generic [ref=e1149]: 🍜
+        - generic [ref=e1150]:
+          - generic [ref=e1151]: 朋友生日聚餐AA
+          - generic [ref=e1152]: 05-22 19:00 · 餐饮
+        - generic [ref=e1153]:
+          - generic [ref=e1154]: "-¥42.00"
+          - generic [ref=e1156]: 预算内
+      - generic [ref=e1157] [cursor=pointer]:
+        - generic [ref=e1159]: 💊
+        - generic [ref=e1160]:
+          - generic [ref=e1161]: 感冒看诊 + 药费
+          - generic [ref=e1162]: 05-22 11:20 · 医疗
+        - generic [ref=e1163]:
+          - generic [ref=e1164]: "-¥150.00"
+          - generic [ref=e1166]: 预算内
+      - generic [ref=e1167] [cursor=pointer]:
+        - generic [ref=e1169]: 📈
+        - generic [ref=e1170]:
+          - generic [ref=e1171]: 基金分红
+          - generic [ref=e1172]: 05-22 09:00 · 投资
+        - generic [ref=e1174]: +¥3,000.00
