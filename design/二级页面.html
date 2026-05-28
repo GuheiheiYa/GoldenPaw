@@ -1,0 +1,738 @@
+
+# 明细页面 - 从首页"明细"胶囊进入
+detail_page = """<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GoldenPaw — 明细</title>
+<style>
+  :root {
+    --gp-brand-50: #FDF8F3; --gp-brand-100: #F5E6D3; --gp-brand-500: #C8956C; --gp-brand-600: #A67B5B;
+    --gp-success-500: #6B8E6B; --gp-success-100: #E8F0E8;
+    --gp-danger-500: #C06C5F; --gp-danger-100: #F5E0DC;
+    --gp-accent-500: #7A9EAF; --gp-accent-100: #E8F1F5;
+    --gp-text-primary: #3D3229; --gp-text-secondary: #7A6B5D; --gp-text-tertiary: #A89B8E;
+    --gp-bg-primary: #FDF8F3; --gp-bg-secondary: #F7EDE0; --gp-surface: #FFFFFF;
+    --gp-border: #EDE4D8;
+    --gp-gradient-brand: linear-gradient(135deg, #C8956C, #A67B5B);
+    --gp-shadow-sm: 0 2px 8px rgba(61,50,41,0.04); --gp-shadow-md: 0 8px 24px rgba(61,50,41,0.06); --gp-shadow-lg: 0 16px 48px rgba(61,50,41,0.08);
+    --gp-radius-sm: 12px; --gp-radius-md: 16px; --gp-radius-lg: 20px; --gp-radius-xl: 24px; --gp-radius-full: 100px;
+    --gp-space-1: 4px; --gp-space-2: 8px; --gp-space-3: 12px; --gp-space-4: 16px; --gp-space-5: 20px; --gp-space-6: 24px;
+    --gp-font-sans: -apple-system, 'SF Pro Display', 'Segoe UI', 'PingFang SC', sans-serif;
+    --gp-transition-base: 0.2s ease;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--gp-font-sans); background: var(--gp-bg-primary); color: var(--gp-text-primary); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  .app { max-width: 414px; margin: 0 auto; min-height: 100vh; position: relative; padding-bottom: 40px; background: linear-gradient(180deg, var(--gp-bg-primary) 0%, var(--gp-bg-secondary) 100%); }
+
+  /* Header */
+  .header { padding: 48px 24px 16px; display: flex; align-items: center; gap: 12px; }
+  .back-btn { width: 40px; height: 40px; border-radius: 12px; background: var(--gp-surface); border: 1px solid var(--gp-border); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--gp-shadow-sm); }
+  .back-btn svg { width: 20px; height: 20px; color: var(--gp-text-secondary); }
+  .header-title { font: 700 20px/1.3 var(--gp-font-sans); letter-spacing: -0.3px; flex: 1; }
+  .header-actions { display: flex; gap: 8px; }
+  .icon-btn { width: 40px; height: 40px; border-radius: 12px; background: var(--gp-surface); border: 1px solid var(--gp-border); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--gp-shadow-sm); }
+  .icon-btn svg { width: 18px; height: 18px; color: var(--gp-text-secondary); }
+
+  /* Filter Tabs */
+  .filter-bar { display: flex; gap: 8px; padding: 0 24px 16px; }
+  .filter-tab { flex: 1; padding: 10px; border-radius: 12px; background: var(--gp-surface); border: 1px solid var(--gp-border); font: 700 13px/1.4 var(--gp-font-sans); color: var(--gp-text-secondary); text-align: center; cursor: pointer; }
+  .filter-tab.active { background: var(--gp-gradient-brand); color: white; border-color: transparent; box-shadow: var(--gp-shadow-brand); }
+
+  /* Month Group */
+  .month-group { padding: 0 24px; }
+  .month-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0 8px; }
+  .month-name { font: 700 16px/1.4 var(--gp-font-sans); }
+  .month-total { font: 700 14px/1.4 var(--gp-font-sans); color: var(--gp-text-secondary); }
+
+  /* Transaction Item */
+  .tx-item { display: flex; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--gp-border); cursor: pointer; }
+  .tx-item:last-child { border-bottom: none; }
+  .tx-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-right: 14px; flex-shrink: 0; }
+  .tx-body { flex: 1; }
+  .tx-title { font: 700 15px/1.4 var(--gp-font-sans); margin-bottom: 2px; }
+  .tx-meta { font: 600 12px/1.4 var(--gp-font-sans); color: var(--gp-text-secondary); }
+  .tx-right { text-align: right; }
+  .tx-amount { font: 700 16px/1.4 var(--gp-font-sans); font-variant-numeric: tabular-nums; }
+  .tx-amount.out { color: var(--gp-text-primary); }
+  .tx-amount.in { color: var(--gp-success-500); }
+  .tx-tag { display: inline-block; margin-top: 4px; padding: 2px 8px; border-radius: 4px; font: 700 10px/1.4 var(--gp-font-sans); background: var(--gp-brand-50); color: var(--gp-brand-600); }
+
+  /* FAB */
+  .fab { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; background: var(--gp-gradient-brand); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: var(--gp-shadow-brand); border: none; z-index: 50; }
+  .fab:active { transform: scale(0.92); }
+  .fab svg { width: 24px; height: 24px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <button class="back-btn" onclick="history.back()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="header-title">明细</div>
+    <div class="header-actions">
+      <button class="icon-btn" aria-label="搜索">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      </button>
+      <button class="icon-btn" aria-label="筛选">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-bar">
+    <div class="filter-tab active">全部</div>
+    <div class="filter-tab">支出</div>
+    <div class="filter-tab">收入</div>
+    <div class="filter-tab">转账</div>
+  </div>
+
+  <!-- May 2026 -->
+  <div class="month-group">
+    <div class="month-header">
+      <span class="month-name">2026年5月</span>
+      <span class="month-total">支出 ¥3,858</span>
+    </div>
+    <div class="tx-item">
+      <div class="tx-icon" style="background: linear-gradient(135deg, #FAF0E6, var(--gp-brand-100));">🍔</div>
+      <div class="tx-body">
+        <div class="tx-title">午餐 - 麦当劳</div>
+        <div class="tx-meta">05-26 12:30 · 餐饮美食</div>
+      </div>
+      <div class="tx-right">
+        <div class="tx-amount out">-¥42.50</div>
+        <span class="tx-tag">预算内</span>
+      </div>
+    </div>
+    <div class="tx-item">
+      <div class="tx-icon" style="background: linear-gradient(135deg, var(--gp-success-100), #D4E6D4);">🚕</div>
+      <div class="tx-body">
+        <div class="tx-title">滴滴出行</div>
+        <div class="tx-meta">05-26 09:15 · 交通出行</div>
+      </div>
+      <div class="tx-right">
+        <div class="tx-amount out">-¥28.00</div>
+        <span class="tx-tag">预算内</span>
+      </div>
+    </div>
+    <div class="tx-item">
+      <div class="tx-icon" style="background: linear-gradient(135deg, var(--gp-accent-100), #D6E5EC);">💰</div>
+      <div class="tx-body">
+        <div class="tx-title">工资收入</div>
+        <div class="tx-meta">05-25 10:00 · 主动收入</div>
+      </div>
+      <div class="tx-right">
+        <div class="tx-amount in">+¥12,500</div>
+      </div>
+    </div>
+    <div class="tx-item">
+      <div class="tx-icon" style="background: linear-gradient(135deg, #FFF8E1, #FFECB3);">🎬</div>
+      <div class="tx-body">
+        <div class="tx-title">电影票 × 2</div>
+        <div class="tx-meta">05-24 19:30 · 休闲娱乐</div>
+      </div>
+      <div class="tx-right">
+        <div class="tx-amount out">-¥78.00</div>
+        <span class="tx-tag">预算内</span>
+      </div>
+    </div>
+    <div class="tx-item">
+      <div class="tx-icon" style="background: linear-gradient(135deg, #FAF0E6, var(--gp-brand-100));">☕</div>
+      <div class="tx-body">
+        <div class="tx-title">星巴克拿铁</div>
+        <div class="tx-meta">05-24 14:20 · 餐饮美食</div>
+      </div>
+      <div class="tx-right">
+        <div class="tx-amount out">-¥32.00</div>
+        <span class="tx-tag">预算内</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Apr 2026 -->
+  <div class="month-group">
+    <div class="month-header">
+      <span class="month-name">2026年4月</span>
+      <span class="month-total">支出 ¥4,120</span>
+    </div>
+    <div class="tx-item">
+      <div class="tx-icon" style="background: linear-gradient(135deg, var(--gp-danger-100), #F0D5CF);">🛍️</div>
+      <div class="tx-body">
+        <div class="tx-title">优衣库购物</div>
+        <div class="tx-meta">04-28 15:20 · 购物消费</div>
+      </div>
+      <div class="tx-right">
+        <div class="tx-amount out">-¥356.00</div>
+      </div>
+    </div>
+    <div class="tx-item">
+      <div class="tx-icon" style="background: linear-gradient(135deg, var(--gp-accent-100), #D6E5EC);">📱</div>
+      <div class="tx-body">
+        <div class="tx-title">话费充值</div>
+        <div class="tx-meta">04-25 10:00 · 通讯</div>
+      </div>
+      <div class="tx-right">
+        <div class="tx-amount out">-¥100.00</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="alert('弹出记账BottomSheet')">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+</body>
+</html>"""
+
+with open('/mnt/agents/output/GoldenPaw_Detail.html', 'w', encoding='utf-8') as f:
+    f.write(detail_page)
+
+# 存钱/目标页面 - 从首页"存钱"胶囊进入
+goals_page = """<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GoldenPaw — 存钱目标</title>
+<style>
+  :root {
+    --gp-brand-50: #FDF8F3; --gp-brand-100: #F5E6D3; --gp-brand-500: #C8956C; --gp-brand-600: #A67B5B;
+    --gp-success-500: #6B8E6B; --gp-success-100: #E8F0E8;
+    --gp-danger-500: #C06C5F; --gp-danger-100: #F5E0DC;
+    --gp-accent-500: #7A9EAF; --gp-accent-100: #E8F1F5;
+    --gp-text-primary: #3D3229; --gp-text-secondary: #7A6B5D; --gp-text-tertiary: #A89B8E;
+    --gp-bg-primary: #FDF8F3; --gp-bg-secondary: #F7EDE0; --gp-surface: #FFFFFF;
+    --gp-border: #EDE4D8;
+    --gp-gradient-brand: linear-gradient(135deg, #C8956C, #A67B5B);
+    --gp-gradient-success: linear-gradient(90deg, #6B8E6B, #8FBC8F);
+    --gp-gradient-danger: linear-gradient(90deg, #C06C5F, #D4857A);
+    --gp-shadow-sm: 0 2px 8px rgba(61,50,41,0.04); --gp-shadow-md: 0 8px 24px rgba(61,50,41,0.06); --gp-shadow-lg: 0 16px 48px rgba(61,50,41,0.08); --gp-shadow-brand: 0 4px 16px rgba(200,149,108,0.35);
+    --gp-radius-sm: 12px; --gp-radius-md: 16px; --gp-radius-lg: 20px; --gp-radius-xl: 24px; --gp-radius-full: 100px;
+    --gp-space-1: 4px; --gp-space-2: 8px; --gp-space-3: 12px; --gp-space-4: 16px; --gp-space-5: 20px; --gp-space-6: 24px;
+    --gp-font-sans: -apple-system, 'SF Pro Display', 'Segoe UI', 'PingFang SC', sans-serif;
+    --gp-transition-base: 0.2s ease;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--gp-font-sans); background: var(--gp-bg-primary); color: var(--gp-text-primary); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  .app { max-width: 414px; margin: 0 auto; min-height: 100vh; position: relative; padding-bottom: 40px; background: linear-gradient(180deg, var(--gp-bg-primary) 0%, var(--gp-bg-secondary) 100%); }
+
+  /* Header */
+  .header { padding: 48px 24px 16px; display: flex; justify-content: space-between; align-items: center; }
+  .back-btn { width: 40px; height: 40px; border-radius: 12px; background: var(--gp-surface); border: 1px solid var(--gp-border); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--gp-shadow-sm); }
+  .back-btn svg { width: 20px; height: 20px; color: var(--gp-text-secondary); }
+  .header-title { font: 700 20px/1.3 var(--gp-font-sans); letter-spacing: -0.3px; }
+  .header-action { padding: 8px 16px; border-radius: 100px; background: var(--gp-gradient-brand); color: white; font: 700 13px/1.4 var(--gp-font-sans); border: none; cursor: pointer; box-shadow: var(--gp-shadow-brand); }
+
+  /* Segmented */
+  .segmented { display: flex; background: var(--gp-surface); border-radius: 100px; padding: 4px; margin: 0 24px 20px; box-shadow: var(--gp-shadow-sm); border: 2px solid var(--gp-border); }
+  .seg-item { flex: 1; text-align: center; padding: 10px; border-radius: 100px; font: 700 14px/1.4 var(--gp-font-sans); color: var(--gp-text-secondary); cursor: pointer; transition: var(--gp-transition-base); border: none; background: transparent; font-family: inherit; }
+  .seg-item.active { background: var(--gp-gradient-brand); color: white; box-shadow: 0 2px 8px rgba(200,149,108,0.25); }
+
+  /* Goal Card Large */
+  .goal-card-lg { margin: 0 24px 16px; background: var(--gp-surface); border-radius: 20px; padding: 24px; box-shadow: var(--gp-shadow-sm); border: 2px solid transparent; position: relative; overflow: hidden; }
+  .goal-card-lg:nth-child(1) { border-color: rgba(200,149,108,0.25); }
+  .goal-card-lg:nth-child(2) { border-color: rgba(122,158,175,0.25); }
+  .goal-card-lg:nth-child(3) { border-color: rgba(107,142,107,0.25); }
+  .goal-lg-top { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .goal-lg-icon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+  .goal-lg-icon-1 { background: linear-gradient(135deg, #FAF0E6, var(--gp-brand-100)); }
+  .goal-lg-icon-2 { background: linear-gradient(135deg, var(--gp-accent-100), #D6E5EC); }
+  .goal-lg-icon-3 { background: linear-gradient(135deg, var(--gp-success-100), #D4E6D4); }
+  .goal-lg-info { flex: 1; }
+  .goal-lg-name { font: 700 18px/1.4 var(--gp-font-sans); margin-bottom: 4px; }
+  .goal-lg-amount { font: 600 14px/1.4 var(--gp-font-sans); color: var(--gp-text-secondary); }
+  .goal-lg-ring { width: 60px; height: 60px; position: relative; }
+  .goal-lg-ring svg { transform: rotate(-90deg); }
+  .goal-lg-ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font: 800 14px/1 var(--gp-font-sans); }
+  .goal-lg-progress { margin-bottom: 16px; }
+  .goal-lg-bar-track { height: 12px; background: var(--gp-border); border-radius: 6px; overflow: hidden; }
+  .goal-lg-bar-fill { height: 100%; border-radius: 6px; transition: width 0.6s ease; }
+  .goal-lg-stats { display: flex; gap: 16px; margin-bottom: 16px; }
+  .goal-lg-stat { flex: 1; padding: 12px; border-radius: 12px; background: var(--gp-bg-primary); text-align: center; }
+  .goal-lg-stat-label { font: 600 11px/1.4 var(--gp-font-sans); color: var(--gp-text-tertiary); margin-bottom: 4px; }
+  .goal-lg-stat-value { font: 700 16px/1.4 var(--gp-font-sans); }
+  .goal-lg-actions { display: flex; gap: 10px; }
+  .goal-lg-btn { flex: 1; padding: 12px; border-radius: 12px; font: 700 14px/1.4 var(--gp-font-sans); text-align: center; cursor: pointer; border: none; font-family: inherit; }
+  .goal-lg-btn.primary { background: var(--gp-gradient-brand); color: white; box-shadow: var(--gp-shadow-brand); }
+  .goal-lg-btn.secondary { background: var(--gp-bg-primary); color: var(--gp-text-secondary); border: 1px solid var(--gp-border); }
+
+  /* Budget Section */
+  .budget-section { margin: 0 24px; }
+  .budget-total { background: var(--gp-surface); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: var(--gp-shadow-sm); border: 1px solid var(--gp-border); }
+  .budget-total-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .budget-total-label { font: 600 13px/1.4 var(--gp-font-sans); color: var(--gp-text-secondary); }
+  .budget-total-value { font: 700 14px/1.4 var(--gp-font-sans); }
+  .budget-total-bar { height: 10px; background: var(--gp-border); border-radius: 5px; overflow: hidden; margin-bottom: 8px; }
+  .budget-total-fill { height: 100%; border-radius: 5px; }
+  .budget-total-stats { display: flex; justify-content: space-between; font: 600 12px/1.4 var(--gp-font-sans); color: var(--gp-text-secondary); }
+  .budget-item { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--gp-border); }
+  .budget-item:last-child { border-bottom: none; }
+  .budget-item-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .budget-item-info { flex: 1; }
+  .budget-item-name { font: 600 14px/1.4 var(--gp-font-sans); margin-bottom: 2px; }
+  .budget-item-bar { height: 6px; background: var(--gp-border); border-radius: 3px; overflow: hidden; }
+  .budget-item-fill { height: 100%; border-radius: 3px; }
+  .budget-item-right { text-align: right; }
+  .budget-item-used { font: 700 14px/1.4 var(--gp-font-sans); }
+  .budget-item-total { font: 600 11px/1.4 var(--gp-font-sans); color: var(--gp-text-tertiary); }
+  .add-budget { margin: 16px 24px; padding: 14px; border-radius: 16px; border: 2px dashed var(--gp-border); display: flex; align-items: center; justify-content: center; gap: 8px; font: 700 14px/1.4 var(--gp-font-sans); color: var(--gp-text-secondary); cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <button class="back-btn" onclick="history.back()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="header-title">存钱与预算</div>
+    <button class="header-action">➕ 新建</button>
+  </div>
+
+  <!-- Segmented -->
+  <div class="segmented">
+    <button class="seg-item active">存钱目标</button>
+    <button class="seg-item">预算管理</button>
+  </div>
+
+  <!-- Goals -->
+  <div class="goal-card-lg">
+    <div class="goal-lg-top">
+      <div class="goal-lg-icon goal-lg-icon-1">✈️</div>
+      <div class="goal-lg-info">
+        <div class="goal-lg-name">年底旅行基金</div>
+        <div class="goal-lg-amount">¥13,000 / ¥20,000</div>
+      </div>
+      <div class="goal-lg-ring">
+        <svg width="60" height="60" viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="#EDE4D8" stroke-width="6"/>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="#C8956C" stroke-width="6" stroke-dasharray="106 163" stroke-linecap="round"/>
+        </svg>
+        <div class="goal-lg-ring-text">65%</div>
+      </div>
+    </div>
+    <div class="goal-lg-progress">
+      <div class="goal-lg-bar-track"><div class="goal-lg-bar-fill" style="width:65%; background: var(--gp-gradient-brand);"></div></div>
+    </div>
+    <div class="goal-lg-stats">
+      <div class="goal-lg-stat">
+        <div class="goal-lg-stat-label">剩余天数</div>
+        <div class="goal-lg-stat-value">218</div>
+      </div>
+      <div class="goal-lg-stat">
+        <div class="goal-lg-stat-label">每月需存</div>
+        <div class="goal-lg-stat-value">¥3,200</div>
+      </div>
+      <div class="goal-lg-stat">
+        <div class="goal-lg-stat-label">已存进度</div>
+        <div class="goal-lg-stat-value">65%</div>
+      </div>
+    </div>
+    <div class="goal-lg-actions">
+      <button class="goal-lg-btn primary">存入金额</button>
+      <button class="goal-lg-btn secondary">调整目标</button>
+    </div>
+  </div>
+
+  <div class="goal-card-lg">
+    <div class="goal-lg-top">
+      <div class="goal-lg-icon goal-lg-icon-2">📱</div>
+      <div class="goal-lg-info">
+        <div class="goal-lg-name">换新手机</div>
+        <div class="goal-lg-amount">¥3,200 / ¥8,000</div>
+      </div>
+      <div class="goal-lg-ring">
+        <svg width="60" height="60" viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="#EDE4D8" stroke-width="6"/>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="#7A9EAF" stroke-width="6" stroke-dasharray="65 163" stroke-linecap="round"/>
+        </svg>
+        <div class="goal-lg-ring-text">40%</div>
+      </div>
+    </div>
+    <div class="goal-lg-progress">
+      <div class="goal-lg-bar-track"><div class="goal-lg-bar-fill" style="width:40%; background: var(--gp-accent-500);"></div></div>
+    </div>
+    <div class="goal-lg-stats">
+      <div class="goal-lg-stat">
+        <div class="goal-lg-stat-label">剩余天数</div>
+        <div class="goal-lg-stat-value">90</div>
+      </div>
+      <div class="goal-lg-stat">
+        <div class="goal-lg-stat-label">每月需存</div>
+        <div class="goal-lg-stat-value">¥5,400</div>
+      </div>
+      <div class="goal-lg-stat">
+        <div class="goal-lg-stat-label">已存进度</div>
+        <div class="goal-lg-stat-value">40%</div>
+      </div>
+    </div>
+    <div class="goal-lg-actions">
+      <button class="goal-lg-btn primary">存入金额</button>
+      <button class="goal-lg-btn secondary">调整目标</button>
+    </div>
+  </div>
+
+  <div class="goal-card-lg">
+    <div class="goal-lg-top">
+      <div class="goal-lg-icon goal-lg-icon-3">🎁</div>
+      <div class="goal-lg-info">
+        <div class="goal-lg-name">应急备用金</div>
+        <div class="goal-lg-amount">¥5,000 / ¥50,000</div>
+      </div>
+      <div class="goal-lg-ring">
+        <svg width="60" height="60" viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="26" fill="none" stroke="#EDE4D8" stroke-width="6"/>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="#6B8E6B" stroke-width="6" stroke-dasharray="16 163" stroke-linecap="round"/>
+        </svg>
+        <div class="goal-lg-ring-text">10%</div>
+      </div>
+    </div>
+    <div class="goal-lg-progress">
+      <div class="goal-lg-bar-track"><div class="goal-lg-bar-fill" style="width:10%; background: var(--gp-success-500);"></div></div>
+    </div>
+    <div class="goal-lg-stats">
+      <div class="goal-lg-stat">
+        <div class="goal-lg-stat-label">目标类型</div>
+        <div class="goal-lg-stat-value">长期</div>
+      </div>
+      <div class="goal-lg-stat">
+        <div class="goal-lg-stat-label">建议月存</div>
+        <div class="goal-lg-stat-value">¥2,000</div>
+      </div>
+      <div class="goal-lg-stat">
+        <div class="goal-lg-stat-label">已存进度</div>
+        <div class="goal-lg-stat-value">10%</div>
+      </div>
+    </div>
+    <div class="goal-lg-actions">
+      <button class="goal-lg-btn primary">存入金额</button>
+      <button class="goal-lg-btn secondary">调整目标</button>
+    </div>
+  </div>
+
+  <!-- Budget Section (hidden by default, shown when segmented switched) -->
+  <div class="budget-section" style="display:none;">
+    <div class="budget-total">
+      <div class="budget-total-header">
+        <span class="budget-total-label">本月总预算</span>
+        <span class="budget-total-value">¥8,000</span>
+      </div>
+      <div class="budget-total-bar"><div class="budget-total-fill" style="width:57%; background: var(--gp-gradient-brand);"></div></div>
+      <div class="budget-total-stats">
+        <span>已用 ¥4,580</span>
+        <span>剩余 ¥3,420</span>
+      </div>
+    </div>
+    <div style="background: var(--gp-surface); border-radius: 16px; padding: 0 20px; box-shadow: var(--gp-shadow-sm); border: 1px solid var(--gp-border);">
+      <div class="budget-item">
+        <div class="budget-item-icon" style="background: linear-gradient(135deg, #FAF0E6, var(--gp-brand-100));">🍜</div>
+        <div class="budget-item-info">
+          <div class="budget-item-name">餐饮美食</div>
+          <div class="budget-item-bar"><div class="budget-item-fill" style="width:60%; background: var(--gp-brand-500);"></div></div>
+        </div>
+        <div class="budget-item-right">
+          <div class="budget-item-used">¥1,200</div>
+          <div class="budget-item-total">/ ¥2,000</div>
+        </div>
+      </div>
+      <div class="budget-item">
+        <div class="budget-item-icon" style="background: linear-gradient(135deg, var(--gp-success-100), #D4E6D4);">🚇</div>
+        <div class="budget-item-info">
+          <div class="budget-item-name">交通出行</div>
+          <div class="budget-item-bar"><div class="budget-item-fill" style="width:96%; background: var(--gp-danger-500);"></div></div>
+        </div>
+        <div class="budget-item-right">
+          <div class="budget-item-used" style="color: var(--gp-danger-500);">¥480</div>
+          <div class="budget-item-total">/ ¥500</div>
+        </div>
+      </div>
+      <div class="budget-item">
+        <div class="budget-item-icon" style="background: linear-gradient(135deg, var(--gp-accent-100), #D6E5EC);">🏠</div>
+        <div class="budget-item-info">
+          <div class="budget-item-name">居住</div>
+          <div class="budget-item-bar"><div class="budget-item-fill" style="width:83%; background: var(--gp-accent-500);"></div></div>
+        </div>
+        <div class="budget-item-right">
+          <div class="budget-item-used">¥2,500</div>
+          <div class="budget-item-total">/ ¥3,000</div>
+        </div>
+      </div>
+      <div class="budget-item">
+        <div class="budget-item-icon" style="background: linear-gradient(135deg, var(--gp-danger-100), #F0D5CF);">🛍️</div>
+        <div class="budget-item-info">
+          <div class="budget-item-name">购物消费</div>
+          <div class="budget-item-bar"><div class="budget-item-fill" style="width:21%; background: var(--gp-success-500);"></div></div>
+        </div>
+        <div class="budget-item-right">
+          <div class="budget-item-used">¥320</div>
+          <div class="budget-item-total">/ ¥1,500</div>
+        </div>
+      </div>
+    </div>
+    <div class="add-budget">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      添加预算
+    </div>
+  </div>
+</div>
+</body>
+</html>"""
+
+with open('/mnt/agents/output/GoldenPaw_Goals.html', 'w', encoding='utf-8') as f:
+    f.write(goals_page)
+
+# 待确认页面 - 从首页"待确认"胶囊进入
+pending_page = """<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GoldenPaw — 待确认</title>
+<style>
+  :root {
+    --gp-brand-50: #FDF8F3; --gp-brand-100: #F5E6D3; --gp-brand-500: #C8956C; --gp-brand-600: #A67B5B;
+    --gp-success-500: #6B8E6B; --gp-success-100: #E8F0E8;
+    --gp-danger-500: #C06C5F; --gp-danger-100: #F5E0DC;
+    --gp-accent-500: #7A9EAF; --gp-accent-100: #E8F1F5;
+    --gp-text-primary: #3D3229; --gp-text-secondary: #7A6B5D; --gp-text-tertiary: #A89B8E;
+    --gp-bg-primary: #FDF8F3; --gp-bg-secondary: #F7EDE0; --gp-surface: #FFFFFF;
+    --gp-border: #EDE4D8;
+    --gp-gradient-brand: linear-gradient(135deg, #C8956C, #A67B5B);
+    --gp-shadow-sm: 0 2px 8px rgba(61,50,41,0.04); --gp-shadow-md: 0 8px 24px rgba(61,50,41,0.06); --gp-shadow-lg: 0 16px 48px rgba(61,50,41,0.08);
+    --gp-radius-sm: 12px; --gp-radius-md: 16px; --gp-radius-lg: 20px; --gp-radius-xl: 24px; --gp-radius-full: 100px;
+    --gp-space-1: 4px; --gp-space-2: 8px; --gp-space-3: 12px; --gp-space-4: 16px; --gp-space-5: 20px; --gp-space-6: 24px;
+    --gp-font-sans: -apple-system, 'SF Pro Display', 'Segoe UI', 'PingFang SC', sans-serif;
+    --gp-transition-base: 0.2s ease;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--gp-font-sans); background: var(--gp-bg-primary); color: var(--gp-text-primary); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  .app { max-width: 414px; margin: 0 auto; min-height: 100vh; position: relative; padding-bottom: 40px; background: linear-gradient(180deg, var(--gp-bg-primary) 0%, var(--gp-bg-secondary) 100%); }
+
+  /* Header */
+  .header { padding: 48px 24px 16px; display: flex; align-items: center; gap: 12px; }
+  .back-btn { width: 40px; height: 40px; border-radius: 12px; background: var(--gp-surface); border: 1px solid var(--gp-border); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--gp-shadow-sm); }
+  .back-btn svg { width: 20px; height: 20px; color: var(--gp-text-secondary); }
+  .header-title { font: 700 20px/1.3 var(--gp-font-sans); letter-spacing: -0.3px; flex: 1; }
+  .header-badge { padding: 4px 12px; border-radius: 100px; background: var(--gp-danger-500); color: white; font: 700 12px/1.4 var(--gp-font-sans); }
+
+  /* Info Banner */
+  .info-banner { margin: 0 24px 20px; padding: 16px 20px; border-radius: 16px; background: linear-gradient(135deg, var(--gp-accent-100), #D6E5EC); border: 1px solid var(--gp-accent-100); }
+  .info-banner-text { font: 600 13px/1.5 var(--gp-font-sans); color: var(--gp-accent-600); }
+
+  /* Pending Item */
+  .pending-item { margin: 0 24px 12px; background: var(--gp-surface); border-radius: 20px; padding: 20px; box-shadow: var(--gp-shadow-sm); border: 2px solid var(--gp-border); position: relative; overflow: hidden; }
+  .pending-item::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--gp-brand-500); }
+  .pending-source { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .pending-source-icon { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #E8F1F5, #D6E5EC); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .pending-source-name { font: 700 14px/1.4 var(--gp-font-sans); }
+  .pending-source-time { font: 600 11px/1.4 var(--gp-font-sans); color: var(--gp-text-tertiary); margin-left: auto; }
+  .pending-content { background: var(--gp-bg-primary); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .pending-raw { font: 600 13px/1.5 var(--gp-font-sans); color: var(--gp-text-secondary); margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--gp-border); }
+  .pending-parsed { display: flex; flex-direction: column; gap: 8px; }
+  .parsed-row { display: flex; justify-content: space-between; align-items: center; }
+  .parsed-label { font: 600 12px/1.4 var(--gp-font-sans); color: var(--gp-text-tertiary); }
+  .parsed-value { font: 700 14px/1.4 var(--gp-font-sans); }
+  .parsed-value.amount { color: var(--gp-danger-500); font-size: 18px; }
+  .pending-actions { display: flex; gap: 10px; }
+  .pending-btn { flex: 1; padding: 12px; border-radius: 12px; font: 700 14px/1.4 var(--gp-font-sans); text-align: center; cursor: pointer; border: none; font-family: inherit; }
+  .pending-btn.confirm { background: var(--gp-gradient-brand); color: white; box-shadow: var(--gp-shadow-brand); }
+  .pending-btn.edit { background: var(--gp-bg-primary); color: var(--gp-text-secondary); border: 1px solid var(--gp-border); }
+  .pending-btn.ignore { background: transparent; color: var(--gp-text-tertiary); border: 1px solid var(--gp-border); }
+
+  /* Source Settings */
+  .source-section { margin: 24px 24px 0; }
+  .source-title { font: 700 16px/1.4 var(--gp-font-sans); margin-bottom: 12px; }
+  .source-list { background: var(--gp-surface); border-radius: 16px; box-shadow: var(--gp-shadow-sm); border: 1px solid var(--gp-border); overflow: hidden; }
+  .source-item { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--gp-border); }
+  .source-item:last-child { border-bottom: none; }
+  .source-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .source-info { flex: 1; }
+  .source-name { font: 700 15px/1.4 var(--gp-font-sans); }
+  .source-status { font: 600 12px/1.4 var(--gp-font-sans); color: var(--gp-success-500); margin-top: 2px; }
+  .source-status.off { color: var(--gp-text-tertiary); }
+  .source-toggle { width: 48px; height: 28px; border-radius: 14px; background: var(--gp-success-500); position: relative; cursor: pointer; }
+  .source-toggle.off { background: var(--gp-border); }
+  .source-toggle::after { content: ''; position: absolute; top: 2px; right: 2px; width: 24px; height: 24px; border-radius: 50%; background: white; box-shadow: var(--gp-shadow-sm); transition: transform 0.2s; }
+  .source-toggle.off::after { transform: translateX(-20px); }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <button class="back-btn" onclick="history.back()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="header-title">待确认</div>
+    <div class="header-badge">3</div>
+  </div>
+
+  <!-- Info Banner -->
+  <div class="info-banner">
+    <div class="info-banner-text">💡 系统自动监听到的消费记录，确认后会自动记入明细。您可以在设置中管理监听来源。</div>
+  </div>
+
+  <!-- Pending Items -->
+  <div class="pending-item">
+    <div class="pending-source">
+      <div class="pending-source-icon">🏦</div>
+      <div class="pending-source-name">招商银行</div>
+      <div class="pending-source-time">2分钟前</div>
+    </div>
+    <div class="pending-content">
+      <div class="pending-raw">"您尾号8888的账户于05-26 14:32支出人民币35.00元，商户：瑞幸咖啡。"</div>
+      <div class="pending-parsed">
+        <div class="parsed-row">
+          <span class="parsed-label">金额</span>
+          <span class="parsed-value amount">-¥35.00</span>
+        </div>
+        <div class="parsed-row">
+          <span class="parsed-label">商户</span>
+          <span class="parsed-value">瑞幸咖啡</span>
+        </div>
+        <div class="parsed-row">
+          <span class="parsed-label">时间</span>
+          <span class="parsed-value">05-26 14:32</span>
+        </div>
+        <div class="parsed-row">
+          <span class="parsed-label">分类</span>
+          <span class="parsed-value">餐饮美食</span>
+        </div>
+        <div class="parsed-row">
+          <span class="parsed-label">账户</span>
+          <span class="parsed-value">招商银行储蓄卡</span>
+        </div>
+      </div>
+    </div>
+    <div class="pending-actions">
+      <button class="pending-btn confirm">✓ 确认</button>
+      <button class="pending-btn edit">✏️ 编辑</button>
+      <button class="pending-btn ignore">忽略</button>
+    </div>
+  </div>
+
+  <div class="pending-item">
+    <div class="pending-source">
+      <div class="pending-source-icon">💳</div>
+      <div class="pending-source-name">支付宝</div>
+      <div class="pending-source-time">15分钟前</div>
+    </div>
+    <div class="pending-content">
+      <div class="pending-raw">"支付宝-花呗账单：05-26 12:15 美团外卖 -¥28.50"</div>
+      <div class="pending-parsed">
+        <div class="parsed-row">
+          <span class="parsed-label">金额</span>
+          <span class="parsed-value amount">-¥28.50</span>
+        </div>
+        <div class="parsed-row">
+          <span class="parsed-label">商户</span>
+          <span class="parsed-value">美团外卖</span>
+        </div>
+        <div class="parsed-row">
+          <span class="parsed-label">时间</span>
+          <span class="parsed-value">05-26 12:15</span>
+        </div>
+        <div class="parsed-row">
+          <span class="parsed-label">分类</span>
+          <span class="parsed-value">餐饮美食</span>
+        </div>
+        <div class="parsed-row">
+          <span class="parsed-label">账户</span>
+          <span class="parsed-value">支付宝花呗</span>
+        </div>
+      </div>
+    </div>
+    <div class="pending-actions">
+      <button class="pending-btn confirm">✓ 确认</button>
+      <button class="pending-btn edit">✏️ 编辑</button>
+      <button class="pending-btn ignore">忽略</button>
+    </div>
+  </div>
+
+  <div class="pending-item">
+    <div class="pending-source">
+      <div class="pending-source-icon">💬</div>
+      <div class="pending-source-name">微信支付</div>
+      <div class="pending-source-time">1小时前</div>
+    </div>
+    <div class="pending-content">
+      <div class="pending-raw">"微信支付凭证：05-26 09:08 滴滴出行 -¥15.00"</div>
+      <div class="pending-parsed">
+        <div class="parsed-row">
+          <span class="parsed-label">金额</span>
+          <span class="parsed-value amount">-¥15.00</span>
+        </div>
+        <div class="parsed-row">
+          <span class="parsed-label">商户</span>
+          <span class="parsed-value">滴滴出行</span>
+        </div>
+        <div class="parsed-row">
+          <span class="parsed-label">时间</span>
+          <span class="parsed-value">05-26 09:08</span>
+        </div>
+        <div class="parsed-row">
+          <span class="parsed-label">分类</span>
+          <span class="parsed-value">交通出行</span>
+        </div>
+        <div class="parsed-row">
+          <span class="parsed-label">账户</span>
+          <span class="parsed-value">微信零钱</span>
+        </div>
+      </div>
+    </div>
+    <div class="pending-actions">
+      <button class="pending-btn confirm">✓ 确认</button>
+      <button class="pending-btn edit">✏️ 编辑</button>
+      <button class="pending-btn ignore">忽略</button>
+    </div>
+  </div>
+
+  <!-- Source Settings -->
+  <div class="source-section">
+    <div class="source-title">监听来源设置</div>
+    <div class="source-list">
+      <div class="source-item">
+        <div class="source-icon" style="background: linear-gradient(135deg, #E8F1F5, #D6E5EC);">🏦</div>
+        <div class="source-info">
+          <div class="source-name">招商银行</div>
+          <div class="source-status">● 监听中</div>
+        </div>
+        <div class="source-toggle"></div>
+      </div>
+      <div class="source-item">
+        <div class="source-icon" style="background: linear-gradient(135deg, #E8F0E8, #D4E6D4);">💳</div>
+        <div class="source-info">
+          <div class="source-name">支付宝</div>
+          <div class="source-status">● 监听中</div>
+        </div>
+        <div class="source-toggle"></div>
+      </div>
+      <div class="source-item">
+        <div class="source-icon" style="background: linear-gradient(135deg, #FAF0E6, var(--gp-brand-100));">💬</div>
+        <div class="source-info">
+          <div class="source-name">微信支付</div>
+          <div class="source-status off">○ 已关闭</div>
+        </div>
+        <div class="source-toggle off"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>"""
+
+with open('/mnt/agents/output/GoldenPaw_Pending.html', 'w', encoding='utf-8') as f:
+    f.write(pending_page)
+
+print("明细、存钱目标、待确认页面已全部生成！")
+print("\n所有页面文件：")
+print("1. GoldenPaw_Home_v3.html - 首页（4Tab+悬浮记账+4胶囊）")
+print("2. GoldenPaw_AI.html - AI记账")
+print("3. GoldenPaw_Assets.html - 资产")
+print("4. GoldenPaw_Profile.html - 我的")
+print("5. GoldenPaw_Report.html - 报表（从首页报表胶囊进入）")
+print("6. GoldenPaw_Detail.html - 明细（从首页明细胶囊进入）")
+print("7. GoldenPaw_Goals.html - 存钱目标（从首页存钱胶囊进入）")
+print("8. GoldenPaw_Pending.html - 待确认（从首页待确认胶囊进入）")

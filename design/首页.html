@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GoldenPaw 金爪 — 首页</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  /* ===== GoldenPaw Design System v1.0 ===== */
+  :root {
+    --gp-brand-50: #FDF8F3;
+    --gp-brand-100: #F5E6D3;
+    --gp-brand-200: #EDD4B8;
+    --gp-brand-300: #D4A574;
+    --gp-brand-400: #C8956C;
+    --gp-brand-500: #C8956C;
+    --gp-brand-600: #A67B5B;
+    --gp-brand-700: #8B6549;
+    --gp-brand-800: #6F4F3A;
+    --gp-brand-900: #3D3229;
+    --gp-success-50: #F0F7F0;
+    --gp-success-100: #E8F0E8;
+    --gp-success-500: #6B8E6B;
+    --gp-success-600: #5A7A5A;
+    --gp-danger-50: #FAF0EE;
+    --gp-danger-100: #F5E0DC;
+    --gp-danger-500: #C06C5F;
+    --gp-danger-600: #A85D52;
+    --gp-accent-50: #F0F5F7;
+    --gp-accent-100: #E8F1F5;
+    --gp-accent-500: #7A9EAF;
+    --gp-accent-600: #6A8C9C;
+    --gp-text-primary: #3D3229;
+    --gp-text-secondary: #7A6B5D;
+    --gp-text-tertiary: #A89B8E;
+    --gp-text-placeholder: #C4B8AD;
+    --gp-bg-primary: #FDF8F3;
+    --gp-bg-secondary: #F7EDE0;
+    --gp-bg-tertiary: #F0E6D8;
+    --gp-surface: #FFFFFF;
+    --gp-surface-elevated: #FFFFFF;
+    --gp-border: #EDE4D8;
+    --gp-border-light: #F5EDE4;
+    --gp-border-focus: #C8956C;
+    --gp-gradient-brand: linear-gradient(135deg, #C8956C, #A67B5B);
+    --gp-gradient-success: linear-gradient(90deg, #6B8E6B, #8FBC8F);
+    --gp-gradient-danger: linear-gradient(90deg, #C06C5F, #D4857A);
+    --gp-gradient-warm: linear-gradient(180deg, #FDF8F3, #F7EDE0);
+    --gp-shadow-sm: 0 2px 8px rgba(61, 50, 41, 0.04);
+    --gp-shadow-md: 0 8px 24px rgba(61, 50, 41, 0.06);
+    --gp-shadow-lg: 0 16px 48px rgba(61, 50, 41, 0.08);
+    --gp-shadow-brand: 0 4px 16px rgba(200, 149, 108, 0.35);
+    --gp-shadow-inset: inset 0 1px 2px rgba(61, 50, 41, 0.04);
+    --gp-radius-sm: 12px;
+    --gp-radius-md: 16px;
+    --gp-radius-lg: 20px;
+    --gp-radius-xl: 24px;
+    --gp-radius-full: 100px;
+    --gp-radius-circle: 50%;
+    --gp-space-1: 4px;
+    --gp-space-2: 8px;
+    --gp-space-3: 12px;
+    --gp-space-4: 16px;
+    --gp-space-5: 20px;
+    --gp-space-6: 24px;
+    --gp-space-8: 32px;
+    --gp-space-10: 40px;
+    --gp-space-12: 48px;
+    --gp-font-sans: -apple-system, 'SF Pro Display', 'Segoe UI', 'PingFang SC', 'Noto Sans SC', sans-serif;
+    --gp-transition-fast: 0.15s ease;
+    --gp-transition-base: 0.2s ease;
+    --gp-transition-slow: 0.3s ease;
+    --gp-transition-spring: 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: var(--gp-font-sans);
+    background: var(--gp-bg-primary);
+    color: var(--gp-text-primary);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    max-width: 414px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: 100px;
+    background: var(--gp-gradient-warm);
+  }
+
+  /* ===== Hero Section ===== */
+  .hero {
+    padding: var(--gp-space-10) var(--gp-space-6) var(--gp-space-6);
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -60px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(200,149,108,0.18) 0%, transparent 70%);
+    filter: blur(40px);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: 20px; left: -40px;
+    width: 160px; height: 160px;
+    background: radial-gradient(circle, rgba(107,142,107,0.12) 0%, transparent 70%);
+    filter: blur(40px);
+  }
+  .hero-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--gp-space-6);
+    position: relative;
+    z-index: 1;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: var(--gp-space-2);
+  }
+  .brand-icon {
+    width: 36px; height: 36px;
+    border-radius: var(--gp-radius-sm);
+    background: var(--gp-gradient-brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: var(--gp-shadow-brand);
+  }
+  .brand-text {
+    font: 700 20px/1.2 var(--gp-font-sans);
+    color: var(--gp-text-primary);
+    letter-spacing: -0.3px;
+  }
+  .hero-actions { display: flex; gap: var(--gp-space-2); position: relative; z-index: 1; }
+
+  /* ===== Components ===== */
+  .icon-btn {
+    width: 40px; height: 40px;
+    border-radius: var(--gp-radius-sm);
+    background: var(--gp-surface);
+    border: 1px solid var(--gp-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--gp-shadow-sm);
+    transition: var(--gp-transition-base);
+  }
+  .icon-btn:active { transform: scale(0.92); }
+  .icon-btn svg { width: 18px; height: 18px; color: var(--gp-text-secondary); }
+
+  .card {
+    background: var(--gp-surface);
+    border-radius: var(--gp-radius-lg);
+    border: 1px solid var(--gp-border);
+    box-shadow: var(--gp-shadow-sm);
+    position: relative;
+    overflow: hidden;
+  }
+  .card-emphasis {
+    border: 2px solid var(--gp-brand-100);
+    box-shadow: var(--gp-shadow-md);
+  }
+
+  /* ===== Balance Card ===== */
+  .balance-card {
+    padding: var(--gp-space-6);
+    text-align: center;
+  }
+  .balance-card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 100px; height: 100px;
+    background: radial-gradient(circle, rgba(200,149,108,0.08) 0%, transparent 70%);
+  }
+  .balance-label {
+    font: 600 12px/1.4 var(--gp-font-sans);
+    color: var(--gp-text-tertiary);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: var(--gp-space-2);
+  }
+  .balance-value {
+    font: 800 40px/1.1 var(--gp-font-sans);
+    color: var(--gp-text-primary);
+    letter-spacing: -1.5px;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: var(--gp-space-5);
+    position: relative;
+  }
+  .balance-row {
+    display: flex;
+    gap: var(--gp-space-3);
+    justify-content: center;
+    position: relative;
+  }
+  .pill {
+    padding: var(--gp-space-3) var(--gp-space-5);
+    border-radius: var(--gp-radius-full);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gp-space-1);
+    min-width: 110px;
+  }
+  .pill-in { background: var(--gp-success-100); }
+  .pill-out { background: var(--gp-danger-100); }
+  .pill-label {
+    font: 600 11px/1.4 var(--gp-font-sans);
+    color: var(--gp-text-secondary);
+    letter-spacing: 0.5px;
+  }
+  .pill-value {
+    font: 700 16px/1.4 var(--gp-font-sans);
+    font-variant-numeric: tabular-nums;
+  }
+  .pill-up { color: var(--gp-success-500); }
+  .pill-down { color: var(--gp-danger-500); }
+
+  /* ===== Quick Actions - 4 Capsules ===== */
+  .quick-row {
+    display: flex;
+    gap: var(--gp-space-2);
+    padding: var(--gp-space-4) var(--gp-space-6);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .quick-row::-webkit-scrollbar { display: none; }
+  .capsule {
+    display: flex;
+    align-items: center;
+    gap: var(--gp-space-2);
+    padding: var(--gp-space-3) var(--gp-space-4);
+    border-radius: var(--gp-radius-full);
+    font: 700 13px/1.4 var(--gp-font-sans);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: var(--gp-transition-base);
+    border: none;
+    font-family: inherit;
+    box-shadow: var(--gp-shadow-sm);
+    flex: 1;
+    justify-content: center;
+  }
+  .capsule:active { transform: scale(0.95); }
+  .capsule svg { width: 16px; height: 16px; }
+  .capsule-green {
+    background: linear-gradient(135deg, var(--gp-success-100), #D4E6D4);
+    color: var(--gp-success-500);
+  }
+  .capsule-blue {
+    background: linear-gradient(135deg, var(--gp-accent-100), #D6E5EC);
+    color: var(--gp-accent-500);
+  }
+  .capsule-warm {
+    background: linear-gradient(135deg, var(--gp-brand-100), var(--gp-bg-tertiary));
+    color: var(--gp-brand-600);
+  }
+  .capsule-gold {
+    background: var(--gp-gradient-brand);
+    color: white;
+    box-shadow: var(--gp-shadow-brand);
+  }
+  .capsule-badge {
+    position: relative;
+  }
+  .capsule-badge::after {
+    content: '3';
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 18px;
+    height: 18px;
+    border-radius: var(--gp-radius-circle);
+    background: var(--gp-danger-500);
+    color: white;
+    font: 700 10px/18px var(--gp-font-sans);
+    text-align: center;
+  }
+
+  /* ===== Week Calendar ===== */
+  .week-calendar {
+    margin: 0 var(--gp-space-6) var(--gp-space-4);
+    padding: var(--gp-space-4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .week-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gp-space-1);
+    padding: var(--gp-space-2) var(--gp-space-1);
+    border-radius: var(--gp-radius-md);
+    min-width: 40px;
+    cursor: pointer;
+    transition: var(--gp-transition-base);
+  }
+  .week-day:active { transform: scale(0.95); }
+  .week-day.active {
+    background: var(--gp-gradient-brand);
+    box-shadow: var(--gp-shadow-brand);
+  }
+  .week-day-name {
+    font: 600 11px/1.4 var(--gp-font-sans);
+    color: var(--gp-text-tertiary);
+  }
+  .week-day.active .week-day-name { color: white; }
+  .week-day-num {
+    font: 700 16px/1.4 var(--gp-font-sans);
+    color: var(--gp-text-primary);
+  }
+  .week-day.active .week-day-num { color: white; }
+  .week-day-dot {
+    width: 4px; height: 4px;
+    border-radius: var(--gp-radius-circle);
+    background: var(--gp-brand-500);
+  }
+  .week-day.active .week-day-dot { background: white; }
+
+  /* ===== Section Title ===== */
+  .section-title {
+    padding: var(--gp-space-6) var(--gp-space-6) var(--gp-space-3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .section-title-text {
+    font: 700 18px/1.4 var(--gp-font-sans);
+    color: var(--gp-text-primary);
+    letter-spacing: -0.2px;
+  }
+  .section-link {
+    font: 600 13px/1.4 var(--gp-font-sans);
+    color: var(--gp-brand-600);
+    cursor: pointer;
+  }
+
+  /* ===== Budget Cards ===== */
+  .budget-scroll {
+    display: flex;
+    gap: var(--gp-space-3);
+    padding: 0 var(--gp-space-6) var(--gp-space-1);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .budget-scroll::-webkit-scrollbar { display: none; }
+  .budget-card {
+    min-width: 140px;
+    padding: var(--gp-space-4);
+    border: 2px solid transparent;
+  }
+  .budget-card:nth-child(1) { border-color: rgba(200,149,108,0.3); }
+  .budget-card:nth-child(2) { border-color: rgba(192,108,95,0.25); }
+  .budget-card:nth-child(3) { border-color: rgba(107,142,107,0.25); }
+  .budget-emoji { font-size: 32px; margin-bottom: var(--gp-space-2); display: block; }
+  .budget-name {
+    font: 700 13px/1.4 var(--gp-font-sans);
+    color: var(--gp-text-primary);
+    margin-bottom: var(--gp-space-2);
+  }
+  .budget-used {
+    font: 800 20px/1.4 var(--gp-font-sans);
+    margin-bottom: var(--gp-space-1);
+  }
+  .budget-total {
+    font: 600 11px/1.4 var(--gp-font-sans);
+    color: var(--gp-text-secondary);
+  }
+  .progress-bar {
+    height: 8px;
+    background: var(--gp-border);
+    border-radius: var(--gp-radius-full);
+    overflow: hidden;
+    margin-top: var(--gp-space-3);
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: var(--gp-radius-full);
+    transition: width 0.6s ease;
+  }
+  .fill-brand { background: var(--gp-gradient-brand); }
+  .fill-danger { background: var(--gp-gradient-danger); }
+  .fill-success { background: var(--gp-gradient-success); }
+
+  /* ===== Goal Cards ===== */
+  .goal-card {
+    margin: 0 var(--gp-space-6) var(--gp-space-3);
+    padding: var(--gp-space-5);
+    display: flex;
+    align-items: center;
+    gap: var(--gp-space-4);
+    border: 2px solid transparent;
+  }
+  .goal-card:nth-child(1) { border-color: rgba(200,149,108,0.25); }
+  .goal-card:nth-child(2) { border-color: rgba(122,158,175,0.25); }
+  .goal-card:nth-child(3) { border-color: rgba(107,142,107,0.25); }
+  .goal-icon {
+    width: 56px; height: 56px;
+    border-radius: var(--gp-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+  .goal-icon-1 { background: linear-gradient(135deg, #FAF0E6, var(--gp-brand-100)); }
+  .goal-icon-2 { background: linear-gradient(135deg, var(--gp-accent-100), #D6E5EC); }
+  .goal-icon-3 { background: linear-gradient(135deg, var(--gp-success-100), #D4E6D4); }
+  .goal-info { flex: 1; }
+  .goal-name {
+    font: 700 16px/1.4 var(--gp-font-sans);
+    color: var(--gp-text-primary);
+    margin-bottom: var(--gp-space-1);
+  }
+  .goal-amount {
+    font: 600 13px/1.4 var(--gp-font-sans);
+    color: var(--gp-text-secondary);
+    margin-bottom: var(--gp-space-3);
+  }
+  .goal-track { display: flex; align-items: center; gap: var(--gp-space-2); }
+  .goal-track-bar { flex: 1; height: 10px; background: var(--gp-border); border-radius: var(--gp-radius-full); overflow: hidden; }
+  .goal-track-fill { height: 100%; border-radius: var(--gp-radius-full); }
+  .goal-pct {
+    font: 800 14px/1.4 var(--gp-font-sans);
+    color: var(--gp-text-primary);
+    min-width: 40px;
+    text-align: right;
+  }
+
+  /* ===== Flow List ===== */
+  .flow-list { padding: 0 var(--gp-space-6); }
+  .flow-item {
+    display: flex;
+    align-items: center;
+    padding: var(--gp-space-3) 0;
+    border-bottom: 2px dashed rgba(168,155,142,0.15);
+    cursor: pointer;
+    transition: var(--gp-transition-fast);
+  }
+  .flow-item:active { opacity: 0.5; }
+  .flow-item:last-child { border-bottom: none; }
+  .flow-icon {
+    width: 48px; height: 48px;
+    border-radius: var(--gp-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-right: var(--gp-space-3);
+    flex-shrink: 0;
+  }
+  .flow-icon-1 { background: linear-gradient(135deg, #FAF0E6, var(--gp-brand-100)); }
+  .flow-icon-2 { background: linear-gradient(135deg, var(--gp-success-100), #D4E6D4); }
+  .flow-icon-3 { background: linear-gradient(135deg, var(--gp-accent-100), #D6E5EC); }
+  .flow-icon-4 { background: linear-gradient(135deg, var(--gp-danger-100), #F0D5CF); }
+  .flow-body { flex: 1; }
+  .flow-title {
+    font: 700 15px/1.4 var(--gp-font-sans);
+    color: var(--gp-text-primary);
+    margin-bottom: var(--gp-space-1);
+  }
+  .flow-meta {
+    font: 600 12px/1.4 var(--gp-font-sans);
+    color: var(--gp-text-secondary);
+  }
+  .flow-right { text-align: right; }
+  .flow-amt {
+    font: 800 16px/1.4 var(--gp-font-sans);
+    font-variant-numeric: tabular-nums;
+  }
+  .flow-amt-out { color: var(--gp-text-primary); }
+  .flow-amt-in { color: var(--gp-success-500); }
+
+  /* ===== TabBar - 4 Tabs + 悬浮记账按钮 ===== */
+  .tabbar-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 414px;
+    z-index: 100;
+    pointer-events: none;
+  }
+  .tabbar {
+    position: relative;
+    margin: 0 24px 16px;
+    height: 68px;
+    background: var(--gp-surface);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-radius: var(--gp-radius-xl);
+    box-shadow: var(--gp-shadow-lg);
+    border: 2px solid var(--gp-border);
+    padding: 0 var(--gp-space-2);
+    backdrop-filter: blur(20px);
+    pointer-events: all;
+  }
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gp-space-1);
+    color: var(--gp-text-tertiary);
+    font: 700 10px/1.3 var(--gp-font-sans);
+    height: 52px;
+    border-radius: var(--gp-radius-full);
+    cursor: pointer;
+    transition: var(--gp-transition-base);
+  }
+  .tab-item svg { width: 22px; height: 22px; }
+  .tab-item.active {
+    color: var(--gp-brand-600);
+    background: linear-gradient(135deg, var(--gp-brand-100), #FAF0E6);
+  }
+  /* 悬浮记账按钮 - 在TabBar上方 */
+  .fab-record {
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 64px;
+    height: 64px;
+    background: var(--gp-gradient-brand);
+    border-radius: var(--gp-radius-circle);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: var(--gp-transition-base);
+    box-shadow: var(--gp-shadow-brand);
+    border: 4px solid var(--gp-bg-primary);
+    pointer-events: all;
+    z-index: 101;
+  }
+  .fab-record:active { transform: translateX(-50%) scale(0.92); }
+  .fab-record svg { width: 28px; height: 28px; }
+  .fab-record-label {
+    font: 700 10px/1.3 var(--gp-font-sans);
+    margin-top: 2px;
+  }
+
+  /* ===== Animations ===== */
+  @keyframes floatUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate { animation: floatUp 0.6s ease both; }
+  .d1 { animation-delay: 0.05s; }
+  .d2 { animation-delay: 0.1s; }
+  .d3 { animation-delay: 0.15s; }
+  .d4 { animation-delay: 0.2s; }
+  .d5 { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-top">
+      <div class="brand">
+        <div class="brand-icon">🐾</div>
+        <div class="brand-text">GoldenPaw</div>
+      </div>
+      <div class="hero-actions">
+        <button class="icon-btn" aria-label="搜索">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </button>
+        <button class="icon-btn" aria-label="消息">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="balance-card card card-emphasis animate">
+      <div class="balance-label">本月结余</div>
+      <div class="balance-value">¥8,642.00</div>
+      <div class="balance-row">
+        <div class="pill pill-in">
+          <span class="pill-label">收入</span>
+          <span class="pill-value pill-up">+¥12,500</span>
+        </div>
+        <div class="pill pill-out">
+          <span class="pill-label">支出</span>
+          <span class="pill-value pill-down">-¥3,858</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions - 4 Capsules -->
+  <div class="quick-row animate d1">
+    <button class="capsule capsule-green">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+      报表
+    </button>
+    <button class="capsule capsule-blue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      明细
+    </button>
+    <button class="capsule capsule-warm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      存钱
+    </button>
+    <button class="capsule capsule-gold capsule-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      待确认
+    </button>
+  </div>
+
+  <!-- Week Calendar -->
+  <div class="week-calendar card animate d2">
+    <div class="week-day"><span class="week-day-name">一</span><span class="week-day-num">19</span></div>
+    <div class="week-day"><span class="week-day-name">二</span><span class="week-day-num">20</span></div>
+    <div class="week-day"><span class="week-day-name">三</span><span class="week-day-num">21</span></div>
+    <div class="week-day"><span class="week-day-name">四</span><span class="week-day-num">22</span></div>
+    <div class="week-day active"><span class="week-day-name">五</span><span class="week-day-num">23</span><span class="week-day-dot"></span></div>
+    <div class="week-day"><span class="week-day-name">六</span><span class="week-day-num">24</span></div>
+    <div class="week-day"><span class="week-day-name">日</span><span class="week-day-num">25</span></div>
+  </div>
+
+  <!-- Budget -->
+  <div class="section-title animate d3">
+    <span class="section-title-text">本月预算</span>
+    <span class="section-link">管理</span>
+  </div>
+  <div class="budget-scroll animate d3">
+    <div class="budget-card card">
+      <span class="budget-emoji">🍜</span>
+      <div class="budget-name">餐饮美食</div>
+      <div class="budget-used">¥1,200</div>
+      <div class="budget-total">剩余 ¥800 / ¥2,000</div>
+      <div class="progress-bar"><div class="progress-fill fill-brand" style="width:60%"></div></div>
+    </div>
+    <div class="budget-card card">
+      <span class="budget-emoji">🚇</span>
+      <div class="budget-name">交通出行</div>
+      <div class="budget-used">¥480</div>
+      <div class="budget-total">剩余 ¥20 / ¥500</div>
+      <div class="progress-bar"><div class="progress-fill fill-danger" style="width:96%"></div></div>
+    </div>
+    <div class="budget-card card">
+      <span class="budget-emoji">🛍️</span>
+      <div class="budget-name">购物消费</div>
+      <div class="budget-used">¥320</div>
+      <div class="budget-total">剩余 ¥1,180 / ¥1,500</div>
+      <div class="progress-bar"><div class="progress-fill fill-success" style="width:21%"></div></div>
+    </div>
+  </div>
+
+  <!-- Goals -->
+  <div class="section-title animate d4">
+    <span class="section-title-text">存钱目标</span>
+    <span class="section-link">全部 3 个</span>
+  </div>
+  <div class="goal-card card animate d4">
+    <div class="goal-icon goal-icon-1">✈️</div>
+    <div class="goal-info">
+      <div class="goal-name">年底旅行基金</div>
+      <div class="goal-amount">¥13,000 / ¥20,000 · 还剩 218 天</div>
+      <div class="goal-track">
+        <div class="goal-track-bar"><div class="progress-fill fill-brand" style="width:65%"></div></div>
+        <span class="goal-pct">65%</span>
+      </div>
+    </div>
+  </div>
+  <div class="goal-card card animate d4">
+    <div class="goal-icon goal-icon-2">📱</div>
+    <div class="goal-info">
+      <div class="goal-name">换新手机</div>
+      <div class="goal-amount">¥3,200 / ¥8,000 · 还剩 90 天</div>
+      <div class="goal-track">
+        <div class="goal-track-bar"><div class="progress-fill" style="width:40%; background: var(--gp-gradient-success);"></div></div>
+        <span class="goal-pct">40%</span>
+      </div>
+    </div>
+  </div>
+  <div class="goal-card card animate d4">
+    <div class="goal-icon goal-icon-3">🎁</div>
+    <div class="goal-info">
+      <div class="goal-name">应急备用金</div>
+      <div class="goal-amount">¥5,000 / ¥50,000 · 长期目标</div>
+      <div class="goal-track">
+        <div class="goal-track-bar"><div class="progress-fill" style="width:10%; background: var(--gp-accent-500);"></div></div>
+        <span class="goal-pct">10%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Flow -->
+  <div class="section-title animate d5">
+    <span class="section-title-text">最近流水</span>
+    <span class="section-link">查看全部</span>
+  </div>
+  <div class="flow-list animate d5">
+    <div class="flow-item">
+      <div class="flow-icon flow-icon-1">🍔</div>
+      <div class="flow-body">
+        <div class="flow-title">午餐 - 麦当劳</div>
+        <div class="flow-meta">05-26 12:30 · 餐饮美食</div>
+      </div>
+      <div class="flow-right"><div class="flow-amt flow-amt-out">-¥42.50</div></div>
+    </div>
+    <div class="flow-item">
+      <div class="flow-icon flow-icon-2">🚕</div>
+      <div class="flow-body">
+        <div class="flow-title">滴滴出行</div>
+        <div class="flow-meta">05-26 09:15 · 交通出行</div>
+      </div>
+      <div class="flow-right"><div class="flow-amt flow-amt-out">-¥28.00</div></div>
+    </div>
+    <div class="flow-item">
+      <div class="flow-icon flow-icon-3">💰</div>
+      <div class="flow-body">
+        <div class="flow-title">工资收入</div>
+        <div class="flow-meta">05-25 10:00 · 主动收入</div>
+      </div>
+      <div class="flow-right"><div class="flow-amt flow-amt-in">+¥12,500</div></div>
+    </div>
+    <div class="flow-item">
+      <div class="flow-icon flow-icon-4">🎬</div>
+      <div class="flow-body">
+        <div class="flow-title">电影票 × 2</div>
+        <div class="flow-meta">05-24 19:30 · 休闲娱乐</div>
+      </div>
+      <div class="flow-right"><div class="flow-amt flow-amt-out">-¥78.00</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TabBar + 悬浮记账按钮 -->
+<div class="tabbar-wrapper">
+  <div class="tabbar">
+    <!-- 悬浮记账按钮 -->
+    <div class="fab-record" onclick="alert('弹出记账BottomSheet')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      <span class="fab-record-label">记账</span>
+    </div>
+
+    <div class="tab-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
+      <span>首页</span>
+    </div>
+    <div class="tab-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M12 6v6l4 2"/></svg>
+      <span>AI记账</span>
+    </div>
+    <div style="width: 64px;"></div> <!-- 记账按钮占位 -->
+    <div class="tab-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      <span>资产</span>
+    </div>
+    <div class="tab-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>我的</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

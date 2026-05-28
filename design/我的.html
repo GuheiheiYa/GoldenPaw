@@ -1,0 +1,279 @@
+
+# 我的页面 - 设置中心
+profile_page = """<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GoldenPaw — 我的</title>
+<style>
+  :root {
+    --gp-brand-50: #FDF8F3; --gp-brand-100: #F5E6D3; --gp-brand-500: #C8956C; --gp-brand-600: #A67B5B;
+    --gp-success-500: #6B8E6B; --gp-success-100: #E8F0E8;
+    --gp-danger-500: #C06C5F; --gp-danger-100: #F5E0DC;
+    --gp-accent-500: #7A9EAF; --gp-accent-100: #E8F1F5;
+    --gp-text-primary: #3D3229; --gp-text-secondary: #7A6B5D; --gp-text-tertiary: #A89B8E;
+    --gp-bg-primary: #FDF8F3; --gp-bg-secondary: #F7EDE0; --gp-surface: #FFFFFF;
+    --gp-border: #EDE4D8;
+    --gp-gradient-brand: linear-gradient(135deg, #C8956C, #A67B5B);
+    --gp-shadow-sm: 0 2px 8px rgba(61,50,41,0.04); --gp-shadow-md: 0 8px 24px rgba(61,50,41,0.06); --gp-shadow-lg: 0 16px 48px rgba(61,50,41,0.08); --gp-shadow-brand: 0 4px 16px rgba(200,149,108,0.35);
+    --gp-radius-sm: 12px; --gp-radius-md: 16px; --gp-radius-lg: 20px; --gp-radius-xl: 24px; --gp-radius-full: 100px; --gp-radius-circle: 50%;
+    --gp-space-1: 4px; --gp-space-2: 8px; --gp-space-3: 12px; --gp-space-4: 16px; --gp-space-5: 20px; --gp-space-6: 24px;
+    --gp-font-sans: -apple-system, 'SF Pro Display', 'Segoe UI', 'PingFang SC', sans-serif;
+    --gp-transition-base: 0.2s ease;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--gp-font-sans); background: var(--gp-bg-primary); color: var(--gp-text-primary); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  .app { max-width: 414px; margin: 0 auto; min-height: 100vh; position: relative; padding-bottom: 120px; background: linear-gradient(180deg, var(--gp-bg-primary) 0%, var(--gp-bg-secondary) 100%); }
+
+  /* Header */
+  .header { padding: 48px 24px 20px; display: flex; justify-content: space-between; align-items: center; }
+  .header-title { font: 700 24px/1.3 var(--gp-font-sans); letter-spacing: -0.3px; }
+
+  /* User Card */
+  .user-card { margin: 0 24px 24px; background: var(--gp-surface); border-radius: 20px; padding: 28px; box-shadow: var(--gp-shadow-md); border: 2px solid var(--gp-brand-100); text-align: center; position: relative; overflow: hidden; }
+  .user-card::after { content: ''; position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: radial-gradient(circle, rgba(200,149,108,0.08) 0%, transparent 70%); }
+  .user-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--gp-gradient-brand); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 16px; box-shadow: var(--gp-shadow-brand); }
+  .user-name { font: 700 18px/1.4 var(--gp-font-sans); margin-bottom: 4px; }
+  .user-id { font: 600 13px/1.4 var(--gp-font-sans); color: var(--gp-text-tertiary); margin-bottom: 16px; }
+  .user-stats { display: flex; justify-content: center; gap: 24px; }
+  .user-stat { text-align: center; }
+  .stat-value { font: 800 20px/1.4 var(--gp-font-sans); color: var(--gp-brand-600); }
+  .stat-label { font: 600 11px/1.4 var(--gp-font-sans); color: var(--gp-text-tertiary); margin-top: 2px; }
+
+  /* Menu Section */
+  .menu-section { margin: 0 24px 16px; }
+  .menu-title { font: 700 14px/1.4 var(--gp-font-sans); color: var(--gp-text-tertiary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; padding-left: 4px; }
+  .menu-list { background: var(--gp-surface); border-radius: 16px; box-shadow: var(--gp-shadow-sm); border: 1px solid var(--gp-border); overflow: hidden; }
+  .menu-item { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--gp-border); cursor: pointer; transition: var(--gp-transition-base); }
+  .menu-item:last-child { border-bottom: none; }
+  .menu-item:active { background: var(--gp-brand-50); }
+  .menu-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .menu-icon.gold { background: linear-gradient(135deg, var(--gp-brand-100), var(--gp-bg-tertiary)); }
+  .menu-icon.green { background: linear-gradient(135deg, var(--gp-success-100), #D4E6D4); }
+  .menu-icon.blue { background: linear-gradient(135deg, var(--gp-accent-100), #D6E5EC); }
+  .menu-icon.red { background: linear-gradient(135deg, var(--gp-danger-100), #F0D5CF); }
+  .menu-icon.gray { background: linear-gradient(135deg, #F0F0F0, #E0E0E0); }
+  .menu-info { flex: 1; }
+  .menu-name { font: 700 15px/1.4 var(--gp-font-sans); }
+  .menu-desc { font: 600 12px/1.4 var(--gp-font-sans); color: var(--gp-text-secondary); margin-top: 2px; }
+  .menu-arrow { font: 700 14px/1 var(--gp-font-sans); color: var(--gp-text-tertiary); }
+  .menu-badge { padding: 2px 8px; border-radius: 100px; background: var(--gp-danger-500); color: white; font: 700 10px/1.4 var(--gp-font-sans); }
+
+  /* TabBar */
+  .tabbar-wrapper { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 414px; z-index: 100; pointer-events: none; }
+  .tabbar { position: relative; margin: 0 24px 16px; height: 68px; background: var(--gp-surface); display: flex; justify-content: space-around; align-items: center; border-radius: 24px; box-shadow: var(--gp-shadow-lg); border: 2px solid var(--gp-border); padding: 0 8px; backdrop-filter: blur(20px); pointer-events: all; }
+  .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--gp-text-tertiary); font: 700 10px/1.3 var(--gp-font-sans); height: 52px; border-radius: 100px; cursor: pointer; transition: var(--gp-transition-base); }
+  .tab-item svg { width: 22px; height: 22px; }
+  .tab-item.active { color: var(--gp-brand-600); background: linear-gradient(135deg, var(--gp-brand-100), #FAF0E6); }
+  .fab-record { position: absolute; top: -28px; left: 50%; transform: translateX(-50%); width: 64px; height: 64px; background: var(--gp-gradient-brand); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; cursor: pointer; transition: var(--gp-transition-base); box-shadow: var(--gp-shadow-brand); border: 4px solid var(--gp-bg-primary); pointer-events: all; z-index: 101; }
+  .fab-record:active { transform: translateX(-50%) scale(0.92); }
+  .fab-record svg { width: 28px; height: 28px; }
+  .fab-record-label { font: 700 10px/1.3 var(--gp-font-sans); margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-title">我的</div>
+  </div>
+
+  <!-- User Card -->
+  <div class="user-card">
+    <div class="user-avatar">👤</div>
+    <div class="user-name">GoldenPaw用户</div>
+    <div class="user-id">ID: goldenpaw_001</div>
+    <div class="user-stats">
+      <div class="user-stat">
+        <div class="stat-value">128</div>
+        <div class="stat-label">记账天数</div>
+      </div>
+      <div class="user-stat">
+        <div class="stat-value">356</div>
+        <div class="stat-label">记账笔数</div>
+      </div>
+      <div class="user-stat">
+        <div class="stat-value">3</div>
+        <div class="stat-label">存钱目标</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Management -->
+  <div class="menu-section">
+    <div class="menu-title">数据管理</div>
+    <div class="menu-list">
+      <div class="menu-item">
+        <div class="menu-icon gold">📤</div>
+        <div class="menu-info">
+          <div class="menu-name">导出数据</div>
+          <div class="menu-desc">CSV / Excel 格式</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon green">📥</div>
+        <div class="menu-info">
+          <div class="menu-name">导入数据</div>
+          <div class="menu-desc">微信 / 支付宝账单</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon blue">☁️</div>
+        <div class="menu-info">
+          <div class="menu-name">云同步</div>
+          <div class="menu-desc">上次同步: 5分钟前</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon red">🗑️</div>
+        <div class="menu-info">
+          <div class="menu-name">清空数据</div>
+          <div class="menu-desc">谨慎操作，不可恢复</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Personalization -->
+  <div class="menu-section">
+    <div class="menu-title">个性化</div>
+    <div class="menu-list">
+      <div class="menu-item">
+        <div class="menu-icon gold">🎨</div>
+        <div class="menu-info">
+          <div class="menu-name">主题颜色</div>
+          <div class="menu-desc">暖金（当前）</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon blue">🔔</div>
+        <div class="menu-info">
+          <div class="menu-name">提醒设置</div>
+          <div class="menu-desc">每日记账提醒、预算预警</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon green">🔒</div>
+        <div class="menu-info">
+          <div class="menu-name">密码/指纹锁</div>
+          <div class="menu-desc">保护您的财务隐私</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Basic Settings -->
+  <div class="menu-section">
+    <div class="menu-title">基础设置</div>
+    <div class="menu-list">
+      <div class="menu-item">
+        <div class="menu-icon gold">🏷️</div>
+        <div class="menu-info">
+          <div class="menu-name">分类管理</div>
+          <div class="menu-desc">自定义收支分类</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon blue">💳</div>
+        <div class="menu-info">
+          <div class="menu-name">账户管理</div>
+          <div class="menu-desc">管理资产账户</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon green">💰</div>
+        <div class="menu-info">
+          <div class="menu-name">币种设置</div>
+          <div class="menu-desc">CNY（人民币）</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon gray">📅</div>
+        <div class="menu-info">
+          <div class="menu-name">记账周期</div>
+          <div class="menu-desc">自然月</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- About -->
+  <div class="menu-section">
+    <div class="menu-title">关于</div>
+    <div class="menu-list">
+      <div class="menu-item">
+        <div class="menu-icon blue">❓</div>
+        <div class="menu-info">
+          <div class="menu-name">帮助中心</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon gold">⭐</div>
+        <div class="menu-info">
+          <div class="menu-name">评分鼓励</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon gray">📋</div>
+        <div class="menu-info">
+          <div class="menu-name">用户协议</div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon gold">🐾</div>
+        <div class="menu-info">
+          <div class="menu-name">GoldenPaw</div>
+          <div class="menu-desc">v1.0.0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TabBar -->
+<div class="tabbar-wrapper">
+  <div class="tabbar">
+    <div class="fab-record" onclick="alert('弹出记账BottomSheet')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      <span class="fab-record-label">记账</span>
+    </div>
+    <div class="tab-item" onclick="location.href='GoldenPaw_Home_v3.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>
+      <span>首页</span>
+    </div>
+    <div class="tab-item" onclick="location.href='GoldenPaw_AI.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M12 6v6l4 2"/></svg>
+      <span>AI记账</span>
+    </div>
+    <div style="width: 64px;"></div>
+    <div class="tab-item" onclick="location.href='GoldenPaw_Assets.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      <span>资产</span>
+    </div>
+    <div class="tab-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>我的</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>"""
+
+with open('/mnt/agents/output/GoldenPaw_Profile.html', 'w', encoding='utf-8') as f:
+    f.write(profile_page)
+
+print("我的页面已生成")
