@@ -21,9 +21,12 @@ GoldenPaw/
 │   ├── pages/assets/assets          # 资产 (Tab 2)
 │   ├── pages/profile/profile        # 我的 (Tab 3)
 │   ├── pages/report/report          # 收支报表 (二级)
-│   ├── pages/detail/detail          # 明细 (二级)
+│   ├── pages/detail/detail          # 明细 (二级，支持日期筛选)
 │   ├── pages/goals/goals            # 存钱目标 (二级)
-│   └── pages/pending/pending        # 待确认 (二级)
+│   ├── pages/pending/pending        # 待确认 (二级)
+│   ├── pages/settings/index         # 设置页面 (二级，根据type参数显示不同内容)
+│   ├── pages/search/search          # 搜索页面 (二级)
+│   └── pages/help/help              # 帮助页面 (二级)
 │
 ├── pages/
 │   ├── index/index.vue              # 首页
@@ -46,7 +49,8 @@ GoldenPaw/
 │   │
 │   ├── profile/profile.vue          # 我的
 │   │   ├── 使用 → TabBar.vue
-│   │   └── 使用 → RecordSheet.vue
+│   │   ├── 使用 → RecordSheet.vue
+│   │   └── 跳转 → settings/index, help/help
 │   │
 │   ├── report/report.vue            # 收支报表
 │   │   └── 数据 → stores/transaction.ts
@@ -58,8 +62,27 @@ GoldenPaw/
 │   ├── goals/goals.vue              # 存钱与预算
 │   │   └── 使用 → SegmentedControl.vue (切换)
 │   │
-│   └── pending/pending.vue          # 待确认
-│       └── 静态数据 (3条示例待确认记录)
+│   ├── pending/pending.vue          # 待确认
+│   │   └── 静态数据 (3条示例待确认记录)
+│   │
+│   ├── settings/index.vue           # 设置页面（通用）
+│   │   ├── type=category            # 分类管理
+│   │   ├── type=account             # 账户管理
+│   │   ├── type=theme               # 主题颜色
+│   │   ├── type=reminder            # 提醒设置
+│   │   ├── type=security            # 密码/指纹锁
+│   │   ├── type=currency            # 币种设置
+│   │   ├── type=cycle               # 记账周期
+│   │   ├── type=export              # 导出数据
+│   │   ├── type=import              # 导入数据
+│   │   ├── type=sync                # 云同步
+│   │   └── type=clear               # 清空数据
+│   │
+│   ├── search/search.vue            # 搜索页面
+│   │   └── 数据 → stores/transaction.ts, stores/category.ts
+│   │
+│   └── help/help.vue                # 帮助页面
+│       └── FAQ + 联系方式
 │
 ├── components/
 │   ├── TabBar.vue                   # 自定义底部导航栏
