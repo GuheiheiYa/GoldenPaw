@@ -1,0 +1,86 @@
+// GoldenPaw Design System v1.0
+
+// ===== Brand Colors =====
+$brand-50: #FDF8F3;
+$brand-100: #F5E6D3;
+$brand-200: #EDD4B8;
+$brand-300: #D4A574;
+$brand-400: #C8956C;
+$brand-500: #C8956C;
+$brand-600: #A67B5B;
+$brand-700: #8B6549;
+$brand-800: #6F4F3A;
+$brand-900: #3D3229;
+
+// ===== Functional Colors =====
+$success-50: #F0F7F0;
+$success-100: #E8F0E8;
+$success-500: #6B8E6B;
+$success-600: #5A7A5A;
+
+$danger-50: #FAF0EE;
+$danger-100: #F5E0DC;
+$danger-500: #C06C5F;
+$danger-600: #A85D52;
+
+$accent-50: #F0F5F7;
+$accent-100: #E8F1F5;
+$accent-500: #7A9EAF;
+$accent-600: #6A8C9C;
+
+// ===== Neutral Colors =====
+$text-primary: #3D3229;
+$text-secondary: #7A6B5D;
+$text-tertiary: #A89B8E;
+$text-placeholder: #C4B8AD;
+
+$bg-primary: #FDF8F3;
+$bg-secondary: #F7EDE0;
+$bg-tertiary: #F0E6D8;
+$surface: #FFFFFF;
+$surface-elevated: #FFFFFF;
+
+$border: #EDE4D8;
+$border-light: #F5EDE4;
+$border-focus: #C8956C;
+
+// ===== Gradients =====
+$gradient-brand: linear-gradient(135deg, #C8956C, #A67B5B);
+$gradient-success: linear-gradient(90deg, #6B8E6B, #8FBC8F);
+$gradient-danger: linear-gradient(90deg, #C06C5F, #D4857A);
+$gradient-warm: linear-gradient(180deg, #FDF8F3, #F7EDE0);
+
+// ===== Shadows =====
+$shadow-sm: 0 2px 8px rgba(61, 50, 41, 0.04);
+$shadow-md: 0 8px 24px rgba(61, 50, 41, 0.06);
+$shadow-lg: 0 16px 48px rgba(61, 50, 41, 0.08);
+$shadow-brand: 0 4px 16px rgba(200, 149, 108, 0.35);
+$shadow-inset: inset 0 1px 2px rgba(61, 50, 41, 0.04);
+
+// ===== Radius =====
+$radius-sm: 12px;
+$radius-md: 16px;
+$radius-lg: 20px;
+$radius-xl: 24px;
+$radius-full: 100px;
+$radius-circle: 50%;
+
+// ===== Spacing =====
+$space-1: 4px;
+$space-2: 8px;
+$space-3: 12px;
+$space-4: 16px;
+$space-5: 20px;
+$space-6: 24px;
+$space-8: 32px;
+$space-10: 40px;
+$space-12: 48px;
+
+// ===== Typography =====
+$font-sans: -apple-system, 'SF Pro Display', 'Segoe UI', 'PingFang SC', 'Noto Sans SC', sans-serif;
+
+// ===== Transitions =====
+$transition-fast: 0.15s ease;
+$transition-base: 0.2s ease;
+$transition-slow: 0.3s ease;
+$transition-spring: 0.4s cubic-bezier(0.32, 0.72, 0, 1);

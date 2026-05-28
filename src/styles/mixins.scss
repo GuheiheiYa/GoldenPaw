@@ -1,0 +1,113 @@
+@use './design-system' as *;
+
+// ===== Typography Mixins =====
+@mixin text-hero {
+  font: 800 40px/1.1 $font-sans;
+  letter-spacing: -1.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+@mixin text-h1 {
+  font: 700 24px/1.3 $font-sans;
+  letter-spacing: -0.3px;
+}
+
+@mixin text-h2 {
+  font: 700 18px/1.4 $font-sans;
+  letter-spacing: -0.2px;
+}
+
+@mixin text-h3 {
+  font: 700 16px/1.4 $font-sans;
+}
+
+@mixin text-body {
+  font: 600 15px/1.5 $font-sans;
+}
+
+@mixin text-caption {
+  font: 600 13px/1.4 $font-sans;
+}
+
+@mixin text-small {
+  font: 600 11px/1.4 $font-sans;
+  letter-spacing: 0.5px;
+}
+
+@mixin text-micro {
+  font: 700 10px/1.3 $font-sans;
+  letter-spacing: 1px;
+}
+
+// ===== Gradient Mixins =====
+@mixin gradient-brand {
+  background: linear-gradient(135deg, $brand-500, $brand-600);
+}
+
+@mixin gradient-success {
+  background: linear-gradient(90deg, $success-500, #8FBC8F);
+}
+
+@mixin gradient-danger {
+  background: linear-gradient(90deg, $danger-500, #D4857A);
+}
+
+// ===== Component Mixins =====
+@mixin card-base {
+  background: $surface;
+  border-radius: $radius-lg;
+  border: 1px solid $border;
+  box-shadow: $shadow-sm;
+}
+
+@mixin card-emphasis {
+  background: $surface;
+  border-radius: $radius-lg;
+  border: 2px solid $brand-100;
+  box-shadow: $shadow-md;
+}
+
+@mixin icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-sm;
+  background: $surface;
+  border: 1px solid $border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: $shadow-sm;
+  transition: $transition-base;
+
+  &:active {
+    transform: scale(0.92);
+  }
+}
+
+@mixin capsule-btn($bg, $color) {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  border-radius: $radius-full;
+  font: 700 13px/1.4 $font-sans;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: $transition-base;
+  border: none;
+  background: $bg;
+  color: $color;
+  box-shadow: $shadow-sm;
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// ===== Amount Display =====
+@mixin amount-display {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -1px;
+  font-weight: 800;
+}
