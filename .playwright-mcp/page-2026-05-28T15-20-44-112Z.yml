@@ -1,0 +1,13 @@
+- generic [ref=e230]:
+  - generic [ref=e231]:
+    - generic [ref=e233] [cursor=pointer]: ←
+    - generic [ref=e234]:
+      - generic [ref=e235]: 🔍
+      - generic [ref=e237]:
+        - generic: 搜索交易记录
+        - textbox [active] [ref=e238]
+  - generic [ref=e240]:
+    - generic [ref=e241]: 搜索提示
+    - generic [ref=e242]: • 输入交易备注关键词
+    - generic [ref=e243]: • 输入分类名称如"餐饮"
+    - generic [ref=e244]: • 输入金额如"100"

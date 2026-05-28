@@ -1,0 +1,69 @@
+- generic [ref=e351]:
+  - generic [ref=e352]:
+    - generic [ref=e354] [cursor=pointer]: ←
+    - generic [ref=e355]: 存钱与预算
+    - generic [ref=e357] [cursor=pointer]: + 新建
+  - generic [ref=e358]:
+    - generic [ref=e360] [cursor=pointer]: 存钱目标
+    - generic [ref=e362] [cursor=pointer]: 预算管理
+  - generic [ref=e363]:
+    - generic [ref=e364]:
+      - generic [ref=e365]:
+        - generic [ref=e367]: ✈️
+        - generic [ref=e368]:
+          - generic [ref=e369]: 年底旅行基金
+          - generic [ref=e370]: ¥13,000 / ¥20,000
+        - generic [ref=e374]: 65%
+      - generic [ref=e378]:
+        - generic [ref=e379]:
+          - generic [ref=e380]: 剩余天数
+          - generic [ref=e381]: "218"
+        - generic [ref=e382]:
+          - generic [ref=e383]: 每月需存
+          - generic [ref=e384]: ¥3,200
+        - generic [ref=e385]:
+          - generic [ref=e386]: 已存进度
+          - generic [ref=e387]: 65%
+      - generic [ref=e388]:
+        - generic [ref=e390] [cursor=pointer]: 存入金额
+        - generic [ref=e392] [cursor=pointer]: 调整目标
+    - generic [ref=e393]:
+      - generic [ref=e394]:
+        - generic [ref=e396]: 📱
+        - generic [ref=e397]:
+          - generic [ref=e398]: 换新手机
+          - generic [ref=e399]: ¥3,200 / ¥8,000
+        - generic [ref=e403]: 40%
+      - generic [ref=e407]:
+        - generic [ref=e408]:
+          - generic [ref=e409]: 剩余天数
+          - generic [ref=e410]: "90"
+        - generic [ref=e411]:
+          - generic [ref=e412]: 每月需存
+          - generic [ref=e413]: ¥5,400
+        - generic [ref=e414]:
+          - generic [ref=e415]: 已存进度
+          - generic [ref=e416]: 40%
+      - generic [ref=e417]:
+        - generic [ref=e419] [cursor=pointer]: 存入金额
+        - generic [ref=e421] [cursor=pointer]: 调整目标
+    - generic [ref=e422]:
+      - generic [ref=e423]:
+        - generic [ref=e425]: 🎁
+        - generic [ref=e426]:
+          - generic [ref=e427]: 应急备用金
+          - generic [ref=e428]: ¥5,000 / ¥50,000
+        - generic [ref=e432]: 10%
+      - generic [ref=e436]:
+        - generic [ref=e437]:
+          - generic [ref=e438]: 目标类型
+          - generic [ref=e439]: 长期
+        - generic [ref=e440]:
+          - generic [ref=e441]: 建议月存
+          - generic [ref=e442]: ¥2,000
+        - generic [ref=e443]:
+          - generic [ref=e444]: 已存进度
+          - generic [ref=e445]: 10%
+      - generic [ref=e446]:
+        - generic [ref=e448] [cursor=pointer]: 存入金额
+        - generic [ref=e450] [cursor=pointer]: 调整目标

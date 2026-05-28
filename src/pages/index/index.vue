@@ -89,7 +89,7 @@
           :meta="tx.meta"
           :amount="tx.amount"
           :amount-type="tx.amountType"
-          @tap="onFlowItemTap"
+          @tap="() => onFlowItemTap(tx.id)"
         />
         <view v-if="recentFlowItems.length === 0" class="empty-hint">
           <text class="empty-text">暂无流水记录</text>

@@ -1,0 +1,41 @@
+- generic [ref=e454]:
+  - generic [ref=e455]:
+    - generic [ref=e457] [cursor=pointer]: ←
+    - generic [ref=e458]: 明细
+    - generic [ref=e459]:
+      - generic [ref=e461] [cursor=pointer]: 🔍
+      - generic [ref=e463] [cursor=pointer]: ⚙
+  - generic [ref=e465]:
+    - generic [ref=e467] [cursor=pointer]: 全部
+    - generic [ref=e469] [cursor=pointer]: 支出
+    - generic [ref=e471] [cursor=pointer]: 收入
+    - generic [ref=e473] [cursor=pointer]: 转账
+  - generic [ref=e474]:
+    - generic [ref=e475]:
+      - generic [ref=e476]: 2026年5月
+      - generic [ref=e477]: 支出 ¥103.00
+    - generic [ref=e478]:
+      - generic [ref=e479] [cursor=pointer]:
+        - generic [ref=e481]: 🍜
+        - generic [ref=e482]:
+          - generic [ref=e483]: 午餐 - 黄焖鸡
+          - generic [ref=e484]: 05-28 12:30 · 餐饮
+        - generic [ref=e485]:
+          - generic [ref=e486]: "-¥35.00"
+          - generic [ref=e488]: 预算内
+      - generic [ref=e489] [cursor=pointer]:
+        - generic [ref=e491]: 🍜
+        - generic [ref=e492]:
+          - generic [ref=e493]: 瑞幸咖啡
+          - generic [ref=e494]: 05-28 09:15 · 餐饮
+        - generic [ref=e495]:
+          - generic [ref=e496]: "-¥18.00"
+          - generic [ref=e498]: 预算内
+      - generic [ref=e499] [cursor=pointer]:
+        - generic [ref=e501]: 🚕
+        - generic [ref=e502]:
+          - generic [ref=e503]: 地铁充值
+          - generic [ref=e504]: 05-28 08:00 · 交通
+        - generic [ref=e505]:
+          - generic [ref=e506]: "-¥50.00"
+          - generic [ref=e508]: 预算内
