@@ -17,7 +17,9 @@
 
 <script setup lang="ts">
 /** 流水项的 props */
-defineProps<{
+const props = defineProps<{
+  /** 交易ID */
+  id?: string
   /** emoji 图标 */
   icon: string
   /** 图标背景色 */
@@ -32,9 +34,15 @@ defineProps<{
   amountType: 'in' | 'out'
 }>()
 
-/** 点击流水项（后续可跳转详情） */
+const emit = defineEmits<{
+  (e: 'tap', id: string): void
+}>()
+
+/** 点击流水项 */
 function handleTap() {
-  // 后续扩展
+  if (props.id) {
+    emit('tap', props.id)
+  }
 }
 </script>
 

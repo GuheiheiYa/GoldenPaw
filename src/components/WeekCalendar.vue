@@ -19,6 +19,10 @@ import { computed } from 'vue'
 /** 星期名称 */
 const WEEK_NAMES = ['日', '一', '二', '三', '四', '五', '六']
 
+const emit = defineEmits<{
+  (e: 'dayTap', dateStr: string): void
+}>()
+
 /** 计算当前周的日期数据 */
 const weekDays = computed(() => {
   const now = new Date()
@@ -32,9 +36,13 @@ const weekDays = computed(() => {
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday)
     d.setDate(monday.getDate() + i)
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
     return {
       name: WEEK_NAMES[i],
       date: d.getDate(),
+      dateStr: `${y}-${m}-${day}`,
       isToday:
         d.getFullYear() === now.getFullYear() &&
         d.getMonth() === now.getMonth() &&
@@ -44,8 +52,8 @@ const weekDays = computed(() => {
 })
 
 /** 点击日期 */
-function handleDayTap(day: { date: number }) {
-  // 后续可扩展为选中日期查看当日流水
+function handleDayTap(day: { dateStr: string }) {
+  emit('dayTap', day.dateStr)
 }
 </script>
 

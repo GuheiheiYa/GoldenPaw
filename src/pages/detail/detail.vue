@@ -69,6 +69,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
 import { useTransactionStore } from '@/stores/transaction'
 import { useCategoryStore } from '@/stores/category'
 import { formatAmount, formatDate } from '@/utils/format'
@@ -77,6 +78,16 @@ import type { Transaction } from '@/types/transaction'
 
 const transactionStore = useTransactionStore()
 const categoryStore = useCategoryStore()
+
+/** URL 参数中的日期筛选 */
+const filterDate = ref('')
+
+/** 页面加载时获取参数 */
+onLoad((options) => {
+  if (options?.date) {
+    filterDate.value = options.date
+  }
+})
 
 /** 当前筛选类型 */
 const activeFilter = ref('all')
@@ -98,9 +109,14 @@ interface MonthGroup {
 /** 按月分组并排序的交易列表 */
 const filteredGroups = computed<MonthGroup[]>(() => {
   // 根据筛选条件过滤
-  const txs = activeFilter.value === 'all'
-    ? transactionStore.transactions
+  let txs = activeFilter.value === 'all'
+    ? [...transactionStore.transactions]
     : transactionStore.transactions.filter(t => t.type === activeFilter.value)
+
+  // 如果有日期筛选，只显示该日期的数据
+  if (filterDate.value) {
+    txs = txs.filter(t => t.date === filterDate.value)
+  }
 
   // 按日期和时间降序排列
   const sorted = [...txs].sort((a, b) => {

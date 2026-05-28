@@ -1,0 +1,181 @@
+[   45415ms] [LOG] 调整目标: 年底旅行基金 @ http://localhost:5174/src/pages/goals/goals.vue:17
+[   45636ms] [LOG] 调整目标: 年底旅行基金 @ http://localhost:5174/src/pages/goals/goals.vue:17
+[   45843ms] [LOG] 存入金额: 年底旅行基金 @ http://localhost:5174/src/pages/goals/goals.vue:14
+[   46013ms] [LOG] 存入金额: 年底旅行基金 @ http://localhost:5174/src/pages/goals/goals.vue:14
+[   80296ms] Object
+[   81635ms] [WARNING] [vue-router]: importing from 'vue-router/dist/vue-router.esm-bundler.js' is deprecated. Use 'vue-router' directly. @ http://localhost:5174/node_modules/@dcloudio/uni-h5/node_modules/vue-router/dist/vue-router.esm-bundler.js:0
+[   81652ms] [LOG] GoldenPaw App Launched @ http://localhost:5174/src/App.vue:8
+[   83145ms] Object
+[  137217ms] [WARNING] [Vue warn]: Unhandled error during execution of native event handler 
+ at <View>
+at <View>
+at <View>
+at <View>
+at <View>
+at <View>
+at <Index>
+at <AsyncComponentWrapper>
+at <PageBody>
+at <Page>
+at <Anonymous>
+at <KeepAlive>
+at <RouterView>
+at <Layout>
+at <App> @ http://localhost:5174/node_modules/@dcloudio/uni-h5/dist/uni-h5.es.js:16313
+[  137217ms] [ERROR] TypeError: _ctx.showToast is not a function
+    at _createVNode.onClick._cache.<computed>._cache.<computed> (http://localhost:5174/src/pages/index/index.vue?t=1779979828482:133:77)
+    at callWithErrorHandling (http://localhost:5174/node_modules/@dcloudio/uni-h5-vue/dist/vue.runtime.esm.js:1381:19)
+    at callWithAsyncErrorHandling (http://localhost:5174/node_modules/@dcloudio/uni-h5-vue/dist/vue.runtime.esm.js:1388:17)
+    at HTMLElement.invoker (http://localhost:5174/node_modules/@dcloudio/uni-h5-vue/dist/vue.runtime.esm.js:10198:5) @ http://localhost:5174/node_modules/@dcloudio/uni-h5-vue/dist/vue.runtime.esm.js:1442
+[  137894ms] Object
+[  139510ms] [WARNING] [vue-router]: importing from 'vue-router/dist/vue-router.esm-bundler.js' is deprecated. Use 'vue-router' directly. @ http://localhost:5174/node_modules/@dcloudio/uni-h5/node_modules/vue-router/dist/vue-router.esm-bundler.js:0
+[  139519ms] [LOG] GoldenPaw App Launched @ http://localhost:5174/src/App.vue:8
+[  140111ms] Object
+[  140510ms] [WARNING] [Vue warn]: Unhandled error during execution of native event handler 
+ at <View>
+at <View>
+at <View>
+at <View>
+at <View>
+at <View>
+at <Index>
+at <AsyncComponentWrapper>
+at <PageBody>
+at <Page>
+at <Anonymous>
+at <KeepAlive>
+at <RouterView>
+at <Layout>
+at <App> @ http://localhost:5174/node_modules/@dcloudio/uni-h5/dist/uni-h5.es.js:16313
+[  140510ms] [ERROR] TypeError: _ctx.showToast is not a function
+    at _createVNode.onClick._cache.<computed>._cache.<computed> (http://localhost:5174/src/pages/index/index.vue?t=1779979828482:133:77)
+    at callWithErrorHandling (http://localhost:5174/node_modules/@dcloudio/uni-h5-vue/dist/vue.runtime.esm.js:1381:19)
+    at callWithAsyncErrorHandling (http://localhost:5174/node_modules/@dcloudio/uni-h5-vue/dist/vue.runtime.esm.js:1388:17)
+    at HTMLElement.invoker (http://localhost:5174/node_modules/@dcloudio/uni-h5-vue/dist/vue.runtime.esm.js:10198:5) @ http://localhost:5174/node_modules/@dcloudio/uni-h5-vue/dist/vue.runtime.esm.js:1442
+[  219383ms] [LOG] 新建目标 @ http://localhost:5174/src/pages/goals/goals.vue:11
+[  221521ms] [LOG] 存入金额: 年底旅行基金 @ http://localhost:5174/src/pages/goals/goals.vue:14
+[  221727ms] [LOG] 调整目标: 年底旅行基金 @ http://localhost:5174/src/pages/goals/goals.vue:17
+[  221895ms] [LOG] 调整目标: 年底旅行基金 @ http://localhost:5174/src/pages/goals/goals.vue:17
+[  370797ms] [WARNING] [vue-router]: importing from 'vue-router/dist/vue-router.esm-bundler.js' is deprecated. Use 'vue-router' directly. @ http://localhost:5174/node_modules/@dcloudio/uni-h5/node_modules/vue-router/dist/vue-router.esm-bundler.js:0
+[  370808ms] [LOG] GoldenPaw App Launched @ http://localhost:5174/src/App.vue:8
+[  384653ms] [WARNING] [Vue warn]: Property "onFlowItemTap" was accessed during render but is not defined on instance. 
+ at <View>
+at <View>
+at <View>
+at <Index>
+at <AsyncComponentWrapper>
+at <PageBody>
+at <Page>
+at <Anonymous>
+at <KeepAlive>
+at <RouterView>
+at <Layout>
+at <App> @ http://localhost:5174/node_modules/@dcloudio/uni-h5/dist/uni-h5.es.js:16313
+[  384653ms] [WARNING] [Vue warn]: Property "onFlowItemTap" was accessed during render but is not defined on instance. 
+ at <View>
+at <View>
+at <View>
+at <Index>
+at <AsyncComponentWrapper>
+at <PageBody>
+at <Page>
+at <Anonymous>
+at <KeepAlive>
+at <RouterView>
+at <Layout>
+at <App> @ http://localhost:5174/node_modules/@dcloudio/uni-h5/dist/uni-h5.es.js:16313
+[  384654ms] [WARNING] [Vue warn]: Property "onFlowItemTap" was accessed during render but is not defined on instance. 
+ at <View>
+at <View>
+at <View>
+at <Index>
+at <AsyncComponentWrapper>
+at <PageBody>
+at <Page>
+at <Anonymous>
+at <KeepAlive>
+at <RouterView>
+at <Layout>
+at <App> @ http://localhost:5174/node_modules/@dcloudio/uni-h5/dist/uni-h5.es.js:16313
+[  384654ms] [WARNING] [Vue warn]: Property "onFlowItemTap" was accessed during render but is not defined on instance. 
+ at <View>
+at <View>
+at <View>
+at <Index>
+at <AsyncComponentWrapper>
+at <PageBody>
+at <Page>
+at <Anonymous>
+at <KeepAlive>
+at <RouterView>
+at <Layout>
+at <App> @ http://localhost:5174/node_modules/@dcloudio/uni-h5/dist/uni-h5.es.js:16313
+[  384654ms] [WARNING] [Vue warn]: Property "onFlowItemTap" was accessed during render but is not defined on instance. 
+ at <View>
+at <View>
+at <View>
+at <Index>
+at <AsyncComponentWrapper>
+at <PageBody>
+at <Page>
+at <Anonymous>
+at <KeepAlive>
+at <RouterView>
+at <Layout>
+at <App> @ http://localhost:5174/node_modules/@dcloudio/uni-h5/dist/uni-h5.es.js:16313
+[  384654ms] [WARNING] [Vue warn]: Property "onFlowItemTap" was accessed during render but is not defined on instance. 
+ at <View>
+at <View>
+at <View>
+at <Index>
+at <AsyncComponentWrapper>
+at <PageBody>
+at <Page>
+at <Anonymous>
+at <KeepAlive>
+at <RouterView>
+at <Layout>
+at <App> @ http://localhost:5174/node_modules/@dcloudio/uni-h5/dist/uni-h5.es.js:16313
+[  384654ms] [WARNING] [Vue warn]: Property "onFlowItemTap" was accessed during render but is not defined on instance. 
+ at <View>
+at <View>
+at <View>
+at <Index>
+at <AsyncComponentWrapper>
+at <PageBody>
+at <Page>
+at <Anonymous>
+at <KeepAlive>
+at <RouterView>
+at <Layout>
+at <App> @ http://localhost:5174/node_modules/@dcloudio/uni-h5/dist/uni-h5.es.js:16313
+[  384655ms] [WARNING] [Vue warn]: Property "onFlowItemTap" was accessed during render but is not defined on instance. 
+ at <View>
+at <View>
+at <View>
+at <Index>
+at <AsyncComponentWrapper>
+at <PageBody>
+at <Page>
+at <Anonymous>
+at <KeepAlive>
+at <RouterView>
+at <Layout>
+at <App> @ http://localhost:5174/node_modules/@dcloudio/uni-h5/dist/uni-h5.es.js:16313
+[  407488ms] [LOG] 点击菜单: 云同步 @ http://localhost:5174/src/pages/profile/profile.vue:14
+[  600656ms] [WARNING] [Vue warn]: Property "onDayTap" was accessed during render but is not defined on instance. 
+ at <View>
+at <View>
+at <Index>
+at <AsyncComponentWrapper>
+at <PageBody>
+at <Page>
+at <Anonymous>
+at <KeepAlive>
+at <RouterView>
+at <Layout>
+at <App> @ http://localhost:5174/node_modules/@dcloudio/uni-h5/dist/uni-h5.es.js:16313
+[ 1227856ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5174/src/pages-json-js?t=1779980628407:0
+[ 1255581ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5174/src/pages-json-js?t=1779980948378:0
+[ 1404710ms] [WARNING] [vue-router]: importing from 'vue-router/dist/vue-router.esm-bundler.js' is deprecated. Use 'vue-router' directly. @ http://localhost:5174/node_modules/@dcloudio/uni-h5/node_modules/vue-router/dist/vue-router.esm-bundler.js:0
+[ 1404726ms] [LOG] GoldenPaw App Launched @ http://localhost:5174/src/App.vue:8

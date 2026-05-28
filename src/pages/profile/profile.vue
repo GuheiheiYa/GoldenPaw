@@ -14,11 +14,11 @@
       <text class="user-id">ID: goldenpaw_001</text>
       <view class="user-stats">
         <view class="user-stat">
-          <text class="stat-value">128</text>
+          <text class="stat-value">{{ recordDays }}</text>
           <text class="stat-label">记账天数</text>
         </view>
         <view class="user-stat">
-          <text class="stat-value">356</text>
+          <text class="stat-value">{{ recordCount }}</text>
           <text class="stat-label">记账笔数</text>
         </view>
         <view class="user-stat">
@@ -102,20 +102,68 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app'
+import { useTransactionStore } from '@/stores/transaction'
 import TabBar from '@/components/TabBar.vue'
 import RecordSheet from '@/components/RecordSheet.vue'
 
 const appStore = useAppStore()
+const txStore = useTransactionStore()
 
 onShow(() => {
   appStore.setCurrentTab(3)
 })
 
+/** 记账天数 */
+const recordDays = computed(() => {
+  const dates = new Set(txStore.transactions.map(t => t.date))
+  return dates.size
+})
+
+/** 记账笔数 */
+const recordCount = computed(() => txStore.transactions.length)
+
+/** 菜单名称到设置类型的映射 */
+const menuTypeMap: Record<string, string> = {
+  '导出数据': 'export',
+  '导入数据': 'import',
+  '云同步': 'sync',
+  '清空数据': 'clear',
+  '主题颜色': 'theme',
+  '提醒设置': 'reminder',
+  '密码/指纹锁': 'security',
+  '分类管理': 'category',
+  '账户管理': 'account',
+  '币种设置': 'currency',
+  '记账周期': 'cycle',
+}
+
 /** 点击菜单项 */
 function onMenuTap(name: string) {
-  console.log('点击菜单:', name)
+  // 特殊处理
+  if (name === '帮助中心') {
+    uni.navigateTo({ url: '/pages/help/help' })
+    return
+  }
+  if (name === '评分鼓励') {
+    uni.showToast({ title: '感谢您的支持！', icon: 'none' })
+    return
+  }
+  if (name === '用户协议') {
+    uni.showToast({ title: '用户协议页面开发中', icon: 'none' })
+    return
+  }
+  if (name === 'GoldenPaw') {
+    return
+  }
+
+  // 跳转设置页面
+  const type = menuTypeMap[name]
+  if (type) {
+    uni.navigateTo({ url: `/pages/settings/index?type=${type}` })
+  }
 }
 
 /** 数据管理菜单 */

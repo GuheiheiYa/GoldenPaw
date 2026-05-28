@@ -11,10 +11,10 @@
             <text class="brand-text">GoldenPaw</text>
           </view>
           <view class="hero-actions">
-            <view class="icon-btn">
+            <view class="icon-btn" @tap="navigateTo('/pages/search/search')">
               <text class="icon-btn-text">🔍</text>
             </view>
-            <view class="icon-btn">
+            <view class="icon-btn" @tap="showToast('通知功能开发中')">
               <text class="icon-btn-text">🔔</text>
             </view>
           </view>
@@ -28,12 +28,12 @@
       <QuickActions />
 
       <!-- 周历 -->
-      <WeekCalendar />
+      <WeekCalendar @day-tap="onDayTap" />
 
       <!-- 本月预算（占位） -->
       <view class="section-header">
         <text class="section-title">本月预算</text>
-        <text class="section-link" @tap="navigateTo('/pages/budget/budget')">管理</text>
+        <text class="section-link" @tap="navigateTo('/pages/goals/goals?tab=budget')">管理</text>
       </view>
       <scroll-view scroll-x class="budget-scroll" :show-scrollbar="false">
         <view class="budget-card card" v-for="(item, idx) in budgetItems" :key="idx">
@@ -50,7 +50,7 @@
       <!-- 存钱目标（占位） -->
       <view class="section-header">
         <text class="section-title">存钱目标</text>
-        <text class="section-link" @tap="navigateTo('/pages/goal/goal')">全部</text>
+        <text class="section-link" @tap="navigateTo('/pages/goals/goals')">全部</text>
       </view>
       <view
         class="goal-card card"
@@ -82,12 +82,14 @@
         <FlowItem
           v-for="tx in recentFlowItems"
           :key="tx.id"
+          :id="tx.id"
           :icon="tx.icon"
           :icon-bg="tx.iconBg"
           :title="tx.title"
           :meta="tx.meta"
           :amount="tx.amount"
           :amount-type="tx.amountType"
+          @tap="onFlowItemTap"
         />
         <view v-if="recentFlowItems.length === 0" class="empty-hint">
           <text class="empty-text">暂无流水记录</text>
@@ -125,6 +127,23 @@ onShow(() => {
 /** 通用页面跳转 */
 function navigateTo(url: string) {
   uni.navigateTo({ url })
+}
+
+/** 显示提示 */
+function showToast(msg: string) {
+  uni.showToast({ title: msg, icon: 'none' })
+}
+
+/** 流水项点击 */
+function onFlowItemTap(id: string) {
+  // 跳转到明细页并高亮该条记录
+  navigateTo(`/pages/detail/detail?highlight=${id}`)
+}
+
+/** 日期点击 */
+function onDayTap(dateStr: string) {
+  // 跳转到明细页并按日期筛选
+  navigateTo(`/pages/detail/detail?date=${dateStr}`)
 }
 
 /** 预算占位数据 */
