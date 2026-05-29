@@ -1,25 +1,29 @@
 <template>
   <view class="balance-card card card-emphasis">
-    <text class="balance-label">本月结余</text>
-    <text class="balance-value">{{ formatAmount(store.monthlyBalance) }}</text>
+    <text class="balance-label">{{ label }}</text>
+    <text class="balance-value">{{ formatAmount(balance) }}</text>
     <view class="balance-row">
       <view class="pill pill-in">
         <text class="pill-label">收入</text>
-        <text class="pill-value pill-up">+{{ formatAmount(store.monthlyIncome) }}</text>
+        <text class="pill-value pill-up">+{{ formatAmount(income) }}</text>
       </view>
       <view class="pill pill-out">
         <text class="pill-label">支出</text>
-        <text class="pill-value pill-down">-{{ formatAmount(store.monthlyExpense) }}</text>
+        <text class="pill-value pill-down">-{{ formatAmount(expense) }}</text>
       </view>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { useTransactionStore } from '@/stores/transaction'
 import { formatAmount } from '@/utils/format'
 
-const store = useTransactionStore()
+const props = defineProps<{
+  income: number
+  expense: number
+  balance: number
+  label?: string
+}>()
 </script>
 
 <style lang="scss" scoped>

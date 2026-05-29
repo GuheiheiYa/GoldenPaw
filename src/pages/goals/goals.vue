@@ -116,8 +116,8 @@
           ></view>
         </view>
         <view class="budget-total-stats">
-          <text class="budget-stat-text">已用 {{ formatAmount(goalBudgetStore.totalBudgetUsed) }}</text>
-          <text class="budget-stat-text">剩余 {{ formatAmount(Math.max(goalBudgetStore.totalBudget - goalBudgetStore.totalBudgetUsed, 0)) }}</text>
+          <text class="budget-stat-text">已用 {{ formatAmount(cycleTotalBudgetUsed) }}</text>
+          <text class="budget-stat-text">剩余 {{ formatAmount(Math.max(goalBudgetStore.totalBudget - cycleTotalBudgetUsed, 0)) }}</text>
         </view>
       </view>
 
@@ -222,11 +222,21 @@ import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useGoalBudgetStore } from '@/stores/goalBudget'
 import { useCategoryStore } from '@/stores/category'
+import { useAppStore } from '@/stores/app'
 import type { Goal } from '@/stores/goalBudget'
 import EmojiGrid from '@/components/EmojiGrid.vue'
+import { getCycleRange } from '@/utils/cycle'
 
 const goalBudgetStore = useGoalBudgetStore()
 const categoryStore = useCategoryStore()
+const appStore = useAppStore()
+
+const cycleBudgetUsage = computed(() => {
+  const { start, end } = getCycleRange(appStore.cycle)
+  return goalBudgetStore.getBudgetUsageByRange(start, end)
+})
+
+const cycleTotalBudgetUsed = computed(() => cycleBudgetUsage.value.reduce((s, b) => s + b.used, 0))
 
 onLoad((options) => {
   if (options?.tab === 'budget') {
@@ -259,7 +269,7 @@ const ringCircumference = 2 * Math.PI * 26
 
 /* ─── Budget enrichment ─── */
 const enrichedBudgets = computed(() => {
-  return goalBudgetStore.budgetUsage.map(b => {
+  return cycleBudgetUsage.value.map(b => {
     const cat = categoryStore.getCategoryById(b.categoryId)
     return {
       ...b,
@@ -292,7 +302,7 @@ function getBudgetIconClass(categoryId: string): string {
 const totalBudgetPct = computed(() => {
   const total = goalBudgetStore.totalBudget
   if (total <= 0) return 0
-  return Math.min(Math.round((goalBudgetStore.totalBudgetUsed / total) * 100), 100)
+  return Math.min(Math.round((cycleTotalBudgetUsed.value / total) * 100), 100)
 })
 
 const usedBudgetCategoryIds = computed(() => new Set(goalBudgetStore.budgets.map(b => b.categoryId)))

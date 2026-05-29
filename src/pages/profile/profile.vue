@@ -96,6 +96,22 @@
       </view>
     </view>
 
+    <!-- 主题颜色（放最后） -->
+    <view class="menu-section">
+      <view class="menu-list">
+        <view class="menu-item" v-for="item in themeMenu" :key="item.name" @tap="onMenuTap(item.name)">
+          <view class="menu-icon" :class="item.iconClass">
+            <text class="menu-icon-text">{{ item.icon }}</text>
+          </view>
+          <view class="menu-info">
+            <text class="menu-name">{{ item.name }}</text>
+            <text class="menu-desc">{{ item.desc }}</text>
+          </view>
+          <uni-icons class="menu-arrow" type="arrow-right" size="14" color="#C8B8A8" />
+        </view>
+      </view>
+    </view>
+
     <TabBar />
     <RecordSheet />
   </view>
@@ -176,9 +192,13 @@ const dataMenus = [
 
 /** 个性化菜单 */
 const personalMenus = [
-  { icon: '🎨', name: '主题颜色', desc: '暖金（当前）', iconClass: 'gold' },
   { icon: '🔔', name: '提醒设置', desc: '每日记账提醒、预算预警', iconClass: 'blue' },
   { icon: '🔒', name: '密码/指纹锁', desc: '保护您的财务隐私', iconClass: 'green' },
+]
+
+/** 主题菜单（放最后） */
+const themeMenu = [
+  { icon: '🎨', name: '主题颜色', desc: '暖金（当前）', iconClass: 'gold' },
 ]
 
 /** 基础设置菜单 */

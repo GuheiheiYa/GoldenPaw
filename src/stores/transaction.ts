@@ -57,6 +57,13 @@ export const useTransactionStore = defineStore('transaction', () => {
     return transactions.value.slice(0, count)
   }
 
+  function getStatsByDateRange(start: string, end: string) {
+    const list = transactions.value.filter(t => t.date >= start && t.date <= end)
+    const income = list.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
+    const expense = list.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
+    return { income, expense, balance: income - expense }
+  }
+
   const monthlyExpense = computed(() => {
     const prefix = getToday().slice(0, 7)
     return transactions.value
@@ -82,6 +89,7 @@ export const useTransactionStore = defineStore('transaction', () => {
     updateTransaction,
     getTransactionsByMonth,
     getRecentTransactions,
+    getStatsByDateRange,
     monthlyExpense,
     monthlyIncome,
     monthlyBalance,

@@ -9,8 +9,8 @@
 
 body {
   font-family: -apple-system, 'SF Pro Display', 'Segoe UI', 'PingFang SC', 'Noto Sans SC', sans-serif;
-  background: #FDF8F3;
-  color: #3D3229;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }

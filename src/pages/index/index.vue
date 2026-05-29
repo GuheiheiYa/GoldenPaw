@@ -21,7 +21,12 @@
         </view>
 
         <!-- 余额卡片 -->
-        <BalanceCard />
+        <BalanceCard
+          :income="cycleStats.income"
+          :expense="cycleStats.expense"
+          :balance="cycleStats.balance"
+          :label="appStore.cycle === 'natural' ? '本月结余' : '本期结余'"
+        />
       </view>
 
       <!-- 快捷操作 -->
@@ -112,6 +117,7 @@ import { useTransactionStore } from '@/stores/transaction'
 import { useCategoryStore } from '@/stores/category'
 import { useGoalBudgetStore } from '@/stores/goalBudget'
 import { formatAmount, formatDate } from '@/utils/format'
+import { getCycleRange } from '@/utils/cycle'
 import TabBar from '@/components/TabBar.vue'
 import RecordSheet from '@/components/RecordSheet.vue'
 import BalanceCard from '@/components/BalanceCard.vue'
@@ -151,8 +157,15 @@ function onDayTap(dateStr: string) {
 }
 
 /** 首页预算数据（取自 store，最多3个） */
+/** 按当前记账周期计算的收支统计 */
+const cycleStats = computed(() => {
+  const { start, end } = getCycleRange(appStore.cycle)
+  return txStore.getStatsByDateRange(start, end)
+})
+
 const budgetItems = computed(() => {
-  return goalBudgetStore.budgetUsage.slice(0, 3).map(b => {
+  const { start, end } = getCycleRange(appStore.cycle)
+  return goalBudgetStore.getBudgetUsageByRange(start, end).slice(0, 3).map(b => {
     const cat = categoryStore.getCategoryById(b.categoryId)
     const remaining = b.amount - b.used
     const fillCls = b.over ? 'fill-danger' : b.pct > 80 ? 'fill-accent' : 'fill-brand'

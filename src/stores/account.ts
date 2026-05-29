@@ -43,6 +43,14 @@ export const useAccountStore = defineStore('account', () => {
     if (idx !== -1) accounts.value.splice(idx, 1)
   }
 
+  function updateAccount(id: string, updates: Partial<Omit<Account, 'id' | 'balance'>>) {
+    const acc = accounts.value.find(a => a.id === id)
+    if (acc) {
+      Object.assign(acc, updates)
+    }
+    return acc
+  }
+
   return {
     accounts,
     getAccountById,
@@ -50,6 +58,7 @@ export const useAccountStore = defineStore('account', () => {
     updateBalance,
     addAccount,
     deleteAccount,
+    updateAccount,
   }
 }, {
   persist: true,

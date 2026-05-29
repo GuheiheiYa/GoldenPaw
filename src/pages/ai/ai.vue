@@ -46,7 +46,12 @@
         <text class="chat-bubble-time">{{ msg.time }}</text>
       </view>
 
-      <view class="chat-suggestion" v-if="messages.length <= 1">
+      <!-- Loading -->
+      <view v-if="isLoading" class="chat-bubble ai">
+        <text class="chat-bubble-text">思考中…</text>
+      </view>
+
+      <view class="chat-suggestion" v-if="messages.length <= 1 && !isLoading">
         <view
           class="suggestion-chip"
           v-for="item in suggestions"
@@ -63,11 +68,12 @@
       <input
         class="chat-input-field"
         v-model="inputText"
-        placeholder="说点什么..."
+        :placeholder="isLoading ? 'AI思考中…' : '说点什么...'"
+        :disabled="isLoading"
         confirm-type="send"
         @confirm="sendMessage"
       />
-      <view class="chat-send" :class="{ disabled: !inputText.trim() }" @tap="sendMessage">
+      <view class="chat-send" :class="{ disabled: !inputText.trim() || isLoading }" @tap="sendMessage">
         <uni-icons type="paperplane" size="16" color="#fff" />
       </view>
     </view>
@@ -87,6 +93,7 @@ import { useAccountStore } from '@/stores/account'
 import TabBar from '@/components/TabBar.vue'
 import RecordSheet from '@/components/RecordSheet.vue'
 import { getToday } from '@/utils/format'
+import { callDeepSeek, parseTransactionFallback, mapCategoryNameToId, type AIResult } from '@/utils/deepseek'
 
 const appStore = useAppStore()
 const transactionStore = useTransactionStore()
@@ -99,6 +106,7 @@ onShow(() => {
 
 /* ─── State ─── */
 const inputText = ref('')
+const isLoading = ref(false)
 
 interface ChatMessage {
   role: 'ai' | 'user'
@@ -110,12 +118,27 @@ const messages = ref<ChatMessage[]>([
   {
     role: 'ai',
     content:
-      '你好！我是你的AI记账助手。你可以对我说：\n• "早餐15块" — 自动记账\n• "本月花了多少" — 消费分析\n• "工资到账8000" — 记录收入',
+      '你好！我是 GoldenPaw AI，接入了 DeepSeek 大模型。你可以对我说：\n• "早餐15块" — 自动记账\n• "本月花了多少" — 消费分析\n• "工资到账8000" — 记录收入',
     time: '刚刚',
   },
 ])
 
 const suggestions = ['早餐15块', '本月花了多少', '工资到账8000']
+
+/** 获取用于 API 调用的历史消息（只取最近 10 轮，避免 token 超限） */
+function getHistoryForAPI(): { role: 'user' | 'assistant'; content: string }[] {
+  const hist: { role: 'user' | 'assistant'; content: string }[] = []
+  // 跳过第一条 welcome 消息
+  for (let i = 1; i < messages.value.length; i++) {
+    const msg = messages.value[i]
+    hist.push({
+      role: msg.role === 'user' ? 'user' : 'assistant',
+      content: msg.content,
+    })
+  }
+  // 只保留最近 10 轮（20 条消息）
+  return hist.slice(-20)
+}
 
 /* ─── Helpers ─── */
 function getCurrentTimeLabel(): string {
@@ -135,102 +158,110 @@ function pushAI(text: string) {
   messages.value.push({ role: 'ai', content: text, time: getCurrentTimeLabel() })
 }
 
-/* ─── Natural Language Parser ─── */
-const CATEGORY_KEYWORDS: Record<string, string> = {
-  // 支出
-  '餐饮': 'cat-food', '饭': 'cat-food', '吃': 'cat-food', '餐': 'cat-food',
-  '早餐': 'cat-food', '午餐': 'cat-food', '晚餐': 'cat-food', '夜宵': 'cat-food',
-  '麦当劳': 'cat-food', '肯德基': 'cat-food', '咖啡': 'cat-food', '奶茶': 'cat-food',
-  '水果': 'cat-food', '外卖': 'cat-food', '超市': 'cat-food',
+/* ─── Core Handler ─── */
+async function sendMessage() {
+  const text = inputText.value.trim()
+  if (!text) return
 
-  '交通': 'cat-transport', '打车': 'cat-transport', '滴滴': 'cat-transport',
-  '地铁': 'cat-transport', '公交': 'cat-transport', '高铁': 'cat-transport',
-  '火车': 'cat-transport', '油费': 'cat-transport', '停车费': 'cat-transport',
+  pushUser(text)
+  inputText.value = ''
+  isLoading.value = true
 
-  '居住': 'cat-housing', '房租': 'cat-housing', '水电': 'cat-housing',
-  '物业': 'cat-housing', '燃气': 'cat-housing',
+  // 调用 DeepSeek API
+  const history = getHistoryForAPI()
+  const res = await callDeepSeek(history, text)
 
-  '购物': 'cat-shopping', '买': 'cat-shopping', '淘宝': 'cat-shopping',
-  '京东': 'cat-shopping', '衣服': 'cat-shopping', '鞋': 'cat-shopping',
-  '包': 'cat-shopping', '化妆品': 'cat-shopping',
-
-  '娱乐': 'cat-entertainment', '电影': 'cat-entertainment', '游戏': 'cat-entertainment',
-  '玩': 'cat-entertainment', 'KTV': 'cat-entertainment', '酒吧': 'cat-entertainment',
-
-  '通讯': 'cat-communication', '话费': 'cat-communication', '流量': 'cat-communication',
-  '宽带': 'cat-communication', '手机费': 'cat-communication',
-
-  '医疗': 'cat-medical', '药': 'cat-medical', '医院': 'cat-medical',
-  '看病': 'cat-medical', '挂号': 'cat-medical',
-
-  '学习': 'cat-education', '书': 'cat-education', '课程': 'cat-education',
-  '学费': 'cat-education', '培训': 'cat-education', '考试': 'cat-education',
-
-  '人情': 'cat-gift', '红包': 'cat-gift', '礼物': 'cat-gift', '送礼': 'cat-gift',
-
-  '宠物': 'cat-pet', '猫': 'cat-pet', '狗': 'cat-pet', '猫粮': 'cat-pet', '狗粮': 'cat-pet',
-
-  // 收入
-  '工资': 'cat-salary', '薪水': 'cat-salary', '月薪': 'cat-salary',
-  '奖金': 'cat-bonus', '年终奖': 'cat-bonus',
-  '投资': 'cat-investment-income', '股票': 'cat-investment-income',
-  '基金': 'cat-investment-income', '理财': 'cat-investment-income', '收益': 'cat-investment-income',
-}
-
-function detectAmount(text: string): number | null {
-  // 匹配 35块, 35元, 35.5, ¥35, 35.50元 等
-  const patterns = [
-    /(\d+(?:\.\d{1,2})?)\s*(?:块|元|块钱)/,
-    /[¥￥]\s*(\d+(?:\.\d{1,2})?)/,
-    /(\d+(?:\.\d{1,2})?)\s*(?:元|块)/,
-  ]
-  for (const p of patterns) {
-    const m = text.match(p)
-    if (m) return Math.round(parseFloat(m[1]) * 100)
+  if (!res.success) {
+    // API 失败，降级到本地 fallback
+    handleFallback(text)
+    isLoading.value = false
+    return
   }
-  // 纯数字，如果在合理范围
-  const numMatch = text.match(/(\d+(?:\.\d{1,2})?)/)
-  if (numMatch) {
-    const n = parseFloat(numMatch[1])
-    if (n > 0 && n < 1000000) return Math.round(n * 100)
+
+  // 处理 AI 返回结果
+  await handleAIResult(res.result)
+  isLoading.value = false
+}
+
+/** 处理 AI 返回的结构化结果 */
+async function handleAIResult(result: AIResult) {
+  if (result.action === 'record') {
+    const defaultAccount = accountStore.accounts[0]
+    if (!defaultAccount) {
+      pushAI('请先添加一个账户，我才能帮你记账哦~')
+      return
+    }
+    // 将中文分类名映射为 categoryId
+    const categoryId = mapCategoryNameToId(result.category, result.type)
+    const amountCents = Math.round(result.amount * 100)
+    const tx = transactionStore.addTransaction({
+      type: result.type,
+      amount: amountCents,
+      categoryId,
+      accountId: defaultAccount.id,
+      note: result.note || result.category,
+    })
+    accountStore.updateBalance(defaultAccount.id, result.type === 'income' ? amountCents : -amountCents)
+    const cat = categoryStore.getCategoryById(categoryId)
+    pushAI(
+      `已记录：${cat?.name || result.category}${result.type === 'income' ? '收入' : '支出'} ${formatAmount(amountCents)}\n` +
+      `分类：${cat?.icon || '💰'} ${cat?.name || result.category}\n时间：${tx.date}`
+    )
+    return
   }
-  return null
-}
 
-function detectCategory(text: string, type: 'expense' | 'income'): string {
-  const defaults = type === 'expense' ? 'cat-other-expense' : 'cat-other-income'
-  for (const [keyword, catId] of Object.entries(CATEGORY_KEYWORDS)) {
-    if (text.includes(keyword)) return catId
+  if (result.action === 'analysis') {
+    const reply = buildAnalysisReply(result.query)
+    pushAI(reply)
+    return
   }
-  return defaults
+
+  // chat
+  pushAI(result.reply)
 }
 
-function detectType(text: string): 'expense' | 'income' {
-  const incomeWords = ['工资', '奖金', '收入', '收到', '到账', '发钱', '赚钱', '收益', '退款', '报销']
-  for (const w of incomeWords) {
-    if (text.includes(w)) return 'income'
+/** 本地 fallback（DeepSeek 不可用时） */
+function handleFallback(text: string) {
+  // 分析查询
+  const reply = buildAnalysisReply(text)
+  if (reply) {
+    pushAI(reply)
+    return
   }
-  return 'expense'
+
+  // 记账解析
+  const parsed = parseTransactionFallback(text)
+  if (parsed.success && parsed.amount) {
+    const defaultAccount = accountStore.accounts[0]
+    if (!defaultAccount) {
+      pushAI('请先添加一个账户，我才能帮你记账哦~')
+      return
+    }
+    const tx = transactionStore.addTransaction({
+      type: parsed.type!,
+      amount: parsed.amount,
+      categoryId: parsed.categoryId!,
+      accountId: defaultAccount.id,
+      note: parsed.note!,
+    })
+    accountStore.updateBalance(defaultAccount.id, parsed.type === 'income' ? parsed.amount : -parsed.amount)
+    const cat = categoryStore.getCategoryById(parsed.categoryId!)
+    pushAI(
+      `已记录：${cat?.name || '其他'}${parsed.type === 'income' ? '收入' : '支出'} ${formatAmount(parsed.amount)}\n` +
+      `分类：${cat?.icon || '💰'} ${cat?.name || '其他'}\n时间：${tx.date}`
+    )
+    return
+  }
+
+  pushAI('抱歉，我没听懂。你可以这样说：\n• "早餐15块"\n• "打车28元"\n• "本月花了多少"\n• "工资到账8000"')
 }
 
-function parseTransaction(text: string):
-  | { success: true; amount: number; categoryId: string; type: 'expense' | 'income'; note: string }
-  | { success: false } {
-  const amount = detectAmount(text)
-  if (!amount) return { success: false }
-  const type = detectType(text)
-  const categoryId = detectCategory(text, type)
-  return { success: true, amount, categoryId, type, note: text }
-}
+/** 构建分析查询回复 */
+function buildAnalysisReply(query: string): string {
+  const t = query.toLowerCase()
 
-/* ─── Analysis Queries ─── */
-function analyzeQuery(text: string): string | null {
-  const t = text.toLowerCase()
-  const today = getToday()
-  const monthPrefix = today.slice(0, 7)
-
-  // 本月支出
-  if (t.includes('本月') && (t.includes('花') || t.includes('支出') || t.includes('消费') || t.includes('多少'))) {
+  // 本月收支
+  if (t.includes('本月') && (t.includes('花') || t.includes('支出') || t.includes('消费') || t.includes('多少') || t.includes('概况'))) {
     const expense = transactionStore.monthlyExpense
     const income = transactionStore.monthlyIncome
     return `本月收支概况：\n• 支出：${formatAmount(expense)}\n• 收入：${formatAmount(income)}\n• 结余：${formatAmount(income - expense)}`
@@ -241,66 +272,23 @@ function analyzeQuery(text: string): string | null {
     return `本月收入共计：${formatAmount(transactionStore.monthlyIncome)}`
   }
 
-  // 总支出 / 总计
+  // 总支出
   if ((t.includes('总') || t.includes('一共') || t.includes('累计')) && (t.includes('支出') || t.includes('花'))) {
-    const totalExpense = transactionStore.transactions
+    const total = transactionStore.transactions
       .filter(tx => tx.type === 'expense')
       .reduce((s, tx) => s + tx.amount, 0)
-    return `累计支出共计：${formatAmount(totalExpense)}`
+    return `累计支出共计：${formatAmount(total)}`
   }
 
   // 总收入
   if ((t.includes('总') || t.includes('一共') || t.includes('累计')) && t.includes('收入')) {
-    const totalIncome = transactionStore.transactions
+    const total = transactionStore.transactions
       .filter(tx => tx.type === 'income')
       .reduce((s, tx) => s + tx.amount, 0)
-    return `累计收入共计：${formatAmount(totalIncome)}`
+    return `累计收入共计：${formatAmount(total)}`
   }
 
-  return null
-}
-
-/* ─── Core Handler ─── */
-function sendMessage() {
-  const text = inputText.value.trim()
-  if (!text) return
-
-  pushUser(text)
-  inputText.value = ''
-
-  // 优先检查是否是分析查询
-  const analysis = analyzeQuery(text)
-  if (analysis) {
-    pushAI(analysis)
-    return
-  }
-
-  // 尝试解析为记账指令
-  const parsed = parseTransaction(text)
-  if (parsed.success) {
-    const defaultAccount = accountStore.accounts[0]
-    if (!defaultAccount) {
-      pushAI('请先添加一个账户，我才能帮你记账哦~')
-      return
-    }
-    const tx = transactionStore.addTransaction({
-      type: parsed.type,
-      amount: parsed.amount,
-      categoryId: parsed.categoryId,
-      accountId: defaultAccount.id,
-      note: parsed.note,
-    })
-    accountStore.updateBalance(defaultAccount.id, parsed.type === 'income' ? parsed.amount : -parsed.amount)
-    const cat = categoryStore.getCategoryById(parsed.categoryId)
-    pushAI(
-      `已记录：${cat?.name || '其他'}${parsed.type === 'income' ? '收入' : '支出'} ${formatAmount(parsed.amount)}\n` +
-      `分类：${cat?.icon || '💰'} ${cat?.name || '其他'}\n时间：${tx.date}`
-    )
-    return
-  }
-
-  // 无法解析
-  pushAI('抱歉，我没听懂。你可以这样说：\n• "早餐15块"\n• "打车28元"\n• "本月花了多少"\n• "工资到账8000"')
+  return ''
 }
 
 function clearChat() {
@@ -308,7 +296,7 @@ function clearChat() {
     {
       role: 'ai',
       content:
-        '对话已清空。你可以对我说：\n• "早餐15块" — 自动记账\n• "本月花了多少" — 消费分析\n• "工资到账8000" — 记录收入',
+        '对话已清空。接入了 DeepSeek 大模型，你可以对我说：\n• "早餐15块" — 自动记账\n• "本月花了多少" — 消费分析\n• "工资到账8000" — 记录收入',
       time: getCurrentTimeLabel(),
     },
   ]

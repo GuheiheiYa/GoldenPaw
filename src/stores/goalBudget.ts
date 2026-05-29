@@ -105,6 +105,25 @@ export const useGoalBudgetStore = defineStore('goalBudget', () => {
     })
   })
 
+  function getBudgetUsageByRange(start: string, end: string) {
+    const txStore = useTransactionStore()
+    const txs = txStore.transactions.filter(t => t.type === 'expense' && t.date >= start && t.date <= end)
+    const usedByCategory = new Map<string, number>()
+    for (const tx of txs) {
+      usedByCategory.set(tx.categoryId, (usedByCategory.get(tx.categoryId) || 0) + tx.amount)
+    }
+    return budgets.value.map(b => {
+      const used = usedByCategory.get(b.categoryId) || 0
+      return {
+        ...b,
+        used,
+        remaining: Math.max(b.amount - used, 0),
+        pct: b.amount > 0 ? Math.min(Math.round((used / b.amount) * 100), 100) : 0,
+        over: used > b.amount,
+      }
+    })
+  }
+
   const totalBudget = computed(() => budgets.value.reduce((s, b) => s + b.amount, 0))
   const totalBudgetUsed = computed(() => budgetUsage.value.reduce((s, b) => s + b.used, 0))
 
@@ -121,6 +140,7 @@ export const useGoalBudgetStore = defineStore('goalBudget', () => {
     addBudget,
     updateBudget,
     deleteBudget,
+    getBudgetUsageByRange,
   }
 }, {
   persist: true,

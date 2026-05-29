@@ -24,19 +24,21 @@
       <view class="composition-card">
         <!-- 环形图 -->
         <view class="ring-chart">
+          <svg viewBox="0 0 160 160" class="ring-svg">
+            <circle cx="80" cy="80" r="70" fill="none" stroke="#EDE4D8" stroke-width="20" />
+            <circle
+              v-for="(segment, index) in svgRingSegments"
+              :key="index"
+              cx="80" cy="80" r="70" fill="none"
+              :stroke="segment.color" stroke-width="20"
+              :stroke-dasharray="segment.dashArray"
+              :stroke-dashoffset="segment.dashOffset"
+              transform="rotate(-90 80 80)"
+            />
+          </svg>
           <view class="ring-chart-inner">
             <text class="ring-chart-label">总资产</text>
             <text class="ring-chart-value">{{ formatAmountCompact(totalAssets) }}</text>
-          </view>
-          <view class="ring-chart-svg">
-            <view
-              v-for="(segment, index) in ringSegments"
-              :key="index"
-              class="ring-segment"
-              :style="{
-                background: `conic-gradient(${segment.color} ${segment.startAngle}deg ${segment.endAngle}deg, transparent ${segment.startAngle}deg)`,
-              }"
-            />
           </view>
         </view>
 
@@ -252,21 +254,21 @@ function getTypeColor(type: string): string {
   return colors[type] || '#C8956C'
 }
 
-// 环形图分段
-const ringSegments = computed(() => {
-  let currentAngle = 0
-  const circumference = 2 * Math.PI * 70
+// 环形图分段（SVG stroke-dasharray 方式，参考 goals.vue）
+const svgRingSegments = computed(() => {
+  const r = 70
+  const circumference = 2 * Math.PI * r
+  let offset = 0
 
   return compositionData.value.map(item => {
-    const segmentAngle = (item.percentage / 100) * 360
-    const startAngle = currentAngle
-    const endAngle = currentAngle + segmentAngle
-    currentAngle = endAngle
-
+    const segmentLength = (item.percentage / 100) * circumference
+    const dashArray = `${segmentLength} ${circumference}`
+    const dashOffset = -offset
+    offset += segmentLength
     return {
       color: item.color,
-      startAngle,
-      endAngle,
+      dashArray,
+      dashOffset,
     }
   })
 })
@@ -425,19 +427,7 @@ const trendLineData = computed(() => {
   position: relative;
 }
 
-.ring-chart-svg {
-  width: 100%;
-  height: 100%;
-  border-radius: $radius-circle;
-  background: $border;
-  position: relative;
-  overflow: hidden;
-}
-
-.ring-segment {
-  position: absolute;
-  top: 0;
-  left: 0;
+.ring-svg {
   width: 100%;
   height: 100%;
 }

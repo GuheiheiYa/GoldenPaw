@@ -2,7 +2,7 @@
   <view class="app">
     <view class="header">
       <view class="back-btn" @tap="goBack">
-        <uni-icons class="back-icon" type="arrow-left" size="20" color="#7A6B5D" />
+        <uni-icons class="back-icon" type="arrow-left" size="20" color="var(--text-secondary)" />
       </view>
       <text class="header-title">{{ pageTitle }}</text>
     </view>
@@ -25,6 +25,7 @@
             <view
               class="setting-item"
               :class="{ swiped: catSwipedId === cat.id }"
+              @tap="onEditCategory(cat)"
               @touchstart="onCatTouchStart($event, cat)"
               @touchmove="onCatTouchMove($event, cat)"
               @touchend="onCatTouchEnd($event, cat)"
@@ -49,6 +50,7 @@
             <view
               class="setting-item"
               :class="{ swiped: catSwipedId === cat.id }"
+              @tap="onEditCategory(cat)"
               @touchstart="onCatTouchStart($event, cat)"
               @touchmove="onCatTouchMove($event, cat)"
               @touchend="onCatTouchEnd($event, cat)"
@@ -66,13 +68,31 @@
       <!-- 账户管理 -->
       <template v-else-if="type === 'account'">
         <view class="setting-list">
-          <view class="setting-item" v-for="acc in accounts" :key="acc.id">
-            <text class="setting-icon">{{ acc.icon }}</text>
-            <view class="setting-info">
-              <text class="setting-name">{{ acc.name }}</text>
-              <text class="setting-desc">{{ acc.bank || acc.type }}</text>
+          <view
+            class="setting-item-wrap"
+            v-for="acc in accounts"
+            :key="acc.id"
+          >
+            <view class="setting-item-actions" v-if="accSwipedId === acc.id">
+              <view class="setting-action-btn delete" @tap.stop="onDeleteAccount(acc.id)">
+                <text>删除</text>
+              </view>
             </view>
-            <text class="setting-value">{{ formatAmount(acc.balance) }}</text>
+            <view
+              class="setting-item"
+              :class="{ swiped: accSwipedId === acc.id }"
+              @tap="onEditAccount(acc)"
+              @touchstart="onAccTouchStart($event, acc)"
+              @touchmove="onAccTouchMove($event, acc)"
+              @touchend="onAccTouchEnd($event, acc)"
+            >
+              <text class="setting-icon">{{ acc.icon }}</text>
+              <view class="setting-info">
+                <text class="setting-name">{{ acc.name }}</text>
+                <text class="setting-desc">{{ acc.bank || acc.type }}</text>
+              </view>
+              <text class="setting-value">{{ formatAmount(acc.balance) }}</text>
+            </view>
           </view>
         </view>
         <view class="add-btn" @tap="openAccountModal">
@@ -83,10 +103,10 @@
       <!-- 主题设置 -->
       <template v-else-if="type === 'theme'">
         <view class="setting-list">
-          <view class="setting-item" v-for="theme in themes" :key="theme.id" @tap="showToast('主题切换功能开发中')">
-            <view class="theme-preview" :style="{ background: theme.color }"></view>
-            <text class="setting-name">{{ theme.name }}</text>
-            <text v-if="theme.id === 'warm'" class="setting-badge">当前</text>
+          <view class="setting-item" v-for="t in themes" :key="t.id" @tap="onSelectTheme(t.id)">
+            <view class="theme-preview" :style="{ background: t.color }"></view>
+            <text class="setting-name">{{ t.name }}</text>
+            <text v-if="t.id === appStore.theme" class="setting-badge">当前</text>
           </view>
         </view>
       </template>
@@ -118,22 +138,18 @@
       <!-- 安全设置 -->
       <template v-else-if="type === 'security'">
         <view class="setting-list">
-          <view class="setting-item" @tap="showToast('密码锁功能开发中')">
+          <view class="setting-item" @tap="openPasswordModal">
             <text class="setting-icon">🔒</text>
             <view class="setting-info">
               <text class="setting-name">密码锁</text>
-              <text class="setting-desc">设置应用密码</text>
+              <text class="setting-desc">{{ appStore.appPassword ? '已开启' : '设置 4 位数字密码' }}</text>
             </view>
-            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="#C8B8A8" />
+            <text v-if="appStore.appPassword" class="setting-badge">已开启</text>
+            <uni-icons v-else class="setting-arrow" type="arrow-right" size="14" color="var(--text-tertiary)" />
           </view>
-          <view class="setting-item" @tap="showToast('指纹解锁功能开发中')">
-            <text class="setting-icon">👆</text>
-            <view class="setting-info">
-              <text class="setting-name">指纹解锁</text>
-              <text class="setting-desc">使用指纹快速解锁</text>
-            </view>
-            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="#C8B8A8" />
-          </view>
+        </view>
+        <view v-if="appStore.appPassword" class="danger-btn" style="margin-top:24px;" @tap="onDisablePassword">
+          <text class="danger-btn-text">关闭密码锁</text>
         </view>
       </template>
 
@@ -154,9 +170,9 @@
       <!-- 记账周期 -->
       <template v-else-if="type === 'cycle'">
         <view class="setting-list">
-          <view class="setting-item" v-for="c in cycles" :key="c.id" @tap="showToast('周期设置功能开发中')">
+          <view class="setting-item" v-for="c in cycles" :key="c.id" @tap="onSelectCycle(c.id)">
             <text class="setting-name">{{ c.name }}</text>
-            <text v-if="c.id === 'natural'" class="setting-badge">当前</text>
+            <text v-if="c.id === appStore.cycle" class="setting-badge">当前</text>
           </view>
         </view>
       </template>
@@ -170,7 +186,7 @@
               <text class="setting-name">导出为 CSV</text>
               <text class="setting-desc">通用格式，可用 Excel 打开</text>
             </view>
-            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="#C8B8A8" />
+            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="var(--text-tertiary)" />
           </view>
           <view class="setting-item" @tap="showToast('Excel导出功能开发中')">
             <text class="setting-icon">📊</text>
@@ -178,7 +194,7 @@
               <text class="setting-name">导出为 Excel</text>
               <text class="setting-desc">包含图表和统计</text>
             </view>
-            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="#C8B8A8" />
+            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="var(--text-tertiary)" />
           </view>
         </view>
       </template>
@@ -192,7 +208,7 @@
               <text class="setting-name">导入微信账单</text>
               <text class="setting-desc">从微信导出的账单文件</text>
             </view>
-            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="#C8B8A8" />
+            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="var(--text-tertiary)" />
           </view>
           <view class="setting-item" @tap="showToast('支付宝账单导入开发中')">
             <text class="setting-icon">💰</text>
@@ -200,7 +216,7 @@
               <text class="setting-name">导入支付宝账单</text>
               <text class="setting-desc">从支付宝导出的账单文件</text>
             </view>
-            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="#C8B8A8" />
+            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="var(--text-tertiary)" />
           </view>
         </view>
       </template>
@@ -229,10 +245,10 @@
         </view>
       </template>
 
-      <!-- 添加分类弹窗 -->
+      <!-- 添加/编辑分类弹窗 -->
       <view class="modal-overlay" v-if="showCategoryModal" @tap="closeCategoryModal">
         <view class="modal-card" @tap.stop>
-          <text class="modal-title">添加分类</text>
+          <text class="modal-title">{{ editingCategoryId ? '编辑分类' : '添加分类' }}</text>
           <view class="modal-field">
             <text class="modal-label">类型</text>
             <view class="modal-options">
@@ -259,10 +275,10 @@
         </view>
       </view>
 
-      <!-- 添加账户弹窗 -->
+      <!-- 添加/编辑账户弹窗 -->
       <view class="modal-overlay" v-if="showAccountModal" @tap="closeAccountModal">
         <view class="modal-card" @tap.stop>
-          <text class="modal-title">添加账户</text>
+          <text class="modal-title">{{ editingAccountId ? '编辑账户' : '添加账户' }}</text>
           <view class="modal-field">
             <text class="modal-label">名称</text>
             <input class="modal-input" v-model="accountForm.name" placeholder="例如：工资卡" />
@@ -294,6 +310,36 @@
           </view>
         </view>
       </view>
+
+      <!-- 密码锁弹窗 -->
+      <view class="modal-overlay" v-if="showPasswordModal" @tap="closePasswordModal">
+        <view class="modal-card" @tap.stop>
+          <text class="modal-title">{{ passwordModalTitle }}</text>
+          <view class="modal-field" v-if="passwordStep === 'old' || passwordStep === 'verify'">
+            <text class="modal-label">当前密码</text>
+            <input class="modal-input" v-model="passwordForm.old" type="password" maxlength="4" placeholder="输入当前密码" />
+          </view>
+          <view class="modal-field" v-if="passwordStep !== 'verify'">
+            <text class="modal-label">{{ passwordStep === 'old' ? '新密码' : '密码' }}</text>
+            <input class="modal-input" v-model="passwordForm.new" type="password" maxlength="4" placeholder="输入 4 位数字" />
+          </view>
+          <view class="modal-field" v-if="passwordStep !== 'verify'">
+            <text class="modal-label">确认密码</text>
+            <input class="modal-input" v-model="passwordForm.confirm" type="password" maxlength="4" placeholder="再次输入 4 位数字" />
+          </view>
+          <view class="modal-field" v-if="passwordStep === 'verify'">
+            <text class="modal-label" style="text-align:center; color: var(--text-secondary);">输入密码以关闭密码锁</text>
+          </view>
+          <view class="modal-actions">
+            <view class="modal-btn secondary" @tap="closePasswordModal">
+              <text>取消</text>
+            </view>
+            <view class="modal-btn primary" @tap="confirmPassword">
+              <text>确定</text>
+            </view>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -304,7 +350,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import { useCategoryStore } from '@/stores/category'
 import { useAccountStore } from '@/stores/account'
 import { useTransactionStore } from '@/stores/transaction'
-import { useAppStore } from '@/stores/app'
+import { useAppStore, type CycleType } from '@/stores/app'
 import { formatAmount } from '@/utils/format'
 import EmojiGrid from '@/components/EmojiGrid.vue'
 import type { Account } from '@/types/transaction'
@@ -351,6 +397,7 @@ const budgetAlertEnabled = computed({
 })
 
 const showCategoryModal = ref(false)
+const editingCategoryId = ref('')
 const categoryForm = ref({
   type: 'expense' as 'expense' | 'income',
   name: '',
@@ -359,12 +406,29 @@ const categoryForm = ref({
 })
 
 function openCategoryModal() {
+  editingCategoryId.value = ''
   categoryForm.value = { type: 'expense', name: '', icon: '💰', color: '#FAF0E6' }
+  showCategoryModal.value = true
+}
+
+function onEditCategory(cat: any) {
+  if (catSwipedId.value) {
+    catSwipedId.value = ''
+    return
+  }
+  editingCategoryId.value = cat.id
+  categoryForm.value = {
+    type: cat.type,
+    name: cat.name,
+    icon: cat.icon,
+    color: cat.color,
+  }
   showCategoryModal.value = true
 }
 
 function closeCategoryModal() {
   showCategoryModal.value = false
+  editingCategoryId.value = ''
 }
 
 function confirmAddCategory() {
@@ -372,14 +436,23 @@ function confirmAddCategory() {
     uni.showToast({ title: '请输入分类名称', icon: 'none' })
     return
   }
-  categoryStore.addCategory({
-    type: categoryForm.value.type,
-    name: categoryForm.value.name.trim(),
-    icon: categoryForm.value.icon,
-    color: categoryForm.value.color,
-  })
+  if (editingCategoryId.value) {
+    categoryStore.updateCategory(editingCategoryId.value, {
+      name: categoryForm.value.name.trim(),
+      icon: categoryForm.value.icon,
+      color: categoryForm.value.color,
+    })
+    uni.showToast({ title: '修改成功', icon: 'success' })
+  } else {
+    categoryStore.addCategory({
+      type: categoryForm.value.type,
+      name: categoryForm.value.name.trim(),
+      icon: categoryForm.value.icon,
+      color: categoryForm.value.color,
+    })
+    uni.showToast({ title: '添加成功', icon: 'success' })
+  }
   closeCategoryModal()
-  uni.showToast({ title: '添加成功', icon: 'success' })
 }
 
 /** 分类滑动删除 */
@@ -447,6 +520,7 @@ function onDeleteCategory(id: string) {
 }
 
 const showAccountModal = ref(false)
+const editingAccountId = ref('')
 const accountForm = ref({
   name: '',
   type: 'savings' as Account['type'],
@@ -455,12 +529,29 @@ const accountForm = ref({
 })
 
 function openAccountModal() {
+  editingAccountId.value = ''
   accountForm.value = { name: '', type: 'savings', bank: '', icon: '💳' }
+  showAccountModal.value = true
+}
+
+function onEditAccount(acc: Account) {
+  if (accSwipedId.value) {
+    accSwipedId.value = ''
+    return
+  }
+  editingAccountId.value = acc.id
+  accountForm.value = {
+    name: acc.name,
+    type: acc.type,
+    bank: acc.bank || '',
+    icon: acc.icon,
+  }
   showAccountModal.value = true
 }
 
 function closeAccountModal() {
   showAccountModal.value = false
+  editingAccountId.value = ''
 }
 
 function confirmAddAccount() {
@@ -468,14 +559,83 @@ function confirmAddAccount() {
     uni.showToast({ title: '请输入账户名称', icon: 'none' })
     return
   }
-  accountStore.addAccount({
-    name: accountForm.value.name.trim(),
-    type: accountForm.value.type,
-    bank: accountForm.value.bank.trim() || undefined,
-    icon: accountForm.value.icon,
-  })
+  if (editingAccountId.value) {
+    accountStore.updateAccount(editingAccountId.value, {
+      name: accountForm.value.name.trim(),
+      type: accountForm.value.type,
+      bank: accountForm.value.bank.trim() || undefined,
+      icon: accountForm.value.icon,
+    })
+    uni.showToast({ title: '修改成功', icon: 'success' })
+  } else {
+    accountStore.addAccount({
+      name: accountForm.value.name.trim(),
+      type: accountForm.value.type,
+      bank: accountForm.value.bank.trim() || undefined,
+      icon: accountForm.value.icon,
+    })
+    uni.showToast({ title: '添加成功', icon: 'success' })
+  }
   closeAccountModal()
-  uni.showToast({ title: '添加成功', icon: 'success' })
+}
+
+/** 账户滑动删除 */
+const accSwipedId = ref('')
+let accTouchStartX = 0
+let accHasSwiped = false
+
+function onAccTouchStart(e: any, acc: Account) {
+  accTouchStartX = e.touches[0].clientX
+  accHasSwiped = false
+  if (accSwipedId.value && accSwipedId.value !== acc.id) {
+    accSwipedId.value = ''
+  }
+}
+
+function onAccTouchMove(e: any, acc: Account) {
+  const deltaX = e.touches[0].clientX - accTouchStartX
+  if (deltaX < -40) {
+    accSwipedId.value = acc.id
+  } else if (deltaX > 40 && accSwipedId.value === acc.id) {
+    accSwipedId.value = ''
+  }
+  if (deltaX < -60 && !accHasSwiped) {
+    accHasSwiped = true
+    // #ifdef APP-PLUS
+    uni.vibrateShort({})
+    // #endif
+  }
+}
+
+function onAccTouchEnd(e: any, acc: Account) {
+  if (accHasSwiped) {
+    accHasSwiped = false
+    setTimeout(() => { accSwipedId.value = '' }, 200)
+    uni.showModal({
+      title: '删除账户',
+      content: `确定删除账户「${acc.name}」吗？\n余额 ${formatAmount(acc.balance)} 将被清零`,
+      confirmColor: '#C06C5F',
+      success: (res) => {
+        if (res.confirm) {
+          accountStore.deleteAccount(acc.id)
+        }
+      },
+    })
+  }
+}
+
+function onDeleteAccount(id: string) {
+  const acc = accountStore.getAccountById(id)
+  uni.showModal({
+    title: '删除账户',
+    content: `确定删除账户「${acc?.name || ''}」吗？`,
+    confirmColor: '#C06C5F',
+    success: (res) => {
+      if (res.confirm) {
+        accountStore.deleteAccount(id)
+      }
+    },
+  })
 }
 
 function exportCSV() {
@@ -531,6 +691,80 @@ const cycles = [
 
 function goBack() {
   uni.navigateBack()
+}
+
+function onSelectTheme(themeId: string) {
+  appStore.setTheme(themeId)
+  uni.showToast({ title: '主题已切换', icon: 'success' })
+}
+
+function onSelectCycle(cycleId: string) {
+  appStore.setCycle(cycleId as CycleType)
+  uni.showToast({ title: '周期已切换', icon: 'success' })
+}
+
+/* ===== Password Lock ===== */
+const showPasswordModal = ref(false)
+const passwordStep = ref<'new' | 'old' | 'verify'>('new')
+const passwordForm = ref({ old: '', new: '', confirm: '' })
+
+const passwordModalTitle = computed(() => {
+  if (passwordStep.value === 'verify') return '关闭密码锁'
+  if (passwordStep.value === 'old') return '修改密码'
+  return '设置密码锁'
+})
+
+function openPasswordModal() {
+  passwordStep.value = appStore.appPassword ? 'old' : 'new'
+  passwordForm.value = { old: '', new: '', confirm: '' }
+  showPasswordModal.value = true
+}
+
+function closePasswordModal() {
+  showPasswordModal.value = false
+  passwordForm.value = { old: '', new: '', confirm: '' }
+}
+
+function confirmPassword() {
+  const { old, new: n, confirm } = passwordForm.value
+  const DIGIT_RE = /^\d{4}$/
+
+  if (passwordStep.value === 'verify') {
+    if (old !== appStore.appPassword) {
+      uni.showToast({ title: '密码错误', icon: 'none' })
+      return
+    }
+    appStore.setPassword('')
+    uni.showToast({ title: '密码锁已关闭', icon: 'success' })
+    closePasswordModal()
+    return
+  }
+
+  if (passwordStep.value === 'old') {
+    if (old !== appStore.appPassword) {
+      uni.showToast({ title: '旧密码错误', icon: 'none' })
+      return
+    }
+  }
+
+  if (!DIGIT_RE.test(n)) {
+    uni.showToast({ title: '请输入 4 位数字密码', icon: 'none' })
+    return
+  }
+  if (n !== confirm) {
+    uni.showToast({ title: '两次输入不一致', icon: 'none' })
+    return
+  }
+
+  appStore.setPassword(n)
+  uni.showToast({ title: '密码设置成功', icon: 'success' })
+  closePasswordModal()
+}
+
+function onDisablePassword() {
+  passwordStep.value = 'verify'
+  passwordForm.value = { old: '', new: '', confirm: '' }
+  showPasswordModal.value = true
 }
 
 function showToast(msg: string) {

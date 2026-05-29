@@ -6,5 +6,12 @@ export default defineConfig({
   plugins: [uni()],
   server: {
     port: 5179,
+    proxy: {
+      '/api/deepseek': {
+        target: 'https://api.deepseek.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/deepseek/, ''),
+      },
+    },
   },
 })

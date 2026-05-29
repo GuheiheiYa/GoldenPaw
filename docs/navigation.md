@@ -68,14 +68,14 @@ GoldenPaw/
 │   │   └── 静态数据 (3条示例待确认记录)
 │   │
 │   ├── settings/index.vue           # 设置页面（通用）
-│   │   ├── type=category            # 分类管理（只读）
-│   │   ├── type=account             # 账户管理（只读）
-│   │   ├── type=theme               # 主题颜色（占位）
+│   │   ├── type=category            # 分类管理（添加/编辑/删除，默认分类不可删）
+│   │   ├── type=account             # 账户管理（添加/编辑/删除）
+│   │   ├── type=theme               # 主题颜色（4套配色切换）
 │   │   ├── type=reminder            # 提醒设置（持久化开关）
-│   │   ├── type=security            # 密码/指纹锁（占位）
+│   │   ├── type=security            # 密码锁（设置/修改/关闭）
 │   │   ├── type=currency            # 币种设置（占位）
-│   │   ├── type=cycle               # 记账周期（占位）
-│   │   ├── type=export              # 导出数据（占位）
+│   │   ├── type=cycle               # 记账周期（自然月/工资/自定义）
+│   │   ├── type=export              # 导出数据（CSV导出）
 │   │   ├── type=import              # 导入数据（占位）
 │   │   ├── type=sync                # 云同步（占位）
 │   │   └── type=clear               # 清空数据（真实删除）
@@ -177,10 +177,11 @@ GoldenPaw/
 │
 ├── docs/
 │   ├── design.md                    # 设计文档
-│   ├── requirements.md              # 需求文档
-│   ├── features.md                  # 功能文档
-│   ├── changelog.md                 # 更新日志
-│   ├── issues.md                    # 已知问题清单
+│   ├── requirements.md              # 需求文档（[R-xxx] ID）
+│   ├── features.md                  # 功能实现文档（[F-xxx] ID，与需求一一对应）
+│   ├── changelog.md                 # 更新日志（每次提交批次，关联 R-xxx / ISS-xxx）
+│   ├── issues.md                    # 问题追踪（[ISS-xxx] ID，分 open/closed）
+│   ├── git-commits.md               # Git 提交索引（commit ↔ 需求映射，回退指南）
 │   ├── navigation.md                # 项目导航（本文件）
 │   └── superpowers/plans/           # 实现计划
 │
@@ -230,5 +231,5 @@ AI记账 (Tab 1)
 
 ---
 
-*文档版本：v3.0*
-*更新时间：2026-05-29 22:00*
+*文档版本：v4.0*
+*更新时间：2026-05-29 22:13:21*
