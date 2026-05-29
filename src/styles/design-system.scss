@@ -84,3 +84,18 @@ $transition-fast: 0.15s ease;
 $transition-base: 0.2s ease;
 $transition-slow: 0.3s ease;
 $transition-spring: 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+
+// ===== Base Component Classes =====
+.card {
+  background: $surface;
+  border-radius: $radius-lg;
+  border: 1px solid $border;
+  box-shadow: $shadow-sm;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-emphasis {
+  border: 2px solid $brand-100;
+  box-shadow: $shadow-md;
+}

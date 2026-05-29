@@ -1,8 +1,15 @@
 {
-  "name": "GoldenPaw",
-  "appid": "__UNI__GOLDENPAW",
-  "description": "个人资产管理APP — 记账 · 存钱 · 资产追踪",
-  "versionName": "1.0.0",
-  "versionCode": "100",
-  "transformPx": false
+    "name" : "GoldenPaw",
+    "appid" : "__UNI__A36E077",
+    "description" : "个人资产管理APP — 记账 · 存钱 · 资产追踪",
+    "versionName" : "1.0.0",
+    "versionCode" : "100",
+    "transformPx" : false,
+    "app-plus" : {
+        "distribute" : {
+            "ios" : {
+                "dSYMs" : false
+            }
+        }
+    }
 }

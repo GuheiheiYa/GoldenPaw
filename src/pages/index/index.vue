@@ -36,13 +36,15 @@
         <text class="section-link" @tap="navigateTo('/pages/goals/goals?tab=budget')">管理</text>
       </view>
       <scroll-view scroll-x class="budget-scroll" :show-scrollbar="false">
-        <view class="budget-card card" v-for="(item, idx) in budgetItems" :key="idx">
-          <text class="budget-emoji">{{ item.icon }}</text>
-          <text class="budget-name">{{ item.name }}</text>
-          <text class="budget-used">{{ item.used }}</text>
-          <text class="budget-total">{{ item.detail }}</text>
-          <view class="progress-bar">
-            <view class="progress-fill" :class="item.fillCls" :style="{ width: item.pct + '%' }"></view>
+        <view class="budget-scroll-inner">
+          <view class="budget-card card" v-for="(item, idx) in budgetItems" :key="idx">
+            <text class="budget-emoji">{{ item.icon }}</text>
+            <text class="budget-name">{{ item.name }}</text>
+            <text class="budget-used">{{ item.used }}</text>
+            <text class="budget-total">{{ item.detail }}</text>
+            <view class="progress-bar">
+              <view class="progress-fill" :class="item.fillCls" :style="{ width: item.pct + '%' }"></view>
+            </view>
           </view>
         </view>
       </scroll-view>
@@ -206,12 +208,13 @@ const recentFlowItems = computed(() => {
 }
 
 .page-content {
-  padding: $space-10 $space-6 $space-6;
+  padding: $space-10 0 $space-6;
 }
 
 /* ===== Hero ===== */
 .hero {
   margin-bottom: $space-4;
+  padding: 0 $space-6 $space-6;
   position: relative;
 
   &::before {
@@ -309,10 +312,14 @@ const recentFlowItems = computed(() => {
 
 /* ===== Budget Cards ===== */
 .budget-scroll {
-  display: flex;
-  gap: $space-3;
   padding: 0 $space-6 $space-1;
   white-space: nowrap;
+}
+
+.budget-scroll-inner {
+  display: flex;
+  gap: $space-3;
+  flex-direction: row;
 }
 
 .budget-card {
@@ -332,22 +339,21 @@ const recentFlowItems = computed(() => {
 }
 
 .budget-name {
-  @include text-caption;
+  font: 700 13px/1.4 $font-sans;
   color: $text-primary;
   margin-bottom: $space-2;
   display: block;
 }
 
 .budget-used {
-  @include text-h1;
+  font: 800 20px/1.4 $font-sans;
   margin-bottom: $space-1;
   display: block;
 }
 
 .budget-total {
-  @include text-micro;
+  font: 600 11px/1.4 $font-sans;
   color: $text-secondary;
-  font-weight: 600;
   display: block;
 }
 

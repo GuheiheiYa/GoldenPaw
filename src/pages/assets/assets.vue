@@ -149,7 +149,7 @@ const appStore = useAppStore()
 const accountStore = useAccountStore()
 
 onShow(() => {
-  appStore.setCurrentTab(2)
+  appStore.setCurrentTab(3)
 })
 
 // 计算总资产（只计算正余额）

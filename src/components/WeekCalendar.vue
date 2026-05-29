@@ -9,6 +9,7 @@
     >
       <text class="week-day-name">{{ day.name }}</text>
       <text class="week-day-num">{{ day.date }}</text>
+      <view v-if="day.isToday" class="week-day-dot"></view>
     </view>
   </view>
 </template>
@@ -106,6 +107,18 @@ function handleDayTap(day: { dateStr: string }) {
 
   .active & {
     color: white;
+  }
+}
+
+.week-day-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: $radius-circle;
+  background: $brand-500;
+  margin-top: 2px;
+
+  .active & {
+    background: white;
   }
 }
 </style>

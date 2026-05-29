@@ -4,11 +4,12 @@
       v-for="action in actions"
       :key="action.label"
       class="capsule"
-      :class="action.cls"
+      :class="[action.cls, { 'capsule-badge': action.badge }]"
       @tap="handleTap(action)"
     >
       <text class="capsule-icon">{{ action.icon }}</text>
       <text class="capsule-label">{{ action.label }}</text>
+      <text v-if="action.badge" class="capsule-badge-text">{{ action.badge }}</text>
     </view>
   </view>
 </template>
@@ -34,6 +35,7 @@ function handleTap(action: { path: string }) {
 
 .quick-row {
   display: flex;
+  justify-content: flex-start;
   gap: $space-2;
   padding: $space-4 $space-6;
   overflow-x: auto;
@@ -45,10 +47,24 @@ function handleTap(action: { path: string }) {
 }
 
 .capsule {
-  @include capsule-btn(transparent, transparent);
-  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  border-radius: $radius-full;
+  font: 700 13px/1.4 $font-sans;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: $transition-base;
+  border: none;
+  font-family: inherit;
+  box-shadow: $shadow-sm;
   justify-content: center;
   position: relative;
+  background: transparent;
+  color: transparent;
+  overflow: visible;
+  flex-shrink: 0;
 
   &.capsule-green {
     background: linear-gradient(135deg, $success-100, #D4E6D4);
@@ -81,5 +97,25 @@ function handleTap(action: { path: string }) {
   font-weight: 700;
   font-size: 13px;
   line-height: 1.4;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.capsule-badge {
+  position: relative;
+}
+
+.capsule-badge-text {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: $radius-circle;
+  background: $danger-500;
+  color: white;
+  font: 700 10px/18px $font-sans;
+  text-align: center;
+  padding: 0 4px;
 }
 </style>

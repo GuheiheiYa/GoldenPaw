@@ -87,16 +87,15 @@ function handleTap() {
 }
 
 .flow-title {
-  @include text-body;
+  font: 700 15px/1.4 $font-sans;
   color: $text-primary;
   margin-bottom: $space-1;
   display: block;
 }
 
 .flow-meta {
-  @include text-small;
+  font: 600 12px/1.4 $font-sans;
   color: $text-secondary;
-  font-weight: 600;
   display: block;
 }
 

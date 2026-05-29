@@ -113,7 +113,7 @@ const appStore = useAppStore()
 const txStore = useTransactionStore()
 
 onShow(() => {
-  appStore.setCurrentTab(3)
+  appStore.setCurrentTab(4)
 })
 
 /** 记账天数 */
