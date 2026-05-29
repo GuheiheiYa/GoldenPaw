@@ -41,7 +41,7 @@ const currentTab = computed(() => appStore.currentTab)
 function onTabTap(index: number, path: string) {
   if (!path) return
   appStore.setCurrentTab(index)
-  uni.switchTab({ url: path })
+  uni.reLaunch({ url: path })
 }
 
 function onFabTap() {

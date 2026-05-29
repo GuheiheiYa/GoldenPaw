@@ -1,0 +1,54 @@
+- generic [ref=e879]:
+  - generic [ref=e880]:
+    - generic [ref=e882] [cursor=pointer]: ←
+    - generic [ref=e883]: 分类管理
+  - generic [ref=e884]:
+    - generic [ref=e885]: 支出分类
+    - generic [ref=e886]:
+      - generic [ref=e887] [cursor=pointer]:
+        - generic [ref=e888]: 🍜
+        - generic [ref=e889]: 餐饮
+      - generic [ref=e890] [cursor=pointer]:
+        - generic [ref=e891]: 🚕
+        - generic [ref=e892]: 交通
+      - generic [ref=e893] [cursor=pointer]:
+        - generic [ref=e894]: 🏠
+        - generic [ref=e895]: 居住
+      - generic [ref=e896] [cursor=pointer]:
+        - generic [ref=e897]: 🛍️
+        - generic [ref=e898]: 购物
+      - generic [ref=e899] [cursor=pointer]:
+        - generic [ref=e900]: 🎬
+        - generic [ref=e901]: 娱乐
+      - generic [ref=e902] [cursor=pointer]:
+        - generic [ref=e903]: 📱
+        - generic [ref=e904]: 通讯
+      - generic [ref=e905] [cursor=pointer]:
+        - generic [ref=e906]: 💊
+        - generic [ref=e907]: 医疗
+      - generic [ref=e908] [cursor=pointer]:
+        - generic [ref=e909]: 📚
+        - generic [ref=e910]: 学习
+      - generic [ref=e911] [cursor=pointer]:
+        - generic [ref=e912]: 🎁
+        - generic [ref=e913]: 人情
+      - generic [ref=e914] [cursor=pointer]:
+        - generic [ref=e915]: 🐱
+        - generic [ref=e916]: 宠物
+      - generic [ref=e917] [cursor=pointer]:
+        - generic [ref=e918]: 💰
+        - generic [ref=e919]: 其他
+    - generic [ref=e920]: 收入分类
+    - generic [ref=e921]:
+      - generic [ref=e922] [cursor=pointer]:
+        - generic [ref=e923]: 💰
+        - generic [ref=e924]: 工资
+      - generic [ref=e925] [cursor=pointer]:
+        - generic [ref=e926]: 🎉
+        - generic [ref=e927]: 奖金
+      - generic [ref=e928] [cursor=pointer]:
+        - generic [ref=e929]: 📈
+        - generic [ref=e930]: 投资
+      - generic [ref=e931] [cursor=pointer]:
+        - generic [ref=e932]: 💵
+        - generic [ref=e933]: 其他

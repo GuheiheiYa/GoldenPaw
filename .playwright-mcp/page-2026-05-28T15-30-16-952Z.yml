@@ -1,0 +1,133 @@
+- generic [ref=e3]:
+  - generic [ref=e706]:
+    - generic [ref=e708]: 我的
+    - generic [ref=e709]:
+      - generic [ref=e711]: 👤
+      - generic [ref=e712]: GoldenPaw用户
+      - generic [ref=e713]: "ID: goldenpaw_001"
+      - generic [ref=e714]:
+        - generic [ref=e715]:
+          - generic [ref=e716]: "7"
+          - generic [ref=e717]: 记账天数
+        - generic [ref=e718]:
+          - generic [ref=e719]: "17"
+          - generic [ref=e720]: 记账笔数
+        - generic [ref=e721]:
+          - generic [ref=e722]: "3"
+          - generic [ref=e723]: 存钱目标
+    - generic [ref=e724]:
+      - generic [ref=e725]: 数据管理
+      - generic [ref=e726]:
+        - generic [ref=e727] [cursor=pointer]:
+          - generic [ref=e729]: 📤
+          - generic [ref=e730]:
+            - generic [ref=e731]: 导出数据
+            - generic [ref=e732]: CSV / Excel 格式
+          - generic [ref=e733]: ›
+        - generic [ref=e734] [cursor=pointer]:
+          - generic [ref=e736]: 📥
+          - generic [ref=e737]:
+            - generic [ref=e738]: 导入数据
+            - generic [ref=e739]: 微信 / 支付宝账单
+          - generic [ref=e740]: ›
+        - generic [ref=e741] [cursor=pointer]:
+          - generic [ref=e743]: ☁️
+          - generic [ref=e744]:
+            - generic [ref=e745]: 云同步
+            - generic [ref=e746]: "上次同步: 5分钟前"
+          - generic [ref=e747]: ›
+        - generic [ref=e748] [cursor=pointer]:
+          - generic [ref=e750]: 🗑️
+          - generic [ref=e751]:
+            - generic [ref=e752]: 清空数据
+            - generic [ref=e753]: 谨慎操作，不可恢复
+          - generic [ref=e754]: ›
+    - generic [ref=e755]:
+      - generic [ref=e756]: 个性化
+      - generic [ref=e757]:
+        - generic [ref=e758] [cursor=pointer]:
+          - generic [ref=e760]: 🎨
+          - generic [ref=e761]:
+            - generic [ref=e762]: 主题颜色
+            - generic [ref=e763]: 暖金（当前）
+          - generic [ref=e764]: ›
+        - generic [ref=e765] [cursor=pointer]:
+          - generic [ref=e767]: 🔔
+          - generic [ref=e768]:
+            - generic [ref=e769]: 提醒设置
+            - generic [ref=e770]: 每日记账提醒、预算预警
+          - generic [ref=e771]: ›
+        - generic [ref=e772] [cursor=pointer]:
+          - generic [ref=e774]: 🔒
+          - generic [ref=e775]:
+            - generic [ref=e776]: 密码/指纹锁
+            - generic [ref=e777]: 保护您的财务隐私
+          - generic [ref=e778]: ›
+    - generic [ref=e779]:
+      - generic [ref=e780]: 基础设置
+      - generic [ref=e781]:
+        - generic [ref=e782] [cursor=pointer]:
+          - generic [ref=e784]: 🏷️
+          - generic [ref=e785]:
+            - generic [ref=e786]: 分类管理
+            - generic [ref=e787]: 自定义收支分类
+          - generic [ref=e788]: ›
+        - generic [ref=e789] [cursor=pointer]:
+          - generic [ref=e791]: 💳
+          - generic [ref=e792]:
+            - generic [ref=e793]: 账户管理
+            - generic [ref=e794]: 管理资产账户
+          - generic [ref=e795]: ›
+        - generic [ref=e796] [cursor=pointer]:
+          - generic [ref=e798]: 💰
+          - generic [ref=e799]:
+            - generic [ref=e800]: 币种设置
+            - generic [ref=e801]: CNY（人民币）
+          - generic [ref=e802]: ›
+        - generic [ref=e803] [cursor=pointer]:
+          - generic [ref=e805]: 📅
+          - generic [ref=e806]:
+            - generic [ref=e807]: 记账周期
+            - generic [ref=e808]: 自然月
+          - generic [ref=e809]: ›
+    - generic [ref=e810]:
+      - generic [ref=e811]: 关于
+      - generic [ref=e812]:
+        - generic [ref=e813] [cursor=pointer]:
+          - generic [ref=e815]: ❓
+          - generic [ref=e817]: 帮助中心
+          - generic [ref=e818]: ›
+        - generic [ref=e819] [cursor=pointer]:
+          - generic [ref=e821]: ⭐
+          - generic [ref=e823]: 评分鼓励
+          - generic [ref=e824]: ›
+        - generic [ref=e825] [cursor=pointer]:
+          - generic [ref=e827]: 📋
+          - generic [ref=e829]: 用户协议
+          - generic [ref=e830]: ›
+        - generic [ref=e831] [cursor=pointer]:
+          - generic [ref=e833]: 🐾
+          - generic [ref=e834]:
+            - generic [ref=e835]: GoldenPaw
+            - generic [ref=e836]: v1.0.0
+    - generic [ref=e837]:
+      - generic [ref=e838] [cursor=pointer]:
+        - generic [ref=e839]: +
+        - generic [ref=e840]: 记账
+      - generic [ref=e841] [cursor=pointer]:
+        - generic [ref=e842]: 🏠
+        - generic [ref=e843]: 首页
+      - generic [ref=e844] [cursor=pointer]:
+        - generic [ref=e845]: 🤖
+        - generic [ref=e846]: AI记账
+      - generic [ref=e848] [cursor=pointer]:
+        - generic [ref=e849]: 💰
+        - generic [ref=e850]: 资产
+      - generic [ref=e851] [cursor=pointer]:
+        - generic [ref=e852]: 👤
+        - generic [ref=e853]: 我的
+  - generic [ref=e7]:
+    - generic [ref=e11] [cursor=pointer]: 首页
+    - generic [ref=e14] [cursor=pointer]: AI记账
+    - generic [ref=e17] [cursor=pointer]: 资产
+    - generic [ref=e20] [cursor=pointer]: 我的

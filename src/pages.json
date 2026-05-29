@@ -16,14 +16,5 @@
     "navigationBarTextStyle": "black",
     "navigationBarBackgroundColor": "#FDF8F3",
     "backgroundColor": "#FDF8F3"
-  },
-  "tabBar": {
-    "custom": true,
-    "list": [
-      { "pagePath": "pages/index/index", "text": "首页" },
-      { "pagePath": "pages/ai/ai", "text": "AI记账" },
-      { "pagePath": "pages/assets/assets", "text": "资产" },
-      { "pagePath": "pages/profile/profile", "text": "我的" }
-    ]
   }
 }

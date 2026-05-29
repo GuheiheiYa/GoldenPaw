@@ -1,0 +1,17 @@
+- generic [ref=e857]:
+  - generic [ref=e858]:
+    - generic [ref=e860] [cursor=pointer]: ←
+    - generic [ref=e861]: 导出数据
+  - generic [ref=e863]:
+    - generic [ref=e864] [cursor=pointer]:
+      - generic [ref=e865]: 📄
+      - generic [ref=e866]:
+        - generic [ref=e867]: 导出为 CSV
+        - generic [ref=e868]: 通用格式，可用 Excel 打开
+      - generic [ref=e869]: ›
+    - generic [ref=e870] [cursor=pointer]:
+      - generic [ref=e871]: 📊
+      - generic [ref=e872]:
+        - generic [ref=e873]: 导出为 Excel
+        - generic [ref=e874]: 包含图表和统计
+      - generic [ref=e875]: ›

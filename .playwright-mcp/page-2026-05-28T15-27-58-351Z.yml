@@ -1,0 +1,5 @@
+- generic [ref=e7]:
+  - generic [ref=e11] [cursor=pointer]: 首页
+  - generic [ref=e14] [cursor=pointer]: AI记账
+  - generic [ref=e17] [cursor=pointer]: 资产
+  - generic [ref=e20] [cursor=pointer]: 我的
