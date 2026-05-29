@@ -2,10 +2,10 @@
   <view class="app">
     <view class="header">
       <view class="back-btn" @tap="goBack">
-        <text class="back-icon">←</text>
+        <uni-icons class="back-icon" type="arrow-left" size="20" color="#7A6B5D" />
       </view>
       <view class="search-box">
-        <text class="search-icon">🔍</text>
+        <uni-icons class="search-icon" type="search" size="16" color="#999" />
         <input class="search-input" v-model="keyword" placeholder="搜索交易记录" focus />
       </view>
     </view>
@@ -29,7 +29,7 @@
 
       <!-- 无结果 -->
       <view v-else-if="keyword && results.length === 0" class="empty">
-        <text class="empty-icon">🔍</text>
+        <uni-icons class="empty-icon" type="search" size="48" color="#C8B8A8" />
         <text class="empty-title">未找到相关记录</text>
         <text class="empty-desc">试试其他关键词</text>
       </view>
@@ -63,10 +63,14 @@ const results = computed(() => {
     const cat = categoryStore.getCategoryById(tx.categoryId)
     const catName = cat?.name || ''
     const note = tx.note || ''
-    const amount = String(tx.amount / 100)
+    const amountYuan = String(tx.amount / 100)
+    const amountCents = String(tx.amount)
+    const amountFormatted = (tx.amount / 100).toFixed(2)
     return note.toLowerCase().includes(kw) ||
            catName.toLowerCase().includes(kw) ||
-           amount.includes(kw)
+           amountYuan.includes(kw) ||
+           amountCents.includes(kw) ||
+           amountFormatted.includes(kw)
   })
 })
 

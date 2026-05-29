@@ -2,7 +2,7 @@
   <view class="app">
     <view class="header">
       <view class="back-btn" @tap="goBack">
-        <text class="back-icon">←</text>
+        <uni-icons class="back-icon" type="arrow-left" size="20" color="#7A6B5D" />
       </view>
       <text class="header-title">帮助中心</text>
     </view>
@@ -14,7 +14,7 @@
         <view class="faq-item" v-for="(faq, idx) in faqs" :key="idx" @tap="faq.open = !faq.open">
           <view class="faq-question">
             <text class="faq-q-text">{{ faq.q }}</text>
-            <text class="faq-arrow" :class="{ open: faq.open }">›</text>
+            <uni-icons class="faq-arrow" :class="{ open: faq.open }" type="arrow-right" size="20" color="#C8B8A8" />
           </view>
           <view v-if="faq.open" class="faq-answer">
             <text class="faq-a-text">{{ faq.a }}</text>

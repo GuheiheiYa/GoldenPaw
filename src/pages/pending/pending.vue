@@ -3,7 +3,7 @@
     <!-- Header -->
     <view class="header">
       <view class="back-btn" @tap="goBack">
-        <text class="back-icon">←</text>
+        <uni-icons class="back-icon" type="arrow-left" size="20" color="#7A6B5D" />
       </view>
       <text class="header-title">待确认</text>
       <view class="header-badge">
@@ -52,7 +52,7 @@
       </view>
       <view class="pending-actions">
         <view class="pending-btn confirm" @tap="onConfirm(item.id)">
-          <text class="pending-btn-text">✓ 确认</text>
+          <uni-icons type="checkmarkempty" size="14" color="#fff" /><text class="pending-btn-text">确认</text>
         </view>
         <view class="pending-btn edit" @tap="onEdit(item.id)">
           <text class="pending-btn-text">✏️ 编辑</text>
@@ -83,32 +83,148 @@
         </view>
       </view>
     </view>
+
+    <!-- 编辑弹窗 -->
+    <view class="modal-overlay" v-if="showEditModal" @tap="closeEditModal">
+      <view class="modal-card" @tap.stop>
+        <text class="modal-title">编辑记录</text>
+        <view class="modal-field">
+          <text class="modal-label">金额</text>
+          <input class="modal-input" v-model="editForm.amount" type="digit" placeholder="0.00" />
+        </view>
+        <view class="modal-field">
+          <text class="modal-label">商户</text>
+          <input class="modal-input" v-model="editForm.merchant" placeholder="商户名称" />
+        </view>
+        <view class="modal-field">
+          <text class="modal-label">分类</text>
+          <input class="modal-input" v-model="editForm.category" placeholder="分类名称" />
+        </view>
+        <view class="modal-actions">
+          <view class="modal-btn secondary" @tap="closeEditModal">
+            <text>取消</text>
+          </view>
+          <view class="modal-btn primary" @tap="confirmEdit">
+            <text>确定</text>
+          </view>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
+import { useTransactionStore } from '@/stores/transaction'
+import { useAccountStore } from '@/stores/account'
+import { useCategoryStore } from '@/stores/category'
+import { getToday, getCurrentTime } from '@/utils/format'
+
+const transactionStore = useTransactionStore()
+const accountStore = useAccountStore()
+const categoryStore = useCategoryStore()
+
+/** 分类名称映射到ID */
+const CATEGORY_MAP: Record<string, string> = {
+  '餐饮美食': 'cat-food',
+  '交通出行': 'cat-transport',
+  '居住': 'cat-housing',
+  '购物消费': 'cat-shopping',
+  '娱乐': 'cat-entertainment',
+  '通讯': 'cat-communication',
+  '医疗': 'cat-medical',
+  '学习': 'cat-education',
+  '人情': 'cat-gift',
+  '宠物': 'cat-pet',
+}
 
 /** 返回上一页 */
 function goBack() {
   uni.navigateBack()
 }
 
-/** 确认记录 */
+/** 解析金额字符串为分 */
+function parseAmount(amountStr: string): number {
+  const num = parseFloat(amountStr.replace(/[¥,+\s]/g, ''))
+  return Math.round(num * 100)
+}
+
+/** 确认记录 — 创建真实交易 */
 function onConfirm(id: number) {
-  console.log('确认记录:', id)
-  pendingItems.splice(pendingItems.findIndex(item => item.id === id), 1)
+  const item = pendingItems.find(i => i.id === id)
+  if (!item) return
+
+  const amount = parseAmount(item.amount)
+  const categoryId = CATEGORY_MAP[item.category] || 'cat-other-expense'
+  const defaultAccount = accountStore.accounts[0]
+  if (!defaultAccount) {
+    uni.showToast({ title: '请先添加账户', icon: 'none' })
+    return
+  }
+
+  transactionStore.addTransaction({
+    type: 'expense',
+    amount,
+    categoryId,
+    accountId: defaultAccount.id,
+    note: item.merchant,
+    date: getToday(),
+    time: getCurrentTime(),
+  })
+  accountStore.updateBalance(defaultAccount.id, -amount)
+
+  pendingItems.splice(pendingItems.findIndex(i => i.id === id), 1)
+  uni.showToast({ title: '已入账', icon: 'success' })
 }
 
 /** 编辑记录 */
+const showEditModal = ref(false)
+const editingItem = ref<any>(null)
+const editForm = ref({ amount: '', merchant: '', category: '' })
+
 function onEdit(id: number) {
-  console.log('编辑记录:', id)
+  const item = pendingItems.find(i => i.id === id)
+  if (!item) return
+  editingItem.value = item
+  editForm.value = {
+    amount: item.amount.replace(/[¥,-\s]/g, ''),
+    merchant: item.merchant,
+    category: item.category,
+  }
+  showEditModal.value = true
+}
+
+function confirmEdit() {
+  if (!editingItem.value) return
+  const amountNum = parseFloat(editForm.value.amount)
+  if (isNaN(amountNum) || amountNum <= 0) {
+    uni.showToast({ title: '请输入有效金额', icon: 'none' })
+    return
+  }
+  editingItem.value.amount = `-¥${amountNum.toFixed(2)}`
+  editingItem.value.merchant = editForm.value.merchant
+  editingItem.value.category = editForm.value.category
+  showEditModal.value = false
+  editingItem.value = null
+}
+
+function closeEditModal() {
+  showEditModal.value = false
+  editingItem.value = null
 }
 
 /** 忽略记录 */
 function onIgnore(id: number) {
-  console.log('忽略记录:', id)
-  pendingItems.splice(pendingItems.findIndex(item => item.id === id), 1)
+  uni.showModal({
+    title: '忽略记录',
+    content: '确定忽略这条记录吗？',
+    confirmColor: '#C06C5F',
+    success: (res) => {
+      if (res.confirm) {
+        pendingItems.splice(pendingItems.findIndex(item => item.id === id), 1)
+      }
+    },
+  })
 }
 
 /** 切换来源开关 */
@@ -470,5 +586,93 @@ const sourceList = reactive([
 
 .source-toggle.off .source-toggle-thumb {
   transform: translateX(-20px);
+}
+
+/* ===== Modal ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 430px;
+  background: $surface;
+  border-radius: $radius-lg $radius-lg 0 0;
+  padding: 24px;
+  padding-bottom: 40px;
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-title {
+  @include text-h2;
+  display: block;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.modal-field {
+  margin-bottom: 16px;
+}
+
+.modal-label {
+  @include text-caption;
+  color: $text-secondary;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.modal-input {
+  width: 100%;
+  height: 48px;
+  background: $bg-primary;
+  border-radius: $radius-sm;
+  padding: 0 14px;
+  border: 1px solid $border;
+  @include text-body;
+  color: $text-primary;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: $text-placeholder;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: $radius-sm;
+  text-align: center;
+  cursor: pointer;
+
+  &.primary {
+    background: $gradient-brand;
+    box-shadow: $shadow-brand;
+    color: white;
+    font-weight: 700;
+  }
+
+  &.secondary {
+    background: $bg-primary;
+    border: 1px solid $border;
+    color: $text-secondary;
+    font-weight: 700;
+  }
 }
 </style>

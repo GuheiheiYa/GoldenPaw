@@ -42,6 +42,13 @@ export const useTransactionStore = defineStore('transaction', () => {
     }
   }
 
+  function updateTransaction(id: string, updates: Partial<Omit<Transaction, 'id' | 'createdAt'>>) {
+    const tx = transactions.value.find(t => t.id === id)
+    if (!tx) return
+    Object.assign(tx, { ...updates, updatedAt: Date.now() })
+    return tx
+  }
+
   function getTransactionsByMonth(yearMonth: string): Transaction[] {
     return transactions.value.filter(t => t.date.startsWith(yearMonth))
   }
@@ -72,6 +79,7 @@ export const useTransactionStore = defineStore('transaction', () => {
     transactions,
     addTransaction,
     deleteTransaction,
+    updateTransaction,
     getTransactionsByMonth,
     getRecentTransactions,
     monthlyExpense,

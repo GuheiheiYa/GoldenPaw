@@ -151,6 +151,7 @@ interface Transaction {
   note: string                  // 备注
   tags: string[]                // 标签
   createdAt: number             // 创建时间戳
+  updatedAt?: number            // 更新时间戳
 }
 
 // 分类
@@ -172,6 +173,23 @@ interface Account {
   bank?: string
   icon: string
   balance: number               // 余额（分）
+}
+
+// 存钱目标
+interface Goal {
+  id: string
+  icon: string                  // emoji
+  name: string
+  targetAmount: number          // 目标金额（分）
+  savedAmount: number           // 已存金额（分）
+  deadline?: string             // YYYY-MM-DD
+}
+
+// 预算
+interface Budget {
+  id: string
+  categoryId: string            // 关联分类ID
+  amount: number                // 月度限额（分）
 }
 ```
 
@@ -203,23 +221,30 @@ GoldenPaw/
 │   │   │   └── detail.vue          # 明细（二级）
 │   │   ├── goals/
 │   │   │   └── goals.vue           # 存钱目标（二级）
-│   │   └── pending/
-│   │       └── pending.vue         # 待确认（二级）
+│   │   ├── pending/
+│   │   │   └── pending.vue         # 待确认（二级）
+│   │   ├── settings/
+│   │   │   └── index.vue           # 设置页面（二级，type参数）
+│   │   ├── search/
+│   │   │   └── search.vue          # 搜索页面（二级）
+│   │   └── help/
+│   │       └── help.vue            # 帮助页面（二级）
 │   ├── components/                 # 公共组件
 │   │   ├── TabBar.vue              # 自定义底部导航栏
-│   │   ├── RecordSheet.vue         # 记账 BottomSheet
+│   │   ├── RecordSheet.vue         # 记账 BottomSheet（新建+编辑）
 │   │   ├── NumberKeyboard.vue      # 数字键盘
 │   │   ├── CategoryGrid.vue        # 分类选择网格
 │   │   ├── FlowItem.vue            # 流水列表项
 │   │   ├── BalanceCard.vue         # 余额卡片
-│   │   ├── GoalCard.vue            # 存钱目标卡片
-│   │   ├── BudgetCard.vue          # 预算卡片
+│   │   ├── QuickActions.vue        # 快捷操作胶囊
+│   │   ├── WeekCalendar.vue        # 周历组件
 │   │   └── SegmentedControl.vue    # 分段控制器
 │   ├── stores/                     # Pinia 状态管理
-│   │   ├── transaction.ts          # 交易记录 store
-│   │   ├── category.ts             # 分类管理 store
-│   │   ├── account.ts              # 账户管理 store
-│   │   └── app.ts                  # 全局应用状态
+│   │   ├── transaction.ts          # 交易记录 store（CRUD + 月度统计）
+│   │   ├── category.ts             # 分类管理 store（只读）
+│   │   ├── account.ts              # 账户管理 store（余额更新）
+│   │   ├── goalBudget.ts           # 存钱目标 + 预算 store（CRUD）
+│   │   └── app.ts                  # 全局应用状态（Tab/Sheet/编辑模式/提醒开关）
 │   ├── styles/                     # 全局样式
 │   │   ├── design-system.scss      # Design Tokens（从设计文档提取）
 │   │   ├── mixins.scss             # 常用 mixin
@@ -337,5 +362,5 @@ GoldenPaw/
 
 ---
 
-*文档版本：v1.0*
-*创建时间：2026-05-28*
+*文档版本：v2.0*
+*更新时间：2026-05-29 22:00*

@@ -4,14 +4,6 @@
       <!-- 头部 -->
       <view class="header">
         <text class="header-title">我的资产</text>
-        <view class="header-actions">
-          <view class="icon-btn">
-            <text class="icon-text">📊</text>
-          </view>
-          <view class="icon-btn">
-            <text class="icon-text">⚙️</text>
-          </view>
-        </view>
       </view>
 
       <!-- 净资产卡片 -->
@@ -19,7 +11,7 @@
         <text class="networth-label">净资产</text>
         <text class="networth-value">{{ formatAmount(totalNetWorth) }}</text>
         <view class="networth-change" :class="netWorthChange >= 0 ? '' : 'down'">
-          <text class="networth-change-icon">{{ netWorthChange >= 0 ? '↑' : '↓' }}</text>
+          <uni-icons class="networth-change-icon" :type="netWorthChange >= 0 ? 'arrow-up' : 'arrow-down'" size="10" :color="netWorthChange >= 0 ? '#4A7C59' : '#C44D34'" />
           <text>较上月 {{ formatAmount(netWorthChange, true) }}</text>
         </view>
       </view>
@@ -27,7 +19,7 @@
       <!-- 资产构成 -->
       <view class="section-header">
         <text class="section-title">资产构成</text>
-        <text class="section-link">详情</text>
+        <text class="section-link" @tap="onCompositionDetail">详情</text>
       </view>
       <view class="composition-card">
         <!-- 环形图 -->
@@ -68,7 +60,7 @@
       <!-- 账户列表 -->
       <view class="section-header">
         <text class="section-title">账户列表</text>
-        <text class="section-link">管理</text>
+        <text class="section-link" @tap="navigateToSettings('account')">管理</text>
       </view>
       <view class="account-list">
         <view
@@ -101,7 +93,7 @@
       </view>
 
       <!-- 添加账户按钮 -->
-      <view class="add-account-btn">
+      <view class="add-account-btn" @tap="navigateToSettings('account')">
         <text class="add-account-icon">+</text>
         <text class="add-account-text">添加账户</text>
       </view>
@@ -112,22 +104,7 @@
         <text class="section-link">近6个月</text>
       </view>
       <view class="trend-card">
-        <view class="trend-chart">
-          <view
-            v-for="(bar, index) in trendData"
-            :key="index"
-            class="trend-bar-wrapper"
-          >
-            <view
-              class="trend-bar"
-              :class="{ active: index === trendData.length - 1 }"
-              :style="{ height: bar.height + '%' }"
-            >
-              <text class="trend-bar-value">{{ bar.value }}</text>
-            </view>
-            <text class="trend-bar-label">{{ bar.label }}</text>
-          </view>
-        </view>
+        <LineChart :labels="trendLineData.labels" :values="trendLineData.values" empty-text="暂无资产数据" />
       </view>
     </view>
 
@@ -141,12 +118,15 @@ import { computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app'
 import { useAccountStore } from '@/stores/account'
+import { useTransactionStore } from '@/stores/transaction'
 import { formatAmount } from '@/utils/format'
 import TabBar from '@/components/TabBar.vue'
 import RecordSheet from '@/components/RecordSheet.vue'
+import LineChart from '@/components/LineChart.vue'
 
 const appStore = useAppStore()
 const accountStore = useAccountStore()
+const transactionStore = useTransactionStore()
 
 onShow(() => {
   appStore.setCurrentTab(3)
@@ -164,12 +144,46 @@ const totalNetWorth = computed(() => {
   return accountStore.accounts.reduce((sum, acc) => sum + acc.balance, 0)
 })
 
-// 月度变化（模拟数据）
+// 月度变化（基于交易数据计算上月变化）
 const netWorthChange = computed(() => {
-  return 324000 // +¥3,240.00
+  const today = new Date().toISOString().slice(0, 10)
+  const currentMonth = today.slice(0, 7)
+  const lastMonthDate = new Date()
+  lastMonthDate.setMonth(lastMonthDate.getMonth() - 1)
+  const lastMonth = lastMonthDate.toISOString().slice(0, 7)
+
+  const currentMonthTxs = transactionStore.transactions.filter(t => t.date.startsWith(currentMonth))
+  const lastMonthTxs = transactionStore.transactions.filter(t => t.date.startsWith(lastMonth))
+
+  const currentBalance = currentMonthTxs.reduce((s, t) => {
+    if (t.type === 'income') return s + t.amount
+    if (t.type === 'expense') return s - t.amount
+    return s
+  }, 0)
+
+  const lastBalance = lastMonthTxs.reduce((s, t) => {
+    if (t.type === 'income') return s + t.amount
+    if (t.type === 'expense') return s - t.amount
+    return s
+  }, 0)
+
+  return currentBalance - lastBalance
 })
 
 // 格式化金额（简化显示）
+function navigateToSettings(type: string) {
+  uni.navigateTo({ url: `/pages/settings/index?type=${type}` })
+}
+
+function onCompositionDetail() {
+  const items = compositionData.value.map(item => `${item.name}: ${formatAmount(item.amount)} (${item.percentage}%)`)
+  uni.showModal({
+    title: '资产构成详情',
+    content: items.length > 0 ? items.join('\n') : '暂无资产数据',
+    showCancel: false,
+  })
+}
+
 function formatAmountCompact(cents: number): string {
   const yuan = cents / 100
   if (yuan >= 10000) {
@@ -257,17 +271,32 @@ const ringSegments = computed(() => {
   })
 })
 
-// 趋势数据（模拟）
-const trendData = computed(() => {
-  return [
-    { label: '1月', value: '¥12万', height: 60 },
-    { label: '2月', value: '¥13万', height: 68 },
-    { label: '3月', value: '¥14万', height: 72 },
-    { label: '4月', value: '¥15万', height: 78 },
-    { label: '5月', value: '¥16万', height: 88 },
-    { label: '6月', value: '¥16万', height: 92 },
-  ]
+// 趋势折线图数据（基于交易数据动态计算最近6个月净资产）
+const trendLineData = computed(() => {
+  const now = new Date()
+  const months: { label: string; netWorth: number }[] = []
+
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    const yearMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    const label = `${d.getMonth() + 1}月`
+
+    const currentNetWorth = totalNetWorth.value
+    const afterMonthTxs = transactionStore.transactions.filter(t => t.date.slice(0, 7) > yearMonth)
+    const afterIncome = afterMonthTxs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
+    const afterExpense = afterMonthTxs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
+    const netWorthAtMonth = currentNetWorth - (afterIncome - afterExpense)
+
+    months.push({ label, netWorth: netWorthAtMonth })
+  }
+
+  return {
+    labels: months.map(m => m.label),
+    values: months.map(m => m.netWorth),
+  }
 })
+
+
 </script>
 
 <style lang="scss" scoped>
@@ -579,57 +608,9 @@ const trendData = computed(() => {
   color: $text-secondary;
 }
 
-// 资产趋势卡片
+// 资产趋势折线图
 .trend-card {
   @include card-base;
   padding: $space-6;
-}
-
-.trend-chart {
-  height: 120px;
-  display: flex;
-  align-items: flex-end;
-  gap: $space-2;
-}
-
-.trend-bar-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.trend-bar {
-  width: 100%;
-  border-radius: 6px 6px 0 0;
-  background: linear-gradient(180deg, $brand-500, $brand-600);
-  opacity: 0.3;
-  position: relative;
-  transition: $transition-base;
-
-  &.active {
-    opacity: 1;
-  }
-}
-
-.trend-bar-value {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font: 700 10px/1.4 $font-sans;
-  color: $brand-600;
-  white-space: nowrap;
-  opacity: 0;
-
-  .trend-bar.active & {
-    opacity: 1;
-  }
-}
-
-.trend-bar-label {
-  font: 600 10px/1.4 $font-sans;
-  color: $text-tertiary;
-  margin-top: $space-2;
 }
 </style>

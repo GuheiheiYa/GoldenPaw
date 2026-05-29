@@ -18,10 +18,10 @@ GoldenPaw/
 ├── pages.json                       # 页面路由配置（custom TabBar）
 │   ├── pages/index/index            # 首页 (Tab 0)
 │   ├── pages/ai/ai                  # AI记账 (Tab 1)
-│   ├── pages/assets/assets          # 资产 (Tab 2)
-│   ├── pages/profile/profile        # 我的 (Tab 3)
+│   ├── pages/assets/assets          # 资产 (Tab 3)
+│   ├── pages/profile/profile        # 我的 (Tab 4)
 │   ├── pages/report/report          # 收支报表 (二级)
-│   ├── pages/detail/detail          # 明细 (二级，支持日期筛选)
+│   ├── pages/detail/detail          # 明细 (二级，支持日期筛选 + highlight)
 │   ├── pages/goals/goals            # 存钱目标 (二级)
 │   ├── pages/pending/pending        # 待确认 (二级)
 │   ├── pages/settings/index         # 设置页面 (二级，根据type参数显示不同内容)
@@ -36,11 +36,12 @@ GoldenPaw/
 │   │   ├── 使用 → FlowItem.vue (流水列表)
 │   │   ├── 使用 → TabBar.vue
 │   │   ├── 使用 → RecordSheet.vue
-│   │   └── 数据 → stores/transaction.ts, stores/category.ts
+│   │   └── 数据 → stores/transaction.ts, stores/category.ts, stores/goalBudget.ts
 │   │
-│   ├── ai/ai.vue                    # AI记账助手
+│   ├── ai/ai.vue                    # AI记账助手（自然语言记账 + 智能分析）
 │   │   ├── 使用 → TabBar.vue
-│   │   └── 使用 → RecordSheet.vue
+│   │   ├── 使用 → RecordSheet.vue
+│   │   └── 数据 → stores/transaction.ts, stores/category.ts, stores/account.ts
 │   │
 │   ├── assets/assets.vue            # 我的资产
 │   │   ├── 使用 → TabBar.vue
@@ -52,33 +53,34 @@ GoldenPaw/
 │   │   ├── 使用 → RecordSheet.vue
 │   │   └── 跳转 → settings/index, help/help
 │   │
-│   ├── report/report.vue            # 收支报表
-│   │   └── 数据 → stores/transaction.ts
-│   │
-│   ├── detail/detail.vue            # 明细
-│   │   ├── 使用 → SegmentedControl.vue (筛选)
+│   ├── report/report.vue            # 收支报表（动态数据 + 周期切换）
 │   │   └── 数据 → stores/transaction.ts, stores/category.ts
 │   │
-│   ├── goals/goals.vue              # 存钱与预算
-│   │   └── 使用 → SegmentedControl.vue (切换)
+│   ├── detail/detail.vue            # 明细（筛选/编辑/删除/高亮）
+│   │   ├── 使用 → SegmentedControl.vue (筛选)
+│   │   ├── 使用 → RecordSheet.vue (编辑)
+│   │   └── 数据 → stores/transaction.ts, stores/category.ts, stores/app.ts
+│   │
+│   ├── goals/goals.vue              # 存钱与预算（目标CRUD + 预算管理）
+│   │   └── 数据 → stores/goalBudget.ts, stores/category.ts, stores/transaction.ts
 │   │
 │   ├── pending/pending.vue          # 待确认
 │   │   └── 静态数据 (3条示例待确认记录)
 │   │
 │   ├── settings/index.vue           # 设置页面（通用）
-│   │   ├── type=category            # 分类管理
-│   │   ├── type=account             # 账户管理
-│   │   ├── type=theme               # 主题颜色
-│   │   ├── type=reminder            # 提醒设置
-│   │   ├── type=security            # 密码/指纹锁
-│   │   ├── type=currency            # 币种设置
-│   │   ├── type=cycle               # 记账周期
-│   │   ├── type=export              # 导出数据
-│   │   ├── type=import              # 导入数据
-│   │   ├── type=sync                # 云同步
-│   │   └── type=clear               # 清空数据
+│   │   ├── type=category            # 分类管理（只读）
+│   │   ├── type=account             # 账户管理（只读）
+│   │   ├── type=theme               # 主题颜色（占位）
+│   │   ├── type=reminder            # 提醒设置（持久化开关）
+│   │   ├── type=security            # 密码/指纹锁（占位）
+│   │   ├── type=currency            # 币种设置（占位）
+│   │   ├── type=cycle               # 记账周期（占位）
+│   │   ├── type=export              # 导出数据（占位）
+│   │   ├── type=import              # 导入数据（占位）
+│   │   ├── type=sync                # 云同步（占位）
+│   │   └── type=clear               # 清空数据（真实删除）
 │   │
-│   ├── search/search.vue            # 搜索页面
+│   ├── search/search.vue            # 搜索页面（备注/分类/金额）
 │   │   └── 数据 → stores/transaction.ts, stores/category.ts
 │   │
 │   └── help/help.vue                # 帮助页面
@@ -86,14 +88,14 @@ GoldenPaw/
 │
 ├── components/
 │   ├── TabBar.vue                   # 自定义底部导航栏
-│   │   ├── 4个Tab项 (首页/AI记账/资产/我的)
+│   │   ├── 5个Tab项 (首页/AI记账/占位/资产/我的)
 │   │   └── 中心悬浮记账按钮 → 触发 RecordSheet
 │   │
-│   ├── RecordSheet.vue              # 记账 BottomSheet（完整功能）
+│   ├── RecordSheet.vue              # 记账 BottomSheet（新建 + 编辑）
 │   │   ├── 使用 → SegmentedControl.vue (支出/收入/转账)
 │   │   ├── 使用 → CategoryGrid.vue (分类选择)
 │   │   ├── 使用 → NumberKeyboard.vue (数字键盘)
-│   │   └── 数据 → stores/transaction.ts (保存交易)
+│   │   └── 数据 → stores/transaction.ts, stores/account.ts, stores/app.ts
 │   │
 │   ├── NumberKeyboard.vue           # 数字键盘
 │   │   └── 7/8/9/←, 4/5/6/+, 1/2/3/-, 0/./完成
@@ -111,28 +113,47 @@ GoldenPaw/
 │   │
 │   ├── WeekCalendar.vue             # 周历组件（周一到周日）
 │   │
-│   └── FlowItem.vue                 # 流水列表项
+│   ├── FlowItem.vue                 # 流水列表项
+│   │
+│   ├── LineChart.vue                # SVG 折线图（可复用）
+│   │   └── 使用于 → report.vue, assets.vue
+│   │
+│   ├── PageHeader.vue               # 统一页面头部（返回 + 标题 + actions slot）
+│   │   └── 使用于 → detail, report, goals, settings, help 等二级页面
+│   │
+│   ├── EmptyState.vue               # 统一空状态组件
+│   │   └── 使用于 → detail, goals
+│   │
+│   └── EmojiGrid.vue                # 统一 emoji 选择器（40个emoji）
+│       └── 使用于 → goals.vue（新建目标）, settings/index.vue（分类/账户图标）
 │
 ├── stores/
-│   ├── app.ts                       # 全局状态
-│   │   ├── state: showRecordSheet, currentTab
-│   │   └── actions: openRecordSheet, closeRecordSheet, setCurrentTab
+│   ├── app.ts                       # 全局UI状态（持久化）
+│   │   ├── state: showRecordSheet, currentTab, editTransactionId
+│   │   ├── state: reminderEnabled, budgetAlertEnabled
+│   │   └── actions: openRecordSheet, closeRecordSheet, setCurrentTab, editTransaction, clearEdit
 │   │
 │   ├── transaction.ts               # 交易记录 store（持久化）
 │   │   ├── state: transactions[]
-│   │   ├── actions: addTransaction, deleteTransaction
+│   │   ├── actions: addTransaction, deleteTransaction, updateTransaction
 │   │   └── getters: monthlyExpense, monthlyIncome, monthlyBalance
 │   │
 │   ├── category.ts                  # 分类管理 store（持久化）
 │   │   ├── state: expenseCategories[], incomeCategories[]
 │   │   └── actions: getCategoriesByType, getCategoryById
 │   │
-│   └── account.ts                   # 账户管理 store（持久化）
-│       ├── state: accounts[]
-│       └── actions: getAccountById, getDefaultAccount, updateBalance
+│   ├── account.ts                   # 账户管理 store（持久化）
+│   │   ├── state: accounts[]
+│   │   └── actions: getAccountById, getDefaultAccount, updateBalance
+│   │
+│   └── goalBudget.ts                # 存钱目标 + 预算管理 store（持久化）
+│       ├── state: goals[], budgets[]
+│       ├── actions: addGoal, updateGoal, deleteGoal, depositToGoal
+│       ├── actions: addBudget, updateBudget, deleteBudget
+│       └── getters: budgetUsage, totalBudget, totalBudgetUsed
 │
 ├── types/
-│   └── transaction.ts               # Transaction, Category, Account 接口
+│   └── transaction.ts               # Transaction, Category, Account, Goal, Budget 接口
 │
 ├── utils/
 │   ├── format.ts                    # formatAmount, formatDate, getToday, getCurrentTime
@@ -159,6 +180,7 @@ GoldenPaw/
 │   ├── requirements.md              # 需求文档
 │   ├── features.md                  # 功能文档
 │   ├── changelog.md                 # 更新日志
+│   ├── issues.md                    # 已知问题清单
 │   ├── navigation.md                # 项目导航（本文件）
 │   └── superpowers/plans/           # 实现计划
 │
@@ -182,19 +204,31 @@ GoldenPaw/
   ├── 点击"明细"胶囊 → /pages/detail/detail
   ├── 点击"存钱"胶囊 → /pages/goals/goals
   ├── 点击"待确认"胶囊 → /pages/pending/pending
+  ├── 点击搜索图标 → /pages/search/search
+  ├── 点击日历日期 → /pages/detail/detail?date=YYYY-MM-DD
+  ├── 点击流水项 → /pages/detail/detail?highlight=id
+  ├── 点击"管理" → /pages/goals/goals?tab=budget
   └── 点击 + 号按钮 → 弹出 RecordSheet
 
 AI记账 (Tab 1)
   └── 点击 + 号按钮 → 弹出 RecordSheet
 
-资产 (Tab 2)
+资产 (Tab 3)
   └── 点击 + 号按钮 → 弹出 RecordSheet
 
-我的 (Tab 3)
+我的 (Tab 4)
+  ├── 点击设置菜单 → /pages/settings/index?type=xxx
+  ├── 点击帮助 → /pages/help/help
   └── 点击 + 号按钮 → 弹出 RecordSheet
+
+明细页
+  └── 点击搜索 → /pages/search/search
+
+搜索页
+  └── 点击结果项 → /pages/detail/detail?highlight=id
 ```
 
 ---
 
-*文档版本：v2.0*
-*更新时间：2026-05-28*
+*文档版本：v3.0*
+*更新时间：2026-05-29 22:00*

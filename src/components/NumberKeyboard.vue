@@ -11,7 +11,7 @@
         <text class="key-text">9</text>
       </view>
       <view class="key key-func" @tap="onBackspace">
-        <text class="key-text">←</text>
+        <uni-icons class="key-text" type="arrow-left" size="18" color="#fff" />
       </view>
     </view>
     <view class="keyboard-row">
@@ -57,9 +57,10 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 /**
  * 自定义数字键盘组件
- * 支持数字输入、小数点（最多2位）、退格、正负切换，最大12位
+ * 支持数字输入、小数点（最多2位）、退格、连续加减计算，最大12位
  */
 const props = defineProps<{
   /** 当前金额字符串 */
@@ -74,11 +75,31 @@ const emit = defineEmits<{
 /** 最大位数 */
 const MAX_DIGITS = 12
 
+/** 当前操作符 */
+const operator = ref<'+' | '-' | ''>('')
+/** 操作数（第一个数值） */
+const operand = ref(0)
+
 /** 处理数字和运算符输入 */
 function onKey(key: string) {
   const val = props.modelValue
-  // 运算符不参与金额存储，仅作视觉反馈
-  if (key === '+' || key === '-') return
+
+  // 处理加减运算符（连续计算）
+  if (key === '+' || key === '-') {
+    const currentVal = parseFloat(val || '0')
+    // 如果已有操作符，先计算结果
+    if (operator.value) {
+      let result = 0
+      if (operator.value === '+') result = operand.value + currentVal
+      if (operator.value === '-') result = operand.value - currentVal
+      operand.value = result
+    } else {
+      operand.value = currentVal
+    }
+    operator.value = key
+    emit('update:modelValue', '0')
+    return
+  }
 
   // 检查最大位数（不含小数点）
   const digitsOnly = val.replace(/[^0-9]/g, '')
@@ -117,6 +138,16 @@ function onBackspace() {
 
 /** 确认 */
 function onConfirm() {
+  // 如果有待计算的操作符，先计算结果
+  if (operator.value) {
+    const currentVal = parseFloat(props.modelValue || '0')
+    let result = 0
+    if (operator.value === '+') result = operand.value + currentVal
+    if (operator.value === '-') result = operand.value - currentVal
+    emit('update:modelValue', result.toFixed(2))
+    operator.value = ''
+    operand.value = 0
+  }
   emit('confirm')
 }
 </script>

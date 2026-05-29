@@ -3,7 +3,7 @@
     <!-- Header -->
     <view class="header">
       <view class="back-btn" @tap="goBack">
-        <text class="back-icon">←</text>
+        <uni-icons class="back-icon" type="arrow-left" size="20" color="#7A6B5D" />
       </view>
       <text class="header-title">收支报表</text>
     </view>
@@ -25,28 +25,18 @@
     <view class="summary-row">
       <view class="summary-card">
         <text class="summary-label">收入</text>
-        <text class="summary-value in">¥12,500</text>
-        <text class="summary-change">较上月 +15%</text>
+        <text class="summary-value in">{{ formatAmount(summary.income) }}</text>
       </view>
       <view class="summary-card">
         <text class="summary-label">支出</text>
-        <text class="summary-value out">¥3,858</text>
-        <text class="summary-change">较上月 -8%</text>
+        <text class="summary-value out">{{ formatAmount(summary.expense) }}</text>
       </view>
     </view>
 
-    <!-- 收支趋势柱状图 -->
+    <!-- 收支趋势折线图 -->
     <view class="chart-card">
       <text class="chart-title">收支趋势</text>
-      <view class="bar-chart">
-        <view class="bar-col" v-for="bar in barData" :key="bar.label">
-          <view class="bar-wrapper">
-            <view class="bar" :class="bar.type" :style="{ height: bar.pct + '%' }"></view>
-            <text class="bar-value">{{ bar.value }}</text>
-          </view>
-          <text class="bar-label">{{ bar.label }}</text>
-        </view>
-      </view>
+      <LineChart :labels="lineChartData.labels" :values="lineChartData.values" empty-text="暂无收支数据" />
     </view>
 
     <!-- 支出构成饼图 -->
@@ -75,8 +65,8 @@
         <view class="pie-chart">
           <view class="pie-chart-inner">
             <view class="pie-center">
-              <text class="pie-center-amount">¥3,858</text>
-              <text class="pie-center-label">总支出</text>
+              <text class="pie-center-amount">{{ formatAmount(pieData.total) }}</text>
+              <text class="pie-center-label">总{{ pieTab === '支出' ? '支出' : '收入' }}</text>
             </view>
             <!-- 使用 CSS conic-gradient 实现饼图 -->
             <view class="pie-ring" :style="{ background: pieGradient }"></view>
@@ -116,7 +106,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useTransactionStore } from '@/stores/transaction'
+import { useCategoryStore } from '@/stores/category'
+import { formatAmount, getToday } from '@/utils/format'
+import type { Transaction } from '@/types/transaction'
+import LineChart from '@/components/LineChart.vue'
+
+const txStore = useTransactionStore()
+const catStore = useCategoryStore()
 
 /** 返回上一页 */
 function goBack() {
@@ -127,50 +125,204 @@ function goBack() {
 const activePeriod = ref('本月')
 
 /** 可选时间周期 */
-const periods = ['本周', '本月', '本季', '本年', '自定义']
+const periods = ['本周', '本月', '本季', '本年']
 
 /** 饼图标签切换 */
-const pieTab = ref('支出')
+const pieTab = ref<'支出' | '收入'>('支出')
 
-/** 柱状图数据 */
-const barData = [
-  { label: '1日', type: 'out', pct: 30, value: '¥800' },
-  { label: '5日', type: 'in', pct: 100, value: '¥12.5K' },
-  { label: '10日', type: 'out', pct: 25, value: '¥650' },
-  { label: '15日', type: 'out', pct: 35, value: '¥900' },
-  { label: '20日', type: 'out', pct: 40, value: '¥1,050' },
-  { label: '25日', type: 'out', pct: 28, value: '¥720' },
-  { label: '30日', type: 'out', pct: 32, value: '¥838' },
-]
+/** 获取周期内的交易 */
+const periodTransactions = computed(() => {
+  const today = getToday()
+  const txs = txStore.transactions
+  switch (activePeriod.value) {
+    case '本周': {
+      const d = new Date(today)
+      const day = d.getDay() || 7
+      const monday = new Date(d)
+      monday.setDate(d.getDate() - day + 1)
+      const sunday = new Date(monday)
+      sunday.setDate(monday.getDate() + 6)
+      const s = monday.toISOString().slice(0, 10)
+      const e = sunday.toISOString().slice(0, 10)
+      return txs.filter(t => t.date >= s && t.date <= e)
+    }
+    case '本月': {
+      const prefix = today.slice(0, 7)
+      return txs.filter(t => t.date.startsWith(prefix))
+    }
+    case '本季': {
+      const d = new Date(today)
+      const m = d.getMonth()
+      const qStart = Math.floor(m / 3) * 3
+      const s = new Date(d.getFullYear(), qStart, 1).toISOString().slice(0, 10)
+      const e = new Date(d.getFullYear(), qStart + 3, 0).toISOString().slice(0, 10)
+      return txs.filter(t => t.date >= s && t.date <= e)
+    }
+    case '本年': {
+      const y = today.slice(0, 4)
+      return txs.filter(t => t.date.startsWith(y))
+    }
+    default:
+      return txs
+  }
+})
 
-/** 饼图渐变色 */
-const pieGradient = `conic-gradient(
-  #C8956C 0deg 111.6deg,
-  #7A9EAF 111.6deg 200.88deg,
-  #6B8E6B 200.88deg 244.44deg,
-  #C06C5F 244.44deg 273.6deg,
-  #D4A574 273.6deg 298.8deg,
-  #B8A99E 298.8deg 360deg
-)`
+/** 周期内收入/支出汇总 */
+const summary = computed(() => {
+  const income = periodTransactions.value
+    .filter(t => t.type === 'income')
+    .reduce((s, t) => s + t.amount, 0)
+  const expense = periodTransactions.value
+    .filter(t => t.type === 'expense')
+    .reduce((s, t) => s + t.amount, 0)
+  return { income, expense }
+})
 
-/** 饼图图例数据 */
-const pieLegendData = [
-  { name: '餐饮美食', value: '¥1,200', pct: 31, color: '#C8956C' },
-  { name: '居住', value: '¥1,000', pct: 26, color: '#7A9EAF' },
-  { name: '交通出行', value: '¥480', pct: 12, color: '#6B8E6B' },
-  { name: '购物消费', value: '¥320', pct: 8, color: '#C06C5F' },
-  { name: '休闲娱乐', value: '¥258', pct: 7, color: '#D4A574' },
-  { name: '其他', value: '¥600', pct: 16, color: '#B8A99E' },
-]
+/** 折线图数据 */
+const lineChartData = computed(() => {
+  const today = getToday()
+  const txs = periodTransactions.value.filter(t => t.type !== 'transfer')
+  const typeFilter = pieTab.value === '支出' ? 'expense' : 'income'
+  let labels: string[] = []
+  let values: number[] = []
 
-/** 消费排行数据 */
-const rankData = [
-  { icon: '🍜', name: '餐饮美食', value: '¥1,200', pct: 100, barColor: '#C8956C', iconBg: 'linear-gradient(135deg, #FAF0E6, #F5E6D3)' },
-  { icon: '🏠', name: '居住', value: '¥1,000', pct: 83, barColor: '#7A9EAF', iconBg: 'linear-gradient(135deg, #E8F1F5, #D6E5EC)' },
-  { icon: '🚇', name: '交通出行', value: '¥480', pct: 40, barColor: '#6B8E6B', iconBg: 'linear-gradient(135deg, #E8F0E8, #D4E6D4)' },
-  { icon: '🛍️', name: '购物消费', value: '¥320', pct: 27, barColor: '#C06C5F', iconBg: 'linear-gradient(135deg, #F5E0DC, #F0D5CF)' },
-  { icon: '🎬', name: '休闲娱乐', value: '¥258', pct: 22, barColor: '#D4A574', iconBg: 'linear-gradient(135deg, #FFF8E1, #FFECB3)' },
-]
+  switch (activePeriod.value) {
+    case '本周': {
+      const d = new Date(today)
+      const day = d.getDay() || 7
+      const monday = new Date(d)
+      monday.setDate(d.getDate() - day + 1)
+      for (let i = 0; i < 7; i++) {
+        const cur = new Date(monday)
+        cur.setDate(monday.getDate() + i)
+        const dateStr = cur.toISOString().slice(0, 10)
+        const dayTxs = txs.filter(t => t.date === dateStr && t.type === typeFilter)
+        const val = dayTxs.reduce((s, t) => s + t.amount, 0)
+        labels.push(`${cur.getMonth() + 1}/${cur.getDate()}`)
+        values.push(val)
+      }
+      break
+    }
+    case '本月': {
+      // 显示最近15天，避免31个点太密集
+      for (let i = 14; i >= 0; i--) {
+        const d = new Date(today)
+        d.setDate(d.getDate() - i)
+        const dateStr = d.toISOString().slice(0, 10)
+        const dayTxs = txs.filter(t => t.date === dateStr && t.type === typeFilter)
+        const val = dayTxs.reduce((s, t) => s + t.amount, 0)
+        // 只显示每隔3天的标签，以及第一天和最后一天
+        const showLabel = i % 3 === 0 || i === 14
+        const label = showLabel
+          ? (i === 0 ? '今天' : i === 1 ? '昨天' : `${d.getMonth() + 1}/${d.getDate()}`)
+          : ''
+        labels.push(label)
+        values.push(val)
+      }
+      break
+    }
+    case '本季': {
+      const d = new Date(today)
+      const m = d.getMonth()
+      const qStart = Math.floor(m / 3) * 3
+      for (let i = 0; i < 3; i++) {
+        const month = qStart + i
+        const monthStr = `${d.getFullYear()}-${String(month + 1).padStart(2, '0')}`
+        const monthTxs = txs.filter(t => t.date.startsWith(monthStr) && t.type === typeFilter)
+        const val = monthTxs.reduce((s, t) => s + t.amount, 0)
+        labels.push(`${month + 1}月`)
+        values.push(val)
+      }
+      break
+    }
+    case '本年': {
+      const year = today.slice(0, 4)
+      for (let i = 0; i < 12; i++) {
+        const monthStr = `${year}-${String(i + 1).padStart(2, '0')}`
+        const monthTxs = txs.filter(t => t.date.startsWith(monthStr) && t.type === typeFilter)
+        const val = monthTxs.reduce((s, t) => s + t.amount, 0)
+        labels.push(`${i + 1}月`)
+        values.push(val)
+      }
+      break
+    }
+  }
+  return { labels, values }
+})
+
+
+
+/** 饼图数据：按分类聚合 */
+const pieData = computed(() => {
+  const type = pieTab.value === '支出' ? 'expense' : 'income'
+  const map = new Map<string, { amount: number; color: string; icon: string }>()
+  for (const tx of periodTransactions.value) {
+    if (tx.type !== type) continue
+    const cat = catStore.getCategoryById(tx.categoryId)
+    const name = cat?.name || '未知'
+    const cur = map.get(name) || { amount: 0, color: cat?.color || '#B8A99E', icon: cat?.icon || '💰' }
+    cur.amount += tx.amount
+    map.set(name, cur)
+  }
+  const arr = Array.from(map.entries())
+    .map(([name, v]) => ({ name, ...v }))
+    .sort((a, b) => b.amount - a.amount)
+  const total = arr.reduce((s, v) => s + v.amount, 0) || 1
+  return { arr, total }
+})
+
+/** 饼图图例 */
+const pieLegendData = computed(() => {
+  const { arr, total } = pieData.value
+  return arr.map(item => ({
+    name: item.name,
+    value: formatAmount(item.amount),
+    pct: Math.round((item.amount / total) * 100),
+    color: item.color,
+  }))
+})
+
+/** 饼图 conic-gradient */
+const pieGradient = computed(() => {
+  const { arr, total } = pieData.value
+  if (arr.length === 0) return 'conic-gradient(#EDE4D8 0deg 360deg)'
+  const colors = ['#C8956C', '#7A9EAF', '#6B8E6B', '#C06C5F', '#D4A574', '#B8A99E', '#EDD4B8', '#A89B8E']
+  let deg = 0
+  const stops = arr.map((item, i) => {
+    const start = deg
+    const pct = item.amount / total
+    deg += pct * 360
+    return `${item.color || colors[i % colors.length]} ${start.toFixed(2)}deg ${deg.toFixed(2)}deg`
+  })
+  return `conic-gradient(${stops.join(', ')})`
+})
+
+/** 消费/收入排行 */
+const rankData = computed(() => {
+  const type = pieTab.value === '支出' ? 'expense' : 'income'
+  const map = new Map<string, { amount: number; color: string; icon: string }>()
+  for (const tx of periodTransactions.value) {
+    if (tx.type !== type) continue
+    const cat = catStore.getCategoryById(tx.categoryId)
+    const name = cat?.name || '未知'
+    const cur = map.get(name) || { amount: 0, color: cat?.color || '#B8A99E', icon: cat?.icon || '💰' }
+    cur.amount += tx.amount
+    map.set(name, cur)
+  }
+  const arr = Array.from(map.entries())
+    .map(([name, v]) => ({ name, ...v }))
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 5)
+  const maxAmt = arr[0]?.amount || 1
+  return arr.map(item => ({
+    icon: item.icon,
+    name: item.name,
+    value: formatAmount(item.amount),
+    pct: Math.round((item.amount / maxAmt) * 100),
+    barColor: item.color,
+    iconBg: `linear-gradient(135deg, ${item.color}22, ${item.color}44)`,
+  }))
+})
 </script>
 
 <style lang="scss" scoped>
@@ -290,7 +442,7 @@ const rankData = [
   display: block;
 }
 
-/* ===== 柱状图 ===== */
+/* ===== 折线图 ===== */
 .chart-card {
   margin: 0 $space-6 20px;
   background: $surface;
@@ -302,64 +454,8 @@ const rankData = [
 
 .chart-title {
   @include text-h3;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   display: block;
-}
-
-.bar-chart {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  height: 160px;
-  padding: 0 4px;
-}
-
-.bar-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.bar-wrapper {
-  flex: 1;
-  width: 100%;
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.bar {
-  width: 100%;
-  border-radius: 6px 6px 0 0;
-  transition: height 0.6s ease;
-
-  &.in {
-    background: $gradient-success;
-  }
-
-  &.out {
-    background: $gradient-danger;
-  }
-}
-
-.bar-value {
-  position: absolute;
-  top: -18px;
-  left: 50%;
-  transform: translateX(-50%);
-  @include text-micro;
-  font-size: 9px;
-  white-space: nowrap;
-  color: $text-secondary;
-}
-
-.bar-label {
-  @include text-small;
-  font-size: 10px;
-  color: $text-tertiary;
 }
 
 /* ===== 饼图区 ===== */

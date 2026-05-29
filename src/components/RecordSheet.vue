@@ -26,10 +26,10 @@
 
       <!-- 附加信息行 -->
       <view class="info-row">
-        <view class="info-item" @tap="onDateTap">
+        <picker class="info-item" mode="date" :value="selectedDate" @change="onDateChange">
           <text class="info-icon">📅</text>
           <text class="info-text">{{ displayDate }}</text>
-        </view>
+        </picker>
         <view class="info-item" @tap="onAccountTap">
           <text class="info-icon">💳</text>
           <text class="info-text">{{ currentAccountName }}</text>
@@ -38,6 +38,17 @@
           <text class="info-icon">🏷️</text>
           <text class="info-text">标签</text>
         </view>
+      </view>
+
+      <!-- 商户输入 -->
+      <view class="note-row">
+        <input
+          v-model="merchant"
+          class="note-input"
+          placeholder="商户名称（选填）..."
+          placeholder-style="color: #C4B8AD"
+          :maxlength="30"
+        />
       </view>
 
       <!-- 备注输入 -->
@@ -83,8 +94,12 @@ const txType = ref<'expense' | 'income' | 'transfer'>('expense')
 const amountStr = ref('0')
 const selectedCategoryId = ref('')
 const note = ref('')
+const merchant = ref('')
 const selectedDate = ref(getToday())
 const selectedAccountId = ref('')
+
+/** 是否为编辑模式 */
+const isEditMode = computed(() => !!appStore.editTransactionId)
 
 const typeOptions = [
   { label: '支出', value: 'expense' },
@@ -121,15 +136,50 @@ watch(txType, () => {
   selectedCategoryId.value = ''
 })
 
-/** 打开时初始化默认账户 */
+/** 组合备注和商户 */
+const composedNote = computed(() => {
+  if (merchant.value && note.value) return `${merchant.value} | ${note.value}`
+  if (merchant.value) return merchant.value
+  return note.value
+})
+
+/** 打开时初始化：新增模式用默认账户，编辑模式加载交易数据 */
 watch(visible, (show) => {
   if (show) {
-    const defaultAcc = accountStore.getDefaultAccount()
-    if (defaultAcc) {
-      selectedAccountId.value = defaultAcc.id
+    if (isEditMode.value) {
+      loadTransaction(appStore.editTransactionId)
+    } else {
+      const defaultAcc = accountStore.getDefaultAccount()
+      if (defaultAcc) {
+        selectedAccountId.value = defaultAcc.id
+      }
+      merchant.value = ''
     }
   }
 })
+
+/**
+ * 加载交易数据到表单
+ * @param txId 交易ID
+ */
+function loadTransaction(txId: string) {
+  const tx = transactionStore.transactions.find(t => t.id === txId)
+  if (!tx) return
+  txType.value = tx.type
+  amountStr.value = (tx.amount / 100).toFixed(2)
+  selectedCategoryId.value = tx.categoryId
+  // 解析商户和备注（格式："商户 | 备注" 或纯备注）
+  const noteParts = (tx.note || '').split(' | ')
+  if (noteParts.length >= 2) {
+    merchant.value = noteParts[0]
+    note.value = noteParts.slice(1).join(' | ')
+  } else {
+    merchant.value = ''
+    note.value = tx.note || ''
+  }
+  selectedDate.value = tx.date
+  selectedAccountId.value = tx.accountId
+}
 
 /** 点击遮罩关闭 */
 function onOverlayTap() {
@@ -137,43 +187,89 @@ function onOverlayTap() {
   appStore.closeRecordSheet()
 }
 
-/** 点击日期（暂无日期选择器，保留扩展） */
-function onDateTap() {
-  // TODO: 打开日期选择器
+/** 日期选择器变更 */
+function onDateChange(e: any) {
+  if (e.detail && e.detail.value) {
+    selectedDate.value = e.detail.value
+  }
 }
 
-/** 点击账户（暂无账户选择器，保留扩展） */
+/** 点击账户 */
 function onAccountTap() {
-  // TODO: 打开账户选择器
+  const accounts = accountStore.accounts
+  if (accounts.length === 0) {
+    uni.showToast({ title: '请先添加账户', icon: 'none' })
+    return
+  }
+  const names = accounts.map(a => `${a.icon} ${a.name}`)
+  uni.showActionSheet({
+    itemList: names,
+    success: (res) => {
+      selectedAccountId.value = accounts[res.tapIndex].id
+    }
+  })
 }
 
-/** 点击标签（暂无标签选择器，保留扩展） */
+/** 点击标签 */
 function onTagTap() {
-  // TODO: 打开标签选择器
+  uni.showToast({ title: '标签功能开发中', icon: 'none' })
 }
 
 /** 确认保存 */
 function onConfirm() {
   const amountYuan = parseFloat(amountStr.value)
-  if (!amountYuan || amountYuan <= 0) return
-  if (!selectedCategoryId.value && txType.value !== 'transfer') return
+  if (!amountYuan || amountYuan <= 0) {
+    uni.showToast({ title: '请输入金额', icon: 'none' })
+    return
+  }
+  if (!selectedCategoryId.value && txType.value !== 'transfer') {
+    uni.showToast({ title: '请选择分类', icon: 'none' })
+    return
+  }
+  if (!selectedAccountId.value) {
+    uni.showToast({ title: '请选择账户', icon: 'none' })
+    return
+  }
 
   // 金额转分
   const amountCents = Math.round(amountYuan * 100)
 
-  // 扣减或增加账户余额
-  const deltaCents = txType.value === 'expense' ? -amountCents : amountCents
-  accountStore.updateBalance(selectedAccountId.value, deltaCents)
+  if (isEditMode.value) {
+    const oldTx = transactionStore.transactions.find(t => t.id === appStore.editTransactionId)
+    if (oldTx) {
+      // 回滚旧交易对余额的影响
+      const oldDelta = oldTx.type === 'expense' ? oldTx.amount : -oldTx.amount
+      accountStore.updateBalance(oldTx.accountId, oldDelta)
 
-  // 保存交易记录
-  transactionStore.addTransaction({
-    type: txType.value,
-    amount: amountCents,
-    categoryId: selectedCategoryId.value,
-    accountId: selectedAccountId.value,
-    note: note.value,
-    date: selectedDate.value,
-  })
+      // 应用新余额影响
+      const newDelta = txType.value === 'expense' ? -amountCents : amountCents
+      accountStore.updateBalance(selectedAccountId.value, newDelta)
+
+      // 更新交易记录
+      transactionStore.updateTransaction(oldTx.id, {
+        type: txType.value,
+        amount: amountCents,
+        categoryId: selectedCategoryId.value,
+        accountId: selectedAccountId.value,
+        note: composedNote.value,
+        date: selectedDate.value,
+      })
+    }
+  } else {
+    // 扣减或增加账户余额
+    const deltaCents = txType.value === 'expense' ? -amountCents : amountCents
+    accountStore.updateBalance(selectedAccountId.value, deltaCents)
+
+    // 保存交易记录
+    transactionStore.addTransaction({
+      type: txType.value,
+      amount: amountCents,
+      categoryId: selectedCategoryId.value,
+      accountId: selectedAccountId.value,
+      note: composedNote.value,
+      date: selectedDate.value,
+    })
+  }
 
   // 重置并关闭
   resetForm()
@@ -186,6 +282,7 @@ function resetForm() {
   amountStr.value = '0'
   selectedCategoryId.value = ''
   note.value = ''
+  merchant.value = ''
   selectedDate.value = getToday()
   selectedAccountId.value = accountStore.getDefaultAccount()?.id || ''
 }

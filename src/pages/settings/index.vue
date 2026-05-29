@@ -2,7 +2,7 @@
   <view class="app">
     <view class="header">
       <view class="back-btn" @tap="goBack">
-        <text class="back-icon">←</text>
+        <uni-icons class="back-icon" type="arrow-left" size="20" color="#7A6B5D" />
       </view>
       <text class="header-title">{{ pageTitle }}</text>
     </view>
@@ -12,17 +12,54 @@
       <template v-if="type === 'category'">
         <view class="section-title">支出分类</view>
         <view class="setting-list">
-          <view class="setting-item" v-for="cat in expenseCategories" :key="cat.id">
-            <text class="setting-icon">{{ cat.icon }}</text>
-            <text class="setting-name">{{ cat.name }}</text>
+          <view
+            class="setting-item-wrap"
+            v-for="cat in expenseCategories"
+            :key="cat.id"
+          >
+            <view class="setting-item-actions" v-if="catSwipedId === cat.id && !cat.isDefault">
+              <view class="setting-action-btn delete" @tap.stop="onDeleteCategory(cat.id)">
+                <text>删除</text>
+              </view>
+            </view>
+            <view
+              class="setting-item"
+              :class="{ swiped: catSwipedId === cat.id }"
+              @touchstart="onCatTouchStart($event, cat)"
+              @touchmove="onCatTouchMove($event, cat)"
+              @touchend="onCatTouchEnd($event, cat)"
+            >
+              <text class="setting-icon">{{ cat.icon }}</text>
+              <text class="setting-name">{{ cat.name }}</text>
+            </view>
           </view>
         </view>
         <view class="section-title">收入分类</view>
         <view class="setting-list">
-          <view class="setting-item" v-for="cat in incomeCategories" :key="cat.id">
-            <text class="setting-icon">{{ cat.icon }}</text>
-            <text class="setting-name">{{ cat.name }}</text>
+          <view
+            class="setting-item-wrap"
+            v-for="cat in incomeCategories"
+            :key="cat.id"
+          >
+            <view class="setting-item-actions" v-if="catSwipedId === cat.id && !cat.isDefault">
+              <view class="setting-action-btn delete" @tap.stop="onDeleteCategory(cat.id)">
+                <text>删除</text>
+              </view>
+            </view>
+            <view
+              class="setting-item"
+              :class="{ swiped: catSwipedId === cat.id }"
+              @touchstart="onCatTouchStart($event, cat)"
+              @touchmove="onCatTouchMove($event, cat)"
+              @touchend="onCatTouchEnd($event, cat)"
+            >
+              <text class="setting-icon">{{ cat.icon }}</text>
+              <text class="setting-name">{{ cat.name }}</text>
+            </view>
           </view>
+        </view>
+        <view class="add-btn" @tap="openCategoryModal">
+          <text class="add-btn-text">+ 添加分类</text>
         </view>
       </template>
 
@@ -38,7 +75,7 @@
             <text class="setting-value">{{ formatAmount(acc.balance) }}</text>
           </view>
         </view>
-        <view class="add-btn" @tap="showToast('添加账户功能开发中')">
+        <view class="add-btn" @tap="openAccountModal">
           <text class="add-btn-text">+ 添加账户</text>
         </view>
       </template>
@@ -87,7 +124,7 @@
               <text class="setting-name">密码锁</text>
               <text class="setting-desc">设置应用密码</text>
             </view>
-            <text class="setting-arrow">›</text>
+            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="#C8B8A8" />
           </view>
           <view class="setting-item" @tap="showToast('指纹解锁功能开发中')">
             <text class="setting-icon">👆</text>
@@ -95,7 +132,7 @@
               <text class="setting-name">指纹解锁</text>
               <text class="setting-desc">使用指纹快速解锁</text>
             </view>
-            <text class="setting-arrow">›</text>
+            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="#C8B8A8" />
           </view>
         </view>
       </template>
@@ -127,13 +164,13 @@
       <!-- 数据导出 -->
       <template v-else-if="type === 'export'">
         <view class="setting-list">
-          <view class="setting-item" @tap="showToast('CSV导出功能开发中')">
+          <view class="setting-item" @tap="exportCSV">
             <text class="setting-icon">📄</text>
             <view class="setting-info">
               <text class="setting-name">导出为 CSV</text>
               <text class="setting-desc">通用格式，可用 Excel 打开</text>
             </view>
-            <text class="setting-arrow">›</text>
+            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="#C8B8A8" />
           </view>
           <view class="setting-item" @tap="showToast('Excel导出功能开发中')">
             <text class="setting-icon">📊</text>
@@ -141,7 +178,7 @@
               <text class="setting-name">导出为 Excel</text>
               <text class="setting-desc">包含图表和统计</text>
             </view>
-            <text class="setting-arrow">›</text>
+            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="#C8B8A8" />
           </view>
         </view>
       </template>
@@ -155,7 +192,7 @@
               <text class="setting-name">导入微信账单</text>
               <text class="setting-desc">从微信导出的账单文件</text>
             </view>
-            <text class="setting-arrow">›</text>
+            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="#C8B8A8" />
           </view>
           <view class="setting-item" @tap="showToast('支付宝账单导入开发中')">
             <text class="setting-icon">💰</text>
@@ -163,7 +200,7 @@
               <text class="setting-name">导入支付宝账单</text>
               <text class="setting-desc">从支付宝导出的账单文件</text>
             </view>
-            <text class="setting-arrow">›</text>
+            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="#C8B8A8" />
           </view>
         </view>
       </template>
@@ -191,6 +228,72 @@
           <text class="danger-btn-text">清空所有数据</text>
         </view>
       </template>
+
+      <!-- 添加分类弹窗 -->
+      <view class="modal-overlay" v-if="showCategoryModal" @tap="closeCategoryModal">
+        <view class="modal-card" @tap.stop>
+          <text class="modal-title">添加分类</text>
+          <view class="modal-field">
+            <text class="modal-label">类型</text>
+            <view class="modal-options">
+              <view class="modal-option" :class="{ active: categoryForm.type === 'expense' }" @tap="categoryForm.type = 'expense'">支出</view>
+              <view class="modal-option" :class="{ active: categoryForm.type === 'income' }" @tap="categoryForm.type = 'income'">收入</view>
+            </view>
+          </view>
+          <view class="modal-field">
+            <text class="modal-label">名称</text>
+            <input class="modal-input" v-model="categoryForm.name" placeholder="例如：健身" />
+          </view>
+          <view class="modal-field">
+            <text class="modal-label">图标</text>
+            <EmojiGrid v-model="categoryForm.icon" />
+          </view>
+          <view class="modal-actions">
+            <view class="modal-btn secondary" @tap="closeCategoryModal">
+              <text>取消</text>
+            </view>
+            <view class="modal-btn primary" @tap="confirmAddCategory">
+              <text>确定</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 添加账户弹窗 -->
+      <view class="modal-overlay" v-if="showAccountModal" @tap="closeAccountModal">
+        <view class="modal-card" @tap.stop>
+          <text class="modal-title">添加账户</text>
+          <view class="modal-field">
+            <text class="modal-label">名称</text>
+            <input class="modal-input" v-model="accountForm.name" placeholder="例如：工资卡" />
+          </view>
+          <view class="modal-field">
+            <text class="modal-label">类型</text>
+            <view class="modal-options">
+              <view class="modal-option" :class="{ active: accountForm.type === 'savings' }" @tap="accountForm.type = 'savings'">储蓄</view>
+              <view class="modal-option" :class="{ active: accountForm.type === 'credit' }" @tap="accountForm.type = 'credit'">信用卡</view>
+              <view class="modal-option" :class="{ active: accountForm.type === 'cash' }" @tap="accountForm.type = 'cash'">现金</view>
+              <view class="modal-option" :class="{ active: accountForm.type === 'investment' }" @tap="accountForm.type = 'investment'">投资</view>
+            </view>
+          </view>
+          <view class="modal-field">
+            <text class="modal-label">银行/机构（可选）</text>
+            <input class="modal-input" v-model="accountForm.bank" placeholder="例如：招商银行" />
+          </view>
+          <view class="modal-field">
+            <text class="modal-label">图标</text>
+            <input class="modal-input" v-model="accountForm.icon" placeholder="例如：💳" />
+          </view>
+          <view class="modal-actions">
+            <view class="modal-btn secondary" @tap="closeAccountModal">
+              <text>取消</text>
+            </view>
+            <view class="modal-btn primary" @tap="confirmAddAccount">
+              <text>确定</text>
+            </view>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -201,11 +304,15 @@ import { onLoad } from '@dcloudio/uni-app'
 import { useCategoryStore } from '@/stores/category'
 import { useAccountStore } from '@/stores/account'
 import { useTransactionStore } from '@/stores/transaction'
+import { useAppStore } from '@/stores/app'
 import { formatAmount } from '@/utils/format'
+import EmojiGrid from '@/components/EmojiGrid.vue'
+import type { Account } from '@/types/transaction'
 
 const categoryStore = useCategoryStore()
 const accountStore = useAccountStore()
 const transactionStore = useTransactionStore()
+const appStore = useAppStore()
 
 const type = ref('')
 
@@ -234,8 +341,173 @@ const expenseCategories = computed(() => categoryStore.getCategoriesByType('expe
 const incomeCategories = computed(() => categoryStore.getCategoriesByType('income'))
 const accounts = computed(() => accountStore.accounts)
 
-const reminderEnabled = ref(true)
-const budgetAlertEnabled = ref(true)
+const reminderEnabled = computed({
+  get: () => appStore.reminderEnabled,
+  set: (v) => { appStore.reminderEnabled = v }
+})
+const budgetAlertEnabled = computed({
+  get: () => appStore.budgetAlertEnabled,
+  set: (v) => { appStore.budgetAlertEnabled = v }
+})
+
+const showCategoryModal = ref(false)
+const categoryForm = ref({
+  type: 'expense' as 'expense' | 'income',
+  name: '',
+  icon: '💰',
+  color: '#FAF0E6',
+})
+
+function openCategoryModal() {
+  categoryForm.value = { type: 'expense', name: '', icon: '💰', color: '#FAF0E6' }
+  showCategoryModal.value = true
+}
+
+function closeCategoryModal() {
+  showCategoryModal.value = false
+}
+
+function confirmAddCategory() {
+  if (!categoryForm.value.name.trim()) {
+    uni.showToast({ title: '请输入分类名称', icon: 'none' })
+    return
+  }
+  categoryStore.addCategory({
+    type: categoryForm.value.type,
+    name: categoryForm.value.name.trim(),
+    icon: categoryForm.value.icon,
+    color: categoryForm.value.color,
+  })
+  closeCategoryModal()
+  uni.showToast({ title: '添加成功', icon: 'success' })
+}
+
+/** 分类滑动删除 */
+const catSwipedId = ref('')
+let catTouchStartX = 0
+let catHasSwiped = false
+
+function onCatTouchStart(e: any, cat: any) {
+  catTouchStartX = e.touches[0].clientX
+  catHasSwiped = false
+  // 点击其他项时复位
+  if (catSwipedId.value && catSwipedId.value !== cat.id) {
+    catSwipedId.value = ''
+  }
+}
+
+function onCatTouchMove(e: any, cat: any) {
+  const deltaX = e.touches[0].clientX - catTouchStartX
+  if (deltaX < -40 && !cat.isDefault) {
+    catSwipedId.value = cat.id
+  } else if (deltaX > 40 && catSwipedId.value === cat.id) {
+    catSwipedId.value = ''
+  }
+  if (deltaX < -60 && !catHasSwiped && !cat.isDefault) {
+    catHasSwiped = true
+    // #ifdef APP-PLUS
+    uni.vibrateShort({})
+    // #endif
+  }
+}
+
+function onCatTouchEnd(e: any, cat: any) {
+  if (catHasSwiped && !cat.isDefault) {
+    catHasSwiped = false
+    setTimeout(() => { catSwipedId.value = '' }, 200)
+    uni.showModal({
+      title: '删除分类',
+      content: `确定删除分类「${cat.name}」吗？`,
+      confirmColor: '#C06C5F',
+      success: (res) => {
+        if (res.confirm) {
+          categoryStore.deleteCategory(cat.id)
+        }
+      },
+    })
+  }
+}
+
+function onDeleteCategory(id: string) {
+  const cat = categoryStore.getCategoryById(id)
+  if (cat?.isDefault) {
+    uni.showToast({ title: '默认分类不可删除', icon: 'none' })
+    return
+  }
+  uni.showModal({
+    title: '删除分类',
+    content: `确定删除分类「${cat?.name || ''}」吗？`,
+    confirmColor: '#C06C5F',
+    success: (res) => {
+      if (res.confirm) {
+        categoryStore.deleteCategory(id)
+      }
+    },
+  })
+}
+
+const showAccountModal = ref(false)
+const accountForm = ref({
+  name: '',
+  type: 'savings' as Account['type'],
+  bank: '',
+  icon: '💳',
+})
+
+function openAccountModal() {
+  accountForm.value = { name: '', type: 'savings', bank: '', icon: '💳' }
+  showAccountModal.value = true
+}
+
+function closeAccountModal() {
+  showAccountModal.value = false
+}
+
+function confirmAddAccount() {
+  if (!accountForm.value.name.trim()) {
+    uni.showToast({ title: '请输入账户名称', icon: 'none' })
+    return
+  }
+  accountStore.addAccount({
+    name: accountForm.value.name.trim(),
+    type: accountForm.value.type,
+    bank: accountForm.value.bank.trim() || undefined,
+    icon: accountForm.value.icon,
+  })
+  closeAccountModal()
+  uni.showToast({ title: '添加成功', icon: 'success' })
+}
+
+function exportCSV() {
+  const txs = transactionStore.transactions
+  const header = '日期,时间,类型,金额,分类,账户,备注\n'
+  const rows = txs.map(tx => {
+    const cat = categoryStore.getCategoryById(tx.categoryId)
+    const acc = accountStore.getAccountById(tx.accountId)
+    const typeLabel = tx.type === 'income' ? '收入' : tx.type === 'expense' ? '支出' : '转账'
+    const amountYuan = (tx.amount / 100).toFixed(2)
+    return `${tx.date},${tx.time},${typeLabel},${amountYuan},${cat?.name || ''},${acc?.name || ''},"${tx.note || ''}"`
+  }).join('\n')
+  const csv = header + rows
+
+  // H5 环境下通过创建 Blob 下载
+  // #ifdef H5
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = `goldenpaw_export_${new Date().toISOString().slice(0, 10)}.csv`
+  link.click()
+  uni.showToast({ title: '导出成功', icon: 'success' })
+  // #endif
+
+  // 非 H5 环境下复制到剪贴板
+  // #ifndef H5
+  uni.setClipboardData({
+    data: csv,
+    success: () => uni.showToast({ title: '已复制CSV到剪贴板', icon: 'success' }),
+  })
+  // #endif
+}
 
 const themes = [
   { id: 'warm', name: '暖金色', color: 'linear-gradient(135deg, #C8956C, #A67B5B)' },
@@ -331,19 +603,53 @@ function onClearData() {
   margin-bottom: $space-4;
 }
 
-.setting-item {
-  display: flex;
-  align-items: center;
-  padding: $space-4 $space-5;
+.setting-item-wrap {
+  position: relative;
   border-bottom: 1px solid $border-light;
-  cursor: pointer;
 
   &:last-child {
     border-bottom: none;
   }
+}
+
+.setting-item-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $danger-500;
+}
+
+.setting-action-btn {
+  @include text-body;
+  color: white;
+  font-weight: 700;
+
+  &.delete {
+    color: white;
+  }
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  padding: $space-4 $space-5;
+  background: $surface;
+  transition: transform 0.25s ease;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
 
   &:active {
     background: $brand-50;
+  }
+
+  &.swiped {
+    transform: translateX(-80px);
   }
 }
 
@@ -532,4 +838,112 @@ function onClearData() {
   color: white;
   font-weight: 700;
 }
+
+/* ===== Modal ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 430px;
+  background: $surface;
+  border-radius: $radius-lg $radius-lg 0 0;
+  padding: 24px;
+  padding-bottom: 40px;
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-title {
+  @include text-h2;
+  display: block;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.modal-field {
+  margin-bottom: 16px;
+}
+
+.modal-label {
+  @include text-caption;
+  color: $text-secondary;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.modal-input {
+  width: 100%;
+  height: 48px;
+  background: $bg-primary;
+  border-radius: $radius-sm;
+  padding: 0 14px;
+  border: 1px solid $border;
+  @include text-body;
+  color: $text-primary;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: $text-placeholder;
+  }
+}
+
+.modal-options {
+  display: flex;
+  gap: 8px;
+}
+
+.modal-option {
+  padding: 8px 14px;
+  border-radius: $radius-full;
+  background: $bg-primary;
+  border: 1px solid $border;
+  cursor: pointer;
+
+  &.active {
+    background: $brand-50;
+    border-color: $brand-500;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: $radius-sm;
+  text-align: center;
+  cursor: pointer;
+
+  &.primary {
+    background: $gradient-brand;
+    box-shadow: $shadow-brand;
+    color: white;
+    font-weight: 700;
+  }
+
+  &.secondary {
+    background: $bg-primary;
+    border: 1px solid $border;
+    color: $text-secondary;
+    font-weight: 700;
+  }
+}
+
+
 </style>

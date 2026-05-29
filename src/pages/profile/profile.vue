@@ -40,7 +40,7 @@
             <text class="menu-name">{{ item.name }}</text>
             <text class="menu-desc">{{ item.desc }}</text>
           </view>
-          <text class="menu-arrow">›</text>
+          <uni-icons class="menu-arrow" type="arrow-right" size="14" color="#C8B8A8" />
         </view>
       </view>
     </view>
@@ -57,7 +57,7 @@
             <text class="menu-name">{{ item.name }}</text>
             <text class="menu-desc">{{ item.desc }}</text>
           </view>
-          <text class="menu-arrow">›</text>
+          <uni-icons class="menu-arrow" type="arrow-right" size="14" color="#C8B8A8" />
         </view>
       </view>
     </view>
@@ -74,7 +74,7 @@
             <text class="menu-name">{{ item.name }}</text>
             <text class="menu-desc">{{ item.desc }}</text>
           </view>
-          <text class="menu-arrow">›</text>
+          <uni-icons class="menu-arrow" type="arrow-right" size="14" color="#C8B8A8" />
         </view>
       </view>
     </view>
@@ -91,7 +91,7 @@
             <text class="menu-name">{{ item.name }}</text>
             <text v-if="item.desc" class="menu-desc">{{ item.desc }}</text>
           </view>
-          <text v-if="item.arrow !== false" class="menu-arrow">›</text>
+          <uni-icons v-if="item.arrow !== false" class="menu-arrow" type="arrow-right" size="14" color="#C8B8A8" />
         </view>
       </view>
     </view>

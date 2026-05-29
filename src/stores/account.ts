@@ -28,11 +28,28 @@ export const useAccountStore = defineStore('account', () => {
     }
   }
 
+  function addAccount(params: Omit<Account, 'id' | 'balance'>) {
+    const acc: Account = {
+      id: `acc-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      balance: 0,
+      ...params,
+    }
+    accounts.value.push(acc)
+    return acc
+  }
+
+  function deleteAccount(id: string) {
+    const idx = accounts.value.findIndex(a => a.id === id)
+    if (idx !== -1) accounts.value.splice(idx, 1)
+  }
+
   return {
     accounts,
     getAccountById,
     getDefaultAccount,
     updateBalance,
+    addAccount,
+    deleteAccount,
   }
 }, {
   persist: true,

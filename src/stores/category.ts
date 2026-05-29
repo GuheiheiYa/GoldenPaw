@@ -35,11 +35,46 @@ export const useCategoryStore = defineStore('category', () => {
     return [...expenseCategories.value, ...incomeCategories.value].find(c => c.id === id)
   }
 
+  function addCategory(category: Omit<Category, 'id' | 'sortOrder' | 'isDefault'>) {
+    const list = category.type === 'expense' ? expenseCategories.value : incomeCategories.value
+    const newCat: Category = {
+      ...category,
+      id: `cat-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      sortOrder: list.length,
+      isDefault: false,
+    }
+    list.push(newCat)
+    return newCat
+  }
+
+  function updateCategory(id: string, updates: Partial<Omit<Category, 'id'>>) {
+    const cat = [...expenseCategories.value, ...incomeCategories.value].find(c => c.id === id)
+    if (cat) Object.assign(cat, updates)
+    return cat
+  }
+
+  function deleteCategory(id: string) {
+    const eIdx = expenseCategories.value.findIndex(c => c.id === id)
+    if (eIdx !== -1) {
+      expenseCategories.value.splice(eIdx, 1)
+      return true
+    }
+    const iIdx = incomeCategories.value.findIndex(c => c.id === id)
+    if (iIdx !== -1) {
+      incomeCategories.value.splice(iIdx, 1)
+      return true
+    }
+    return false
+  }
+
   return {
     expenseCategories,
     incomeCategories,
     getCategoriesByType,
     getCategoryById,
+    addCategory,
+    updateCategory,
+    deleteCategory,
   }
 }, {
   persist: true,

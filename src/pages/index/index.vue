@@ -12,7 +12,7 @@
           </view>
           <view class="hero-actions">
             <view class="icon-btn" @tap="navigateTo('/pages/search/search')">
-              <text class="icon-btn-text">🔍</text>
+              <uni-icons class="icon-btn-text" type="search" size="18" color="#999" />
             </view>
             <view class="icon-btn" @tap="showToast('通知功能开发中')">
               <text class="icon-btn-text">🔔</text>
@@ -110,6 +110,7 @@ import { onShow } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app'
 import { useTransactionStore } from '@/stores/transaction'
 import { useCategoryStore } from '@/stores/category'
+import { useGoalBudgetStore } from '@/stores/goalBudget'
 import { formatAmount, formatDate } from '@/utils/format'
 import TabBar from '@/components/TabBar.vue'
 import RecordSheet from '@/components/RecordSheet.vue'
@@ -121,6 +122,7 @@ import FlowItem from '@/components/FlowItem.vue'
 const appStore = useAppStore()
 const txStore = useTransactionStore()
 const categoryStore = useCategoryStore()
+const goalBudgetStore = useGoalBudgetStore()
 
 onShow(() => {
   appStore.setCurrentTab(0)
@@ -148,19 +150,42 @@ function onDayTap(dateStr: string) {
   navigateTo(`/pages/detail/detail?date=${dateStr}`)
 }
 
-/** 预算占位数据 */
-const budgetItems = [
-  { icon: '🍜', name: '餐饮美食', used: '¥1,200', detail: '剩余 ¥800 / ¥2,000', pct: 60, fillCls: 'fill-brand' },
-  { icon: '🚇', name: '交通出行', used: '¥480', detail: '剩余 ¥20 / ¥500', pct: 96, fillCls: 'fill-danger' },
-  { icon: '🛍️', name: '购物消费', used: '¥320', detail: '剩余 ¥1,180 / ¥1,500', pct: 21, fillCls: 'fill-success' },
-]
+/** 首页预算数据（取自 store，最多3个） */
+const budgetItems = computed(() => {
+  return goalBudgetStore.budgetUsage.slice(0, 3).map(b => {
+    const cat = categoryStore.getCategoryById(b.categoryId)
+    const remaining = b.amount - b.used
+    const fillCls = b.over ? 'fill-danger' : b.pct > 80 ? 'fill-accent' : 'fill-brand'
+    return {
+      icon: cat?.icon || '💰',
+      name: cat?.name || '未知',
+      used: formatAmount(b.used),
+      detail: `剩余 ${formatAmount(Math.max(remaining, 0))} / ${formatAmount(b.amount)}`,
+      pct: Math.min(b.pct, 100),
+      fillCls,
+    }
+  })
+})
 
-/** 目标占位数据 */
-const goalItems = [
-  { icon: '✈️', name: '年底旅行基金', amount: '¥13,000 / ¥20,000 · 还剩 218 天', pct: 65, fillCls: 'fill-brand', iconBg: 'linear-gradient(135deg, #FAF0E6, #F5E6D3)', borderColor: 'rgba(200,149,108,0.25)' },
-  { icon: '📱', name: '换新手机', amount: '¥3,200 / ¥8,000 · 还剩 90 天', pct: 40, fillCls: 'fill-success', iconBg: 'linear-gradient(135deg, #E8F1F5, #D6E5EC)', borderColor: 'rgba(122,158,175,0.25)' },
-  { icon: '🎁', name: '应急备用金', amount: '¥5,000 / ¥50,000 · 长期目标', pct: 10, fillCls: 'fill-accent', iconBg: 'linear-gradient(135deg, #E8F0E8, #D4E6D4)', borderColor: 'rgba(107,142,107,0.25)' },
-]
+/** 首页目标数据（取自 store，最多3个） */
+const goalItems = computed(() => {
+  const colors = [
+    { fillCls: 'fill-brand', iconBg: 'linear-gradient(135deg, #FAF0E6, #F5E6D3)', borderColor: 'rgba(200,149,108,0.25)' },
+    { fillCls: 'fill-success', iconBg: 'linear-gradient(135deg, #E8F1F5, #D6E5EC)', borderColor: 'rgba(122,158,175,0.25)' },
+    { fillCls: 'fill-accent', iconBg: 'linear-gradient(135deg, #E8F0E8, #D4E6D4)', borderColor: 'rgba(107,142,107,0.25)' },
+  ]
+  return goalBudgetStore.goals.slice(0, 3).map((g, idx) => {
+    const pct = g.targetAmount > 0 ? Math.round((g.savedAmount / g.targetAmount) * 100) : 0
+    const style = colors[idx % colors.length]
+    return {
+      icon: g.icon,
+      name: g.name,
+      amount: `${formatAmount(g.savedAmount)} / ${formatAmount(g.targetAmount)}`,
+      pct,
+      ...style,
+    }
+  })
+})
 
 /** 最近流水数据 */
 const recentFlowItems = computed(() => {

@@ -4,7 +4,6 @@
       <!-- 悬浮记账按钮 -->
       <view class="fab-record" @tap="onFabTap">
         <text class="fab-icon">+</text>
-        <text class="fab-label">记账</text>
       </view>
 
       <!-- Tab项 -->
