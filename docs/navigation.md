@@ -139,7 +139,7 @@ GoldenPaw/
 │   ├── app.ts                       # 全局UI状态（持久化）
 │   │   ├── state: showRecordSheet, currentTab, editTransactionId
 │   │   ├── state: reminderEnabled, budgetAlertEnabled
-│   │   ├── state: theme, cycle, appPassword, currency
+│   │   ├── state: theme, cycle, appPassword, currency, fingerprintEnabled
 │   │   └── actions: openRecordSheet, closeRecordSheet, setCurrentTab, editTransaction, clearEdit
 │   │
 │   ├── transaction.ts               # 交易记录 store（持久化）

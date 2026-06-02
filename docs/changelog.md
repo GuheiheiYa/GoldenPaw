@@ -227,6 +227,20 @@
 
 ---
 
-*文档版本：v3.5*
+## 2026-06-02 10:33:56
+
+**需求**: [R-080]
+**问题**: —
+**修改文件**:
+- `src/stores/app.ts` — 新增 `fingerprintEnabled` + `setFingerprintEnabled()`，持久化
+- `src/pages/settings/index.vue` — 安全设置添加指纹解锁开关；检测支持状态；开启时验证指纹
+- `src/App.vue` — 启动时优先尝试指纹验证，失败 fallback 到密码锁；H5 自动 fallback
+
+**变更摘要**:
+- 指纹解锁：APP/小程序端支持，H5 提示不支持；与密码锁配合使用（作为 fallback）
+
+---
+
+*文档版本：v3.6*
 *更新时间：2026-06-02 10:33:56*
 *格式说明：每次提交一批写一条，必须关联 [R-xxx] / [ISS-xxx]*

@@ -147,6 +147,16 @@
             <text v-if="appStore.appPassword" class="setting-badge">已开启</text>
             <uni-icons v-else class="setting-arrow" type="arrow-right" size="14" color="var(--text-tertiary)" />
           </view>
+          <view class="setting-item">
+            <text class="setting-icon">👆</text>
+            <view class="setting-info">
+              <text class="setting-name">指纹解锁</text>
+              <text class="setting-desc">{{ fingerprintSupported ? (appStore.fingerprintEnabled ? '已开启' : '使用指纹快速解锁') : '当前设备不支持' }}</text>
+            </view>
+            <view class="toggle" :class="{ on: appStore.fingerprintEnabled }" @tap="onToggleFingerprint">
+              <view class="toggle-knob"></view>
+            </view>
+          </view>
         </view>
         <view v-if="appStore.appPassword" class="danger-btn" style="margin-top:24px;" @tap="onDisablePassword">
           <text class="danger-btn-text">关闭密码锁</text>
@@ -364,7 +374,68 @@ const type = ref('')
 
 onLoad((options) => {
   type.value = options?.type || ''
+  checkFingerprintSupport()
 })
+
+/** 设备是否支持指纹 */
+const fingerprintSupported = ref(false)
+
+/** 检测指纹支持 */
+function checkFingerprintSupport() {
+  // #ifdef APP-PLUS || MP-WEIXIN
+  uni.checkIsSupportSoterAuthentication({
+    success(res) {
+      fingerprintSupported.value = (res.supportMode || []).includes('fingerPrint')
+    },
+    fail() {
+      fingerprintSupported.value = false
+    },
+  })
+  // #endif
+  // #ifndef APP-PLUS || MP-WEIXIN
+  fingerprintSupported.value = false
+  // #endif
+}
+
+/** 切换指纹解锁 */
+function onToggleFingerprint() {
+  if (!fingerprintSupported.value) {
+    uni.showToast({ title: '当前设备不支持指纹解锁', icon: 'none' })
+    return
+  }
+
+  if (appStore.fingerprintEnabled) {
+    // 关闭指纹
+    appStore.setFingerprintEnabled(false)
+    uni.showToast({ title: '指纹解锁已关闭', icon: 'success' })
+    return
+  }
+
+  // 开启指纹：需要先设置密码锁
+  if (!appStore.appPassword) {
+    uni.showToast({ title: '请先设置密码锁', icon: 'none' })
+    return
+  }
+
+  // 验证指纹
+  // #ifdef APP-PLUS || MP-WEIXIN
+  uni.startSoterAuthentication({
+    requestAuthModes: ['fingerPrint'],
+    challenge: 'goldenpaw_fingerprint_' + Date.now(),
+    authContent: '验证指纹以开启指纹解锁',
+    success() {
+      appStore.setFingerprintEnabled(true)
+      uni.showToast({ title: '指纹解锁已开启', icon: 'success' })
+    },
+    fail() {
+      uni.showToast({ title: '指纹验证失败', icon: 'none' })
+    },
+  })
+  // #endif
+  // #ifndef APP-PLUS || MP-WEIXIN
+  uni.showToast({ title: '当前平台不支持指纹解锁', icon: 'none' })
+  // #endif
+}
 
 const pageTitle = computed(() => {
   const titles: Record<string, string> = {

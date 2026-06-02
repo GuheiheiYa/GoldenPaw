@@ -1147,6 +1147,30 @@
 
 ---
 
+## [F-080] 我的/设置 - 指纹解锁 ← [R-080]
+
+**状态**: 已完成  **实现时间**: 2026-06-02 10:33:56
+
+**实现方式**:
+- `appStore.fingerprintEnabled` 存储开关状态，Pinia persist
+- 设置页：
+  - 通过 `uni.checkIsSupportSoterAuthentication` 检测指纹支持
+  - 不支持时显示"当前设备不支持"并禁用开关
+  - 开启时需先设置密码锁，然后通过 `uni.startSoterAuthentication` 验证指纹
+- `App.vue` 启动时：若指纹开启且设备支持，优先尝试指纹验证；失败/取消后 fallback 到密码锁
+- H5 环境自动 fallback 到密码锁
+
+**关联文件**:
+- `src/App.vue`
+- `src/stores/app.ts`
+- `src/pages/settings/index.vue`
+
+**注意事项**:
+- 仅在 APP-PLUS / MP-WEIXIN 端可用，H5 不支持
+- 开启指纹前必须先设置密码锁（作为 fallback）
+
+---
+
 ## [F-082] 我的/设置 - 记账周期 ← [R-082]
 
 **状态**: 已完成  **实现时间**: 2026-05-29 00:00:00

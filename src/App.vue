@@ -20,6 +20,45 @@ onLaunch(() => {
 })
 
 onShow(() => {
+  if (appStore.fingerprintEnabled && appStore.appPassword) {
+    // 优先尝试指纹验证
+    // #ifdef APP-PLUS || MP-WEIXIN
+    uni.checkIsSupportSoterAuthentication({
+      success(res) {
+        if ((res.supportMode || []).includes('fingerPrint')) {
+          uni.startSoterAuthentication({
+            requestAuthModes: ['fingerPrint'],
+            challenge: 'goldenpaw_unlock_' + Date.now(),
+            authContent: '请用指纹解锁',
+            success() {
+              // 指纹验证通过，无需显示密码锁
+            },
+            fail() {
+              // 指纹验证失败，fallback 到密码锁
+              locked.value = true
+              lockInput.value = ''
+            },
+          })
+        } else {
+          // 设备不支持指纹，fallback 到密码锁
+          locked.value = true
+          lockInput.value = ''
+        }
+      },
+      fail() {
+        locked.value = true
+        lockInput.value = ''
+      },
+    })
+    // #endif
+    // #ifndef APP-PLUS || MP-WEIXIN
+    // H5 不支持指纹，fallback 到密码锁
+    locked.value = true
+    lockInput.value = ''
+    // #endif
+    return
+  }
+
   if (appStore.appPassword) {
     locked.value = true
     lockInput.value = ''

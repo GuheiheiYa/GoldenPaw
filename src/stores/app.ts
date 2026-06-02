@@ -16,6 +16,7 @@ export const useAppStore = defineStore('app', () => {
   const cycle = ref<CycleType>('natural')
   const appPassword = ref('') // 空字符串表示未设置密码
   const currency = ref('CNY')
+  const fingerprintEnabled = ref(false)
 
   function toggleRecordSheet() {
     showRecordSheet.value = !showRecordSheet.value
@@ -58,6 +59,10 @@ export const useAppStore = defineStore('app', () => {
     setCurrencySymbol(code)
   }
 
+  function setFingerprintEnabled(enabled: boolean) {
+    fingerprintEnabled.value = enabled
+  }
+
   // 初始化时同步持久化的币种到 format.ts
   watch(currency, (val) => {
     setCurrencySymbol(val)
@@ -82,6 +87,8 @@ export const useAppStore = defineStore('app', () => {
     setPassword,
     currency,
     setCurrency,
+    fingerprintEnabled,
+    setFingerprintEnabled,
   }
 }, {
   persist: true,
