@@ -312,15 +312,52 @@ function goBack() {
   uni.navigateBack()
 }
 
+/** 启动语音输入 */
+function startVoiceInput() {
+  // #ifdef H5
+  const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+  if (!SpeechRecognition) {
+    pushAI('当前浏览器不支持语音输入，请直接在下方的输入框中输入')
+    return
+  }
+  const recognition = new SpeechRecognition()
+  recognition.lang = 'zh-CN'
+  recognition.interimResults = false
+  recognition.maxAlternatives = 1
+
+  pushAI('🎙️ 正在聆听，请说话...')
+
+  recognition.onresult = (event: any) => {
+    const text = event.results[0][0].transcript
+    inputText.value = text
+    sendMessage()
+  }
+
+  recognition.onerror = (event: any) => {
+    pushAI('语音识别出错：' + (event.error || '未知错误'))
+  }
+
+  recognition.onend = () => {
+    // 识别结束，如果输入框为空则提示
+    if (!inputText.value) {
+      pushAI('未识别到语音，请重试或直接输入')
+    }
+  }
+
+  recognition.start()
+  // #endif
+  // #ifndef H5
+  pushAI('语音输入仅在 H5 环境可用，请直接在下方的输入框中输入')
+  // #endif
+}
+
 const quickActions = [
   {
     icon: '🎙️',
     title: '语音记账',
     desc: '说"午餐35块"自动识别',
     iconClass: 'voice',
-    onTap: () => {
-      pushAI('请直接在下方的输入框中输入，例如："早餐15块"、"打车28元"')
-    },
+    onTap: startVoiceInput,
   },
   {
     icon: '💬',
