@@ -4,7 +4,7 @@
  */
 
 const API_BASE = import.meta.env.DEV ? '/api/deepseek' : 'https://api.deepseek.com'
-const API_KEY = 'sk-18cff1e829d449d6902fd62a1ecd5dc8'
+const API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY || ''
 
 export interface DeepSeekMessage {
   role: 'system' | 'user' | 'assistant'

@@ -493,7 +493,7 @@ import { useAccountStore } from '@/stores/account'
 import { useTransactionStore } from '@/stores/transaction'
 import { useAppStore, type CycleType } from '@/stores/app'
 import { useRecurringStore } from '@/stores/recurring'
-import { formatAmount, getToday } from '@/utils/format'
+import { formatAmount, getToday, dateToString } from '@/utils/format'
 import { parseAndImportCsv } from '@/utils/csvImport'
 import EmojiGrid from '@/components/EmojiGrid.vue'
 import type { Account, RecurringCycle } from '@/types/transaction'
@@ -861,7 +861,7 @@ function exportCSV() {
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
-  link.download = `goldenpaw_export_${new Date().toISOString().slice(0, 10)}.csv`
+  link.download = `goldenpaw_export_${dateToString(new Date())}.csv`
   link.click()
   uni.showToast({ title: '导出成功', icon: 'success' })
   // #endif
@@ -1038,6 +1038,7 @@ function onClearData() {
 /* ===== 定期记账 ===== */
 const showRecurringModal = ref(false)
 const editingRecurringId = ref('')
+const fileInputRef = ref<HTMLInputElement>()
 const showRecurringDatePicker = ref(false)
 const recurringForm = ref({
   name: '',

@@ -114,7 +114,7 @@
 import { ref, computed } from 'vue'
 import { useTransactionStore } from '@/stores/transaction'
 import { useCategoryStore } from '@/stores/category'
-import { formatAmount, getToday } from '@/utils/format'
+import { formatAmount, getToday, dateToString } from '@/utils/format'
 import type { Transaction } from '@/types/transaction'
 import LineChart from '@/components/LineChart.vue'
 import DateRangePicker from '@/components/DateRangePicker.vue'
@@ -125,6 +125,13 @@ const catStore = useCategoryStore()
 /** 返回上一页 */
 function goBack() {
   uni.navigateBack()
+}
+
+/** 计算两个日期字符串之间的天数差 */
+function getDaysDiff(start: string, end: string): number {
+  const s = new Date(start)
+  const e = new Date(end)
+  return Math.round((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24))
 }
 
 /** 当前选中的时间周期 */
@@ -169,8 +176,8 @@ const periodTransactions = computed(() => {
       monday.setDate(d.getDate() - day + 1)
       const sunday = new Date(monday)
       sunday.setDate(monday.getDate() + 6)
-      const s = monday.toISOString().slice(0, 10)
-      const e = sunday.toISOString().slice(0, 10)
+      const s = dateToString(monday)
+      const e = dateToString(sunday)
       return txs.filter(t => t.date >= s && t.date <= e)
     }
     case '本月': {
@@ -181,8 +188,8 @@ const periodTransactions = computed(() => {
       const d = new Date(today)
       const m = d.getMonth()
       const qStart = Math.floor(m / 3) * 3
-      const s = new Date(d.getFullYear(), qStart, 1).toISOString().slice(0, 10)
-      const e = new Date(d.getFullYear(), qStart + 3, 0).toISOString().slice(0, 10)
+      const s = dateToString(new Date(d.getFullYear(), qStart, 1))
+      const e = dateToString(new Date(d.getFullYear(), qStart + 3, 0))
       return txs.filter(t => t.date >= s && t.date <= e)
     }
     case '本年': {
@@ -222,7 +229,7 @@ const lineChartData = computed(() => {
       for (let i = 0; i < 7; i++) {
         const cur = new Date(monday)
         cur.setDate(monday.getDate() + i)
-        const dateStr = cur.toISOString().slice(0, 10)
+        const dateStr = dateToString(cur)
         const dayTxs = txs.filter(t => t.date === dateStr && t.type === typeFilter)
         const val = dayTxs.reduce((s, t) => s + t.amount, 0)
         labels.push(`${cur.getMonth() + 1}/${cur.getDate()}`)
@@ -235,7 +242,7 @@ const lineChartData = computed(() => {
       for (let i = 14; i >= 0; i--) {
         const d = new Date(today)
         d.setDate(d.getDate() - i)
-        const dateStr = d.toISOString().slice(0, 10)
+        const dateStr = dateToString(d)
         const dayTxs = txs.filter(t => t.date === dateStr && t.type === typeFilter)
         const val = dayTxs.reduce((s, t) => s + t.amount, 0)
         // 只显示每隔3天的标签，以及第一天和最后一天
@@ -282,7 +289,7 @@ const lineChartData = computed(() => {
         for (let i = 0; i <= days; i++) {
           const d = new Date(start)
           d.setDate(d.getDate() + i)
-          const dateStr = d.toISOString().slice(0, 10)
+          const dateStr = dateToString(d)
           const dayTxs = txs.filter(t => t.date === dateStr && t.type === typeFilter)
           const val = dayTxs.reduce((s, t) => s + t.amount, 0)
           // 稀疏标签：只显示每隔5天和首尾
@@ -313,8 +320,8 @@ const lineChartData = computed(() => {
 
 
 
-/** 饼图数据：按分类聚合 */
-const pieData = computed(() => {
+/** 按分类聚合统计（饼图和排行共用） */
+const categoryStats = computed(() => {
   const type = pieTab.value === '支出' ? 'expense' : 'income'
   const map = new Map<string, { amount: number; color: string; icon: string }>()
   for (const tx of periodTransactions.value) {
@@ -334,7 +341,7 @@ const pieData = computed(() => {
 
 /** 饼图图例 */
 const pieLegendData = computed(() => {
-  const { arr, total } = pieData.value
+  const { arr, total } = categoryStats.value
   return arr.map(item => ({
     name: item.name,
     value: formatAmount(item.amount),
@@ -345,7 +352,7 @@ const pieLegendData = computed(() => {
 
 /** 饼图 conic-gradient */
 const pieGradient = computed(() => {
-  const { arr, total } = pieData.value
+  const { arr, total } = categoryStats.value
   if (arr.length === 0) return 'conic-gradient(#EDE4D8 0deg 360deg)'
   const colors = ['#C8956C', '#7A9EAF', '#6B8E6B', '#C06C5F', '#D4A574', '#B8A99E', '#EDD4B8', '#A89B8E']
   let deg = 0
@@ -360,22 +367,10 @@ const pieGradient = computed(() => {
 
 /** 消费/收入排行 */
 const rankData = computed(() => {
-  const type = pieTab.value === '支出' ? 'expense' : 'income'
-  const map = new Map<string, { amount: number; color: string; icon: string }>()
-  for (const tx of periodTransactions.value) {
-    if (tx.type !== type) continue
-    const cat = catStore.getCategoryById(tx.categoryId)
-    const name = cat?.name || '未知'
-    const cur = map.get(name) || { amount: 0, color: cat?.color || '#B8A99E', icon: cat?.icon || '💰' }
-    cur.amount += tx.amount
-    map.set(name, cur)
-  }
-  const arr = Array.from(map.entries())
-    .map(([name, v]) => ({ name, ...v }))
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, 5)
-  const maxAmt = arr[0]?.amount || 1
-  return arr.map(item => ({
+  const { arr } = categoryStats.value
+  const top5 = arr.slice(0, 5)
+  const maxAmt = top5[0]?.amount || 1
+  return top5.map(item => ({
     icon: item.icon,
     name: item.name,
     value: formatAmount(item.amount),

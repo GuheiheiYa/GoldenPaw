@@ -103,7 +103,7 @@ import { useTransactionStore } from '@/stores/transaction'
 import { useCategoryStore } from '@/stores/category'
 import { useAccountStore } from '@/stores/account'
 import { useAppStore } from '@/stores/app'
-import { formatAmount, formatDate, getToday } from '@/utils/format'
+import { formatAmount, formatDate, getToday, dateToString } from '@/utils/format'
 import SegmentedControl from '@/components/SegmentedControl.vue'
 import RecordSheet from '@/components/RecordSheet.vue'
 import DateRangePicker from '@/components/DateRangePicker.vue'
@@ -116,6 +116,7 @@ const appStore = useAppStore()
 
 /** URL 参数中的日期筛选（单日期或 start,end 范围） */
 const filterDate = ref('')
+const datePickerRef = ref<InstanceType<typeof DateRangePicker>>()
 /** 高亮交易ID */
 const highlightId = ref('')
 /** 当前左滑展开的交易ID */
@@ -247,7 +248,7 @@ function formatDayHeader(dateStr: string): string {
   const yesterday = new Date(today)
   yesterday.setDate(yesterday.getDate() - 1)
   if (dateStr === today) return '今天'
-  if (dateStr === yesterday.toISOString().slice(0, 10)) return '昨天'
+  if (dateStr === dateToString(yesterday)) return '昨天'
   const month = (d.getMonth() + 1).toString().padStart(2, '0')
   const day = d.getDate().toString().padStart(2, '0')
   const weekday = WEEKDAYS[d.getDay()]
@@ -275,7 +276,7 @@ const filterDateLabel = computed(() => {
   if (filterDate.value === today) return '今天'
   const yesterday = new Date(today)
   yesterday.setDate(yesterday.getDate() - 1)
-  if (filterDate.value === yesterday.toISOString().slice(0, 10)) return '昨天'
+  if (filterDate.value === dateToString(yesterday)) return '昨天'
   if (filterDate.value.includes(',')) {
     const [start, end] = filterDate.value.split(',')
     if (end === today) {

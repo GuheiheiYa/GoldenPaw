@@ -67,7 +67,7 @@ GoldenPaw/
 │   │   └── 数据 → stores/goalBudget.ts, stores/category.ts, stores/transaction.ts
 │   │
 │   ├── pending/pending.vue          # 待确认
-│   │   └── 静态数据 (3条示例待确认记录)
+│   │   └── 3条示例待确认记录（mock数据，实际从本地存储读取）
 │   │
 │   ├── settings/index.vue           # 设置页面（通用）
 │   │   ├── type=category            # 分类管理（添加/编辑/删除，默认分类不可删）
@@ -75,9 +75,8 @@ GoldenPaw/
 │   │   ├── type=theme               # 主题颜色（4套配色切换）
 │   │   ├── type=reminder            # 提醒设置（持久化开关）
 │   │   ├── type=security            # 密码锁（设置/修改/关闭）
-│   │   ├── type=currency            # 币种设置（占位）
+│   │   ├── type=currency            # 币种设置（4种币种切换）
 │   │   ├── type=cycle               # 记账周期（自然月/工资/自定义）
-│   │   ├── type=recurring           # 定期记账（自动创建交易规则）
 │   │   ├── type=recurring           # 定期记账（自动创建交易规则）
 │   │   ├── type=export              # 导出数据（CSV导出）
 │   │   ├── type=import              # 导入数据（CSV 智能识别 GoldenPaw/微信/支付宝）
@@ -146,10 +145,10 @@ GoldenPaw/
 │   │
 │   ├── transaction.ts               # 交易记录 store（持久化）
 │   ├── recurring.ts                 # 定期交易 store（持久化）
-│   ├── recurring.ts                 # 定期交易 store（持久化）
-│   │   ├── state: transactions[]
-│   │   ├── actions: addTransaction, deleteTransaction, updateTransaction
-│   │   └── getters: monthlyExpense, monthlyIncome, monthlyBalance
+│   │   ├── state: rules[]
+│   │   ├── actions: addRule, updateRule, deleteRule, toggleEnabled
+│   │   ├── getters: enabledCount, getDueRules
+│   │   └── utils: calcNextDate, advanceNextDate
 │   │
 │   ├── category.ts                  # 分类管理 store（持久化）
 │   │   ├── state: expenseCategories[], incomeCategories[]

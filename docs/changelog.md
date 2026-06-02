@@ -273,14 +273,14 @@
 **需求**: [R-082a]
 **问题**: 用户反馈记账周期理解偏差（实际为统计周期，用户期望为定期自动记账）
 **修改文件**:
--  — 新增  /  类型
--  — 新建定期交易 Store（规则 CRUD + 到期执行 + 日期计算）
--  — 启动时执行到期定期交易，自动创建记录并更新余额
--  — 新增定期记账管理页面（添加/编辑/删除/启用禁用）
--  — 设置菜单添加「定期记账」入口
--  — 日期/账户选择改为统一底部弹窗风格；标签文字溢出省略修复
--  — 删除按钮图标修复（ 字符）
--  — 编辑弹窗分类改为选择器（底部弹窗列表）
+- `src/types/transaction.ts` — 新增 `RecurringTransaction` / `RecurringCycle` 类型
+- `src/stores/recurring.ts` — 新建定期交易 Store（规则 CRUD + 到期执行 + 日期计算）
+- `src/App.vue` — 启动时执行到期定期交易，自动创建记录并更新余额
+- `src/pages/settings/index.vue` — 新增定期记账管理页面（添加/编辑/删除/启用禁用）
+- `src/pages/profile/profile.vue` — 设置菜单添加「定期记账」入口
+- `src/components/RecordSheet.vue` — 日期/账户选择改为统一底部弹窗风格；标签文字溢出省略修复
+- `src/components/NumberKeyboard.vue` — 删除按钮图标修复（`⌫` 字符）
+- `src/pages/pending/pending.vue` — 编辑弹窗分类改为选择器（底部弹窗列表）
 
 **变更摘要**:
 - 新增「定期自动记账」功能：每月8号扣车贷、每周一早餐等场景自动记账
@@ -304,6 +304,40 @@
 - 退格键颜色修复
 
 ---
-*文档版本：v3.9*
+---
+
+## 2026-06-02 11:11:19
+
+**需求**: 文档清理 + 代码优化
+**问题**: [ISS-020]（文档同步）
+**修改文件**:
+- `docs/requirements.md` — 删除 R-082a 重复行；Store 表格补充 recurring store
+- `docs/features.md` — 删除 F-082a 重复段落（第一段格式损坏）
+- `docs/changelog.md` — 修复 2026-06-02 10:33:56 条目中的空内容
+- `docs/navigation.md` — 删除 type=recurring 和 recurring.ts 重复行；更新币种/待确认描述
+- `docs/issues.md` — ISS-020 已关闭，从 Open 区域移至 Closed 区域
+- `src/utils/format.ts` — 新增 `dateToString()`（本地时区安全的日期格式化）
+- `src/pages/report/report.vue` — 新增 `getDaysDiff()` 修复未定义错误；替换全部 `toISOString().slice(0,10)` 为 `dateToString()`；提取 `categoryStats` computed 消除 pieData/rankData 重复遍历
+- `src/pages/assets/assets.vue` — 替换 `toISOString()` 为 `dateToString()`
+- `src/pages/detail/detail.vue` — 替换 `toISOString()` 为 `dateToString()`；补充 `datePickerRef` 声明
+- `src/components/DateRangePicker.vue` — 替换 `toISOString()` 为 `dateToString()`
+- `src/pages/settings/index.vue` — 替换 `toISOString()` 为 `dateToString()`；补充 `fileInputRef` 声明
+- `src/utils/deepseek.ts` — API Key 改为从环境变量 `VITE_DEEPSEEK_API_KEY` 读取
+- `src/types/transaction.ts` — Transaction 接口补充 `updatedAt?: number`
+- `src/components/BalanceCard.vue` / `CategoryGrid.vue` / `DateRangePicker.vue` / `EmojiGrid.vue` / `FlowItem.vue` / `NumberKeyboard.vue` — 移除未使用的 `const props = ` 赋值
+- `src/pages/ai/ai.vue` — 移除未使用的 `onMounted` 导入
+- `src/App.vue` — 密码锁输入框增加 `type="number"` 限制只能输入数字
+- `src/stores/category.ts` — 新增 `categoryMap` computed，`getCategoryById` / `updateCategory` 改用 Map 查找避免每次展开合并数组
+
+**变更摘要**:
+- 文档：修复全部重复项和过时描述，所有文档与代码同步
+- 时区安全：全项目统一使用 `dateToString()` 替代 `toISOString().slice(0,10)`，消除 UTC+8 凌晨日期偏差 bug
+- 运行时：修复 report.vue `getDaysDiff` 未定义错误
+- 安全：DeepSeek API Key 不再硬编码
+- 性能：report.vue 分类聚合结果缓存；category.ts 使用 Map 索引
+- 代码质量：移除 6 个组件未使用的 props 变量、1 个未使用的 import、2 个未声明的 ref
+
+---
+*文档版本：v4.0*
 *更新时间：2026-06-02 10:33:56*
 *格式说明：每次提交一批写一条，必须关联 [R-xxx] / [ISS-xxx]*

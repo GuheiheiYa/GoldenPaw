@@ -46,14 +46,20 @@ export function formatDate(dateStr: string): string {
 }
 
 /**
+ * 将 Date 对象安全格式化为 YYYY-MM-DD（使用本地时区，避免 toISOString 时区偏移）
+ */
+export function dateToString(date: Date): string {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+/**
  * 获取今天的日期字符串
  */
 export function getToday(): string {
-  const d = new Date()
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
+  return dateToString(new Date())
 }
 
 /**

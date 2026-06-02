@@ -53,9 +53,9 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { getToday } from '@/utils/format'
+import { getToday, dateToString } from '@/utils/format'
 
-const props = defineProps<{
+defineProps<{
   /** 当前值：单日期 YYYY-MM-DD 或范围 YYYY-MM-DD,YYYY-MM-DD */
   modelValue: string
 }>()
@@ -116,7 +116,7 @@ function deriveActiveTag(value: string): string {
   if (value === today) return '今天'
   const yesterday = new Date(today)
   yesterday.setDate(yesterday.getDate() - 1)
-  if (value === yesterday.toISOString().slice(0, 10)) return '昨天'
+  if (value === dateToString(yesterday)) return '昨天'
   return ''
 }
 
@@ -139,7 +139,7 @@ const quickDateTags: QuickTag[] = [
       const t = getToday()
       const d = new Date(t)
       d.setDate(d.getDate() - 1)
-      const y = d.toISOString().slice(0, 10)
+      const y = dateToString(d)
       return `${y},${y}`
     },
   },
@@ -149,7 +149,7 @@ const quickDateTags: QuickTag[] = [
       const t = getToday()
       const d = new Date(t)
       d.setDate(d.getDate() - 6)
-      return `${d.toISOString().slice(0, 10)},${t}`
+      return `${dateToString(d)},${t}`
     },
   },
   {
@@ -158,7 +158,7 @@ const quickDateTags: QuickTag[] = [
       const t = getToday()
       const d = new Date(t)
       d.setDate(d.getDate() - 29)
-      return `${d.toISOString().slice(0, 10)},${t}`
+      return `${dateToString(d)},${t}`
     },
   },
   {

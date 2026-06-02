@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 /** 流水项的 props */
-const props = defineProps<{
+defineProps<{
   /** 交易ID */
   id?: string
   /** emoji 图标 */

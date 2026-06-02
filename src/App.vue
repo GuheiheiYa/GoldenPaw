@@ -142,7 +142,7 @@ function executeRecurringTransactions() {
         <input
           class="lock-input"
           v-model="lockInput"
-          type="password"
+          type="number"
           maxlength="4"
           placeholder="4 位数字密码"
           confirm-type="done"

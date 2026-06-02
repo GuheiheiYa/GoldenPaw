@@ -25,7 +25,7 @@
 import { computed } from 'vue'
 import { useCategoryStore } from '@/stores/category'
 
-const props = defineProps<{
+defineProps<{
   /** 收支类型 */
   type: 'expense' | 'income' | 'transfer'
   /** 选中的分类ID */

@@ -121,7 +121,7 @@ import { onShow } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app'
 import { useAccountStore } from '@/stores/account'
 import { useTransactionStore } from '@/stores/transaction'
-import { formatAmount } from '@/utils/format'
+import { formatAmount, dateToString } from '@/utils/format'
 import TabBar from '@/components/TabBar.vue'
 import RecordSheet from '@/components/RecordSheet.vue'
 import LineChart from '@/components/LineChart.vue'
@@ -148,7 +148,7 @@ const totalNetWorth = computed(() => {
 
 // 月度变化（基于交易数据计算上月变化）
 const netWorthChange = computed(() => {
-  const today = new Date().toISOString().slice(0, 10)
+  const today = dateToString(new Date())
   const currentMonth = today.slice(0, 7)
   const lastMonthDate = new Date()
   lastMonthDate.setMonth(lastMonthDate.getMonth() - 1)

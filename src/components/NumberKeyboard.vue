@@ -62,7 +62,7 @@ import { ref } from 'vue'
  * 自定义数字键盘组件
  * 支持数字输入、小数点（最多2位）、退格、连续加减计算，最大12位
  */
-const props = defineProps<{
+defineProps<{
   /** 当前金额字符串 */
   modelValue: string
 }>()

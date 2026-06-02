@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { formatAmount } from '@/utils/format'
 
-const props = defineProps<{
+defineProps<{
   income: number
   expense: number
   balance: number

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { Category } from '@/types/transaction'
 
 const DEFAULT_EXPENSE_CATEGORIES: Category[] = [
@@ -27,12 +27,20 @@ export const useCategoryStore = defineStore('category', () => {
   const expenseCategories = ref<Category[]>([...DEFAULT_EXPENSE_CATEGORIES])
   const incomeCategories = ref<Category[]>([...DEFAULT_INCOME_CATEGORIES])
 
+  /** 聚合所有分类的 Map，避免每次查找都展开合并数组 */
+  const categoryMap = computed(() => {
+    const map = new Map<string, Category>()
+    for (const c of expenseCategories.value) map.set(c.id, c)
+    for (const c of incomeCategories.value) map.set(c.id, c)
+    return map
+  })
+
   function getCategoriesByType(type: 'expense' | 'income'): Category[] {
     return type === 'expense' ? expenseCategories.value : incomeCategories.value
   }
 
   function getCategoryById(id: string): Category | undefined {
-    return [...expenseCategories.value, ...incomeCategories.value].find(c => c.id === id)
+    return categoryMap.value.get(id)
   }
 
   function addCategory(category: Omit<Category, 'id' | 'sortOrder' | 'isDefault'>) {
@@ -48,7 +56,7 @@ export const useCategoryStore = defineStore('category', () => {
   }
 
   function updateCategory(id: string, updates: Partial<Omit<Category, 'id'>>) {
-    const cat = [...expenseCategories.value, ...incomeCategories.value].find(c => c.id === id)
+    const cat = categoryMap.value.get(id)
     if (cat) Object.assign(cat, updates)
     return cat
   }

@@ -18,6 +18,7 @@ export interface Transaction {
   note: string
   tags: string[]
   createdAt: number
+  updatedAt?: number
 }
 
 /** 分类 */

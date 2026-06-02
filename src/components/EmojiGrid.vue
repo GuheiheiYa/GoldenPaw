@@ -28,7 +28,7 @@ interface Props {
   emojiList?: string[]
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
 const displayList = computed(() => props.emojiList ?? DEFAULT_EMOJI_LIST)
 
