@@ -1,3 +1,24 @@
+/** 币种符号映射 */
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  CNY: '¥',
+  USD: '$',
+  EUR: '€',
+  JPY: '¥',
+}
+
+/** 当前全局币种 */
+let _currency = 'CNY'
+
+/** 设置全局币种（由 appStore 调用同步） */
+export function setCurrencySymbol(code: string) {
+  _currency = code
+}
+
+/** 获取当前全局币种 */
+export function getCurrencySymbol(): string {
+  return CURRENCY_SYMBOLS[_currency] || '¥'
+}
+
 /**
  * 格式化金额（分 → 元）
  * @param cents 金额（分）
@@ -9,8 +30,9 @@ export function formatAmount(cents: number, showSign = false): string {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })
-  if (showSign && cents > 0) return `+¥${formatted}`
-  return `¥${formatted}`
+  const symbol = CURRENCY_SYMBOLS[_currency] || '¥'
+  if (showSign && cents > 0) return `+${symbol}${formatted}`
+  return `${symbol}${formatted}`
 }
 
 /**

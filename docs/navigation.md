@@ -139,6 +139,7 @@ GoldenPaw/
 │   ├── app.ts                       # 全局UI状态（持久化）
 │   │   ├── state: showRecordSheet, currentTab, editTransactionId
 │   │   ├── state: reminderEnabled, budgetAlertEnabled
+│   │   ├── state: theme, cycle, appPassword, currency
 │   │   └── actions: openRecordSheet, closeRecordSheet, setCurrentTab, editTransaction, clearEdit
 │   │
 │   ├── transaction.ts               # 交易记录 store（持久化）
@@ -164,7 +165,7 @@ GoldenPaw/
 │   └── transaction.ts               # Transaction, Category, Account, Goal, Budget 接口
 │
 ├── utils/
-│   ├── format.ts                    # formatAmount, formatDate, getToday, getCurrentTime
+│   ├── format.ts                    # formatAmount(支持多币种符号), formatDate, getToday, getCurrentTime
 │   ├── id.ts                        # generateId
 │   └── date.ts                      # getDaysAgo
 │

@@ -156,13 +156,13 @@
       <!-- 币种设置 -->
       <template v-else-if="type === 'currency'">
         <view class="setting-list">
-          <view class="setting-item" v-for="c in currencies" :key="c.code" @tap="showToast('币种切换功能开发中')">
+          <view class="setting-item" v-for="c in currencies" :key="c.code" @tap="onSelectCurrency(c.code)">
             <text class="setting-icon">{{ c.icon }}</text>
             <view class="setting-info">
               <text class="setting-name">{{ c.name }}</text>
               <text class="setting-desc">{{ c.code }}</text>
             </view>
-            <text v-if="c.code === 'CNY'" class="setting-badge">当前</text>
+            <text v-if="c.code === appStore.currency" class="setting-badge">当前</text>
           </view>
         </view>
       </template>
@@ -701,6 +701,11 @@ function onSelectTheme(themeId: string) {
 function onSelectCycle(cycleId: string) {
   appStore.setCycle(cycleId as CycleType)
   uni.showToast({ title: '周期已切换', icon: 'success' })
+}
+
+function onSelectCurrency(code: string) {
+  appStore.setCurrency(code)
+  uni.showToast({ title: '币种已切换', icon: 'success' })
 }
 
 /* ===== Password Lock ===== */

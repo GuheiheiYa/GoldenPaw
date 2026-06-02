@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { setCurrencySymbol } from '@/utils/format'
 
 const THEME_STORAGE_KEY = 'goldenpaw_theme'
 
@@ -14,6 +15,7 @@ export const useAppStore = defineStore('app', () => {
   const theme = ref<string>(uni.getStorageSync(THEME_STORAGE_KEY) || 'warm')
   const cycle = ref<CycleType>('natural')
   const appPassword = ref('') // 空字符串表示未设置密码
+  const currency = ref('CNY')
 
   function toggleRecordSheet() {
     showRecordSheet.value = !showRecordSheet.value
@@ -51,6 +53,16 @@ export const useAppStore = defineStore('app', () => {
     appPassword.value = pwd
   }
 
+  function setCurrency(code: string) {
+    currency.value = code
+    setCurrencySymbol(code)
+  }
+
+  // 初始化时同步持久化的币种到 format.ts
+  watch(currency, (val) => {
+    setCurrencySymbol(val)
+  }, { immediate: true })
+
   return {
     showRecordSheet,
     currentTab,
@@ -68,6 +80,8 @@ export const useAppStore = defineStore('app', () => {
     setTheme,
     setCycle,
     setPassword,
+    currency,
+    setCurrency,
   }
 }, {
   persist: true,

@@ -1350,6 +1350,26 @@
 
 ---
 
+## [F-081] 我的/设置 - 币种设置 ← [R-081]
+
+**状态**: 已完成  **实现时间**: 2026-06-02 10:33:56
+
+**实现方式**:
+- `appStore.currency` 存储当前币种（CNY/USD/EUR/JPY），Pinia persist
+- `format.ts` 维护全局币种变量，通过 `setCurrencySymbol()` 同步
+- `formatAmount()` 自动根据当前币种显示对应符号（¥/$/€/¥）
+- `settings/index.vue` 币种列表点击切换，显示「当前」badge
+
+**关联文件**:
+- `src/pages/settings/index.vue`
+- `src/stores/app.ts`
+- `src/utils/format.ts`
+
+**注意事项**:
+- 仅切换显示符号，金额数值不变（不做汇率转换）
+
+---
+
 ## [F-099] 组件 - DateRangePicker ← [R-040]
 
 **状态**: 已完成  **实现时间**: 2026-06-02 10:33:56
@@ -1376,6 +1396,6 @@
 
 ---
 
-*文档版本：v3.2*
+*文档版本：v3.3*
 *更新时间：2026-06-02 10:33:56*
 *格式说明：每个功能按 [F-xxx] 编号，与 requirements.md 的 [R-xxx] 一一对应*
