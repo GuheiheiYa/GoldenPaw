@@ -78,7 +78,7 @@ GoldenPaw/
 │   │   ├── type=currency            # 币种设置（占位）
 │   │   ├── type=cycle               # 记账周期（自然月/工资/自定义）
 │   │   ├── type=export              # 导出数据（CSV导出）
-│   │   ├── type=import              # 导入数据（占位）
+│   │   ├── type=import              # 导入数据（CSV 智能识别 GoldenPaw/微信/支付宝）
 │   │   ├── type=sync                # 云同步（占位）
 │   │   └── type=clear               # 清空数据（真实删除）
 │   │
@@ -166,6 +166,7 @@ GoldenPaw/
 │
 ├── utils/
 │   ├── format.ts                    # formatAmount(支持多币种符号), formatDate, getToday, getCurrentTime
+│   ├── csvImport.ts                 # CSV 智能导入：识别 GoldenPaw/微信/支付宝格式
 │   ├── id.ts                        # generateId
 │   └── date.ts                      # getDaysAgo
 │

@@ -212,23 +212,29 @@
       <!-- 数据导入 -->
       <template v-else-if="type === 'import'">
         <view class="setting-list">
-          <view class="setting-item" @tap="showToast('微信账单导入开发中')">
-            <text class="setting-icon">💬</text>
+          <view class="setting-item" @tap="onImportCSV">
+            <text class="setting-icon">📄</text>
             <view class="setting-info">
-              <text class="setting-name">导入微信账单</text>
-              <text class="setting-desc">从微信导出的账单文件</text>
-            </view>
-            <uni-icons class="setting-arrow" type="arrow-right" size="14" color="var(--text-tertiary)" />
-          </view>
-          <view class="setting-item" @tap="showToast('支付宝账单导入开发中')">
-            <text class="setting-icon">💰</text>
-            <view class="setting-info">
-              <text class="setting-name">导入支付宝账单</text>
-              <text class="setting-desc">从支付宝导出的账单文件</text>
+              <text class="setting-name">导入 CSV 文件</text>
+              <text class="setting-desc">支持 GoldenPaw 导出格式 / 微信账单 / 支付宝账单</text>
             </view>
             <uni-icons class="setting-arrow" type="arrow-right" size="14" color="var(--text-tertiary)" />
           </view>
         </view>
+        <view class="import-tip">
+          <text class="import-tip-text">💡 支持自动识别以下格式：</text>
+          <text class="import-tip-text">• GoldenPaw 导出 CSV</text>
+          <text class="import-tip-text">• 微信账单 CSV（从微信支付下载）</text>
+          <text class="import-tip-text">• 支付宝账单 CSV（从支付宝下载）</text>
+        </view>
+        <!-- H5 隐藏文件输入 -->
+        <input
+          ref="fileInputRef"
+          type="file"
+          accept=".csv"
+          style="display:none"
+          @change="onFileSelected"
+        />
       </template>
 
       <!-- 云同步 -->
@@ -362,6 +368,7 @@ import { useAccountStore } from '@/stores/account'
 import { useTransactionStore } from '@/stores/transaction'
 import { useAppStore, type CycleType } from '@/stores/app'
 import { formatAmount } from '@/utils/format'
+import { parseAndImportCsv } from '@/utils/csvImport'
 import EmojiGrid from '@/components/EmojiGrid.vue'
 import type { Account } from '@/types/transaction'
 
@@ -847,6 +854,43 @@ function showToast(msg: string) {
   uni.showToast({ title: msg, icon: 'none' })
 }
 
+/** 点击导入 CSV */
+function onImportCSV() {
+  // #ifdef H5
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.csv'
+  input.onchange = (e: any) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string
+      if (text) {
+        handleImportResult(parseAndImportCsv(text))
+      }
+    }
+    reader.readAsText(file, 'utf-8')
+  }
+  input.click()
+  // #endif
+  // #ifndef H5
+  uni.showToast({ title: 'CSV 导入仅在 H5 环境可用', icon: 'none' })
+  // #endif
+}
+
+/** 处理导入结果 */
+function handleImportResult(result: ReturnType<typeof parseAndImportCsv>) {
+  const msg = result.errors.length > 0
+    ? `导入完成：成功 ${result.success} 条，失败 ${result.fail} 条\n${result.errors.join('\n')}`
+    : `导入完成：成功 ${result.success} 条${result.fail > 0 ? '，失败 ' + result.fail + ' 条' : ''}`
+  uni.showModal({
+    title: '导入结果',
+    content: msg,
+    showCancel: false,
+  })
+}
+
 function onClearData() {
   uni.showModal({
     title: '确认清空',
@@ -1059,6 +1103,22 @@ function onClearData() {
 .add-btn-text {
   @include text-body;
   color: $brand-600;
+}
+
+/* Import Tip */
+.import-tip {
+  margin: $space-6 $space-6 0;
+  padding: $space-4;
+  background: $bg-primary;
+  border-radius: $radius-md;
+  border: 1px dashed $border;
+}
+
+.import-tip-text {
+  @include text-small;
+  color: $text-secondary;
+  display: block;
+  line-height: 1.8;
 }
 
 /* Sync Status */
