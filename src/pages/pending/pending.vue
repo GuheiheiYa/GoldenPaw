@@ -98,8 +98,16 @@
         </view>
         <view class="modal-field">
           <text class="modal-label">分类</text>
-          <view class="modal-select" @tap="showCategoryModal = true">
-            <text>{{ editForm.category || '请选择分类' }}</text>
+          <view class="modal-options">
+            <view
+              class="modal-option"
+              v-for="cat in categoryStore.getCategoriesByType('expense')"
+              :key="cat.id"
+              :class="{ active: editForm.categoryId === cat.id }"
+              @tap="editForm.categoryId = cat.id"
+            >
+              <text>{{ cat.icon }} {{ cat.name }}</text>
+            </view>
           </view>
         </view>
         <view class="modal-actions">
@@ -108,31 +116,6 @@
           </view>
           <view class="modal-btn primary" @tap="confirmEdit">
             <text>确定</text>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- 分类选择弹窗 -->
-    <view class="modal-overlay" v-if="showCategoryModal" @tap="showCategoryModal = false">
-      <view class="modal-card category-modal-card" @tap.stop>
-        <text class="modal-title">选择分类</text>
-        <view class="category-list">
-          <view
-            class="category-item"
-            :class="{ active: editForm.category === cat.name }"
-            v-for="cat in categoryStore.getCategoriesByType('expense')"
-            :key="cat.id"
-            @tap="selectCategory(cat.name)"
-          >
-            <text class="category-icon">{{ cat.icon }}</text>
-            <text class="category-name">{{ cat.name }}</text>
-            <text v-if="editForm.category === cat.name" class="category-check">✓</text>
-          </view>
-        </view>
-        <view class="modal-actions">
-          <view class="modal-btn secondary" @tap="showCategoryModal = false">
-            <text>取消</text>
           </view>
         </view>
       </view>
@@ -206,9 +189,8 @@ function onConfirm(id: number) {
 
 /** 编辑记录 */
 const showEditModal = ref(false)
-const showCategoryModal = ref(false)
 const editingItem = ref<any>(null)
-const editForm = ref({ amount: '', merchant: '', category: '' })
+const editForm = ref({ amount: '', merchant: '', categoryId: '' })
 
 function onEdit(id: number) {
   const item = pendingItems.find(i => i.id === id)
@@ -217,7 +199,7 @@ function onEdit(id: number) {
   editForm.value = {
     amount: item.amount.replace(/[¥,-\s]/g, ''),
     merchant: item.merchant,
-    category: item.category,
+    categoryId: CATEGORY_MAP[item.category] || '',
   }
   showEditModal.value = true
 }
@@ -229,21 +211,16 @@ function confirmEdit() {
     uni.showToast({ title: '请输入有效金额', icon: 'none' })
     return
   }
+  const cat = categoryStore.getCategoryById(editForm.value.categoryId)
   editingItem.value.amount = `-¥${amountNum.toFixed(2)}`
   editingItem.value.merchant = editForm.value.merchant
-  editingItem.value.category = editForm.value.category
+  editingItem.value.category = cat?.name || editingItem.value.category
   showEditModal.value = false
   editingItem.value = null
 }
 
-function selectCategory(name: string) {
-  editForm.value.category = name
-  showCategoryModal.value = false
-}
-
 function closeEditModal() {
   showEditModal.value = false
-  showCategoryModal.value = false
   editingItem.value = null
 }
 
@@ -682,64 +659,29 @@ const sourceList = reactive([
   }
 }
 
-.modal-select {
-  width: 100%;
-  height: 48px;
-  background: $bg-primary;
-  border-radius: $radius-sm;
-  padding: 0 14px;
-  border: 1px solid $border;
+.modal-options {
   display: flex;
-  align-items: center;
-  @include text-body;
-  color: $text-primary;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-
-.category-modal-card {
-  max-height: 70vh;
-  overflow-y: auto;
-}
-
-.category-list {
-  display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 16px;
-  max-height: 300px;
-  overflow-y: auto;
 }
 
-.category-item {
+.modal-option {
+  padding: 8px 14px;
+  border-radius: $radius-full;
+  background: $bg-primary;
+  border: 1px solid $border;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: $radius-sm;
-  background: $bg-primary;
-  cursor: pointer;
-  transition: background 0.2s;
+  gap: 6px;
+  @include text-small;
+  color: $text-secondary;
 
-  &:active,
   &.active {
     background: $brand-50;
-    border: 1px solid $brand-200;
+    border-color: $brand-500;
+    color: $text-primary;
   }
-}
-
-.category-icon {
-  font-size: 20px;
-}
-
-.category-name {
-  flex: 1;
-  @include text-body;
-}
-
-.category-check {
-  color: $brand-500;
-  font-weight: 700;
 }
 
 .modal-actions {

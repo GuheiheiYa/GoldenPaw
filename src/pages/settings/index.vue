@@ -258,21 +258,37 @@
             </view>
             <view class="modal-field">
               <text class="modal-label">分类</text>
-              <view class="modal-select" @tap="showRecurringCategoryModal = true">
-                <text>{{ getCategoryName(recurringForm.categoryId) || '请选择分类' }}</text>
+              <view class="modal-options">
+                <view
+                  class="modal-option"
+                  v-for="cat in categoryStore.getCategoriesByType(recurringForm.type)"
+                  :key="cat.id"
+                  :class="{ active: recurringForm.categoryId === cat.id }"
+                  @tap="recurringForm.categoryId = cat.id"
+                >
+                  <text>{{ cat.icon }} {{ cat.name }}</text>
+                </view>
               </view>
             </view>
             <view class="modal-field">
               <text class="modal-label">账户</text>
-              <view class="modal-select" @tap="showRecurringAccountModal = true">
-                <text>{{ getAccountName(recurringForm.accountId) || '请选择账户' }}</text>
+              <view class="modal-options">
+                <view
+                  class="modal-option"
+                  v-for="acc in accountStore.accounts"
+                  :key="acc.id"
+                  :class="{ active: recurringForm.accountId === acc.id }"
+                  @tap="recurringForm.accountId = acc.id"
+                >
+                  <text>{{ acc.icon }} {{ acc.name }}</text>
+                </view>
               </view>
             </view>
             <view class="modal-field">
               <text class="modal-label">首次执行日期</text>
-              <picker mode="date" :value="recurringForm.nextDate" @change="onRecurringDateChange">
-                <view class="modal-select">{{ recurringForm.nextDate }}</view>
-              </picker>
+              <view class="modal-select" @tap="showRecurringDatePicker = true">
+                <text>{{ recurringForm.nextDate }}</text>
+              </view>
             </view>
             <view class="modal-actions">
               <view class="modal-btn secondary" @tap="closeRecurringModal">
@@ -285,53 +301,13 @@
           </view>
         </view>
 
-        <!-- 分类选择弹窗 -->
-        <view class="modal-overlay" v-if="showRecurringCategoryModal" @tap="showRecurringCategoryModal = false">
-          <view class="modal-card category-modal-card" @tap.stop>
-            <text class="modal-title">选择分类</text>
-            <view class="category-list">
-              <view
-                class="category-item"
-                :class="{ active: recurringForm.categoryId === cat.id }"
-                v-for="cat in categoryStore.getCategoriesByType(recurringForm.type === 'income' ? 'income' : 'expense')"
-                :key="cat.id"
-                @tap="recurringForm.categoryId = cat.id; showRecurringCategoryModal = false"
-              >
-                <text class="category-icon">{{ cat.icon }}</text>
-                <text class="category-name">{{ cat.name }}</text>
-                <text v-if="recurringForm.categoryId === cat.id" class="category-check">✓</text>
-              </view>
-            </view>
-            <view class="modal-actions">
-              <view class="modal-btn secondary" @tap="showRecurringCategoryModal = false">
-                <text>取消</text>
-              </view>
-            </view>
-          </view>
-        </view>
-
-        <!-- 账户选择弹窗 -->
-        <view class="modal-overlay" v-if="showRecurringAccountModal" @tap="showRecurringAccountModal = false">
-          <view class="modal-card category-modal-card" @tap.stop>
-            <text class="modal-title">选择账户</text>
-            <view class="category-list">
-              <view
-                class="category-item"
-                :class="{ active: recurringForm.accountId === acc.id }"
-                v-for="acc in accountStore.accounts"
-                :key="acc.id"
-                @tap="recurringForm.accountId = acc.id; showRecurringAccountModal = false"
-              >
-                <text class="category-icon">{{ acc.icon }}</text>
-                <text class="category-name">{{ acc.name }}</text>
-                <text v-if="recurringForm.accountId === acc.id" class="category-check">✓</text>
-              </view>
-            </view>
-            <view class="modal-actions">
-              <view class="modal-btn secondary" @tap="showRecurringAccountModal = false">
-                <text>取消</text>
-              </view>
-            </view>
+        <!-- 日期选择底部弹窗 -->
+        <view class="modal-overlay" v-if="showRecurringDatePicker" @tap="showRecurringDatePicker = false">
+          <view class="modal-card date-picker-card" @tap.stop>
+            <text class="modal-title">选择首次执行日期</text>
+            <picker mode="date" :value="recurringForm.nextDate" @change="onRecurringDateChange">
+              <view class="picker-btn primary">选择日期</view>
+            </picker>
           </view>
         </view>
       </template>
@@ -1062,8 +1038,7 @@ function onClearData() {
 /* ===== 定期记账 ===== */
 const showRecurringModal = ref(false)
 const editingRecurringId = ref('')
-const showRecurringCategoryModal = ref(false)
-const showRecurringAccountModal = ref(false)
+const showRecurringDatePicker = ref(false)
 const recurringForm = ref({
   name: '',
   amount: '',
@@ -1119,8 +1094,7 @@ function openRecurringModal(rule?: any) {
 
 function closeRecurringModal() {
   showRecurringModal.value = false
-  showRecurringCategoryModal.value = false
-  showRecurringAccountModal.value = false
+  showRecurringDatePicker.value = false
   editingRecurringId.value = ''
 }
 
@@ -1180,6 +1154,7 @@ function onRecurringDateChange(e: any) {
   if (e.detail?.value) {
     recurringForm.value.nextDate = e.detail.value
   }
+  showRecurringDatePicker.value = false
 }
 
 function deleteRecurring(id: string) {
@@ -1560,6 +1535,7 @@ function deleteRecurring(id: string) {
 
 .modal-options {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -1569,10 +1545,16 @@ function deleteRecurring(id: string) {
   background: $bg-primary;
   border: 1px solid $border;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  @include text-small;
+  color: $text-secondary;
 
   &.active {
     background: $brand-50;
     border-color: $brand-500;
+    color: $text-primary;
   }
 }
 
@@ -1694,26 +1676,20 @@ function deleteRecurring(id: string) {
   }
 }
 
-.modal-options {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+/* Date picker in recurring modal */
+.date-picker-card {
+  padding-bottom: 40px;
 }
 
-.modal-option {
-  padding: 8px 16px;
-  border-radius: $radius-full;
-  background: $bg-primary;
-  border: 1px solid $border;
+.picker-btn {
+  padding: 14px;
+  border-radius: $radius-sm;
+  text-align: center;
   cursor: pointer;
-  @include text-small;
-  color: $text-secondary;
-
-  &.active {
-    background: $gradient-brand;
-    color: white;
-    border-color: transparent;
-  }
+  background: $gradient-brand;
+  box-shadow: $shadow-brand;
+  color: white;
+  font-weight: 700;
 }
 
 </style>

@@ -11,7 +11,7 @@
         <text class="key-text">9</text>
       </view>
       <view class="key key-func" @tap="onBackspace">
-        <text class="key-text" style="color:#fff;font-size:16px;">⌫</text>
+        <text class="key-text" style="font-size:16px;">⌫</text>
       </view>
     </view>
     <view class="keyboard-row">
