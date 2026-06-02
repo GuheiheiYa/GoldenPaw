@@ -86,10 +86,13 @@
       <text class="empty-desc">当前筛选条件下没有交易记录</text>
     </view>
 
+    <!-- FAB 记账按钮 -->
+    <view class="fab-btn" @tap="appStore.openRecordSheet()">
+      <text class="fab-icon">+</text>
+    </view>
+
     <!-- 记账/编辑面板 -->
     <RecordSheet />
-
-
   </view>
 </template>
 
@@ -649,6 +652,34 @@ function onLongPressTransaction(tx: Transaction) {
   @include text-micro;
   color: $danger-500;
   font-size: 12px;
+}
+
+/* FAB 记账按钮 */
+.fab-btn {
+  position: fixed;
+  right: 24px;
+  bottom: 32px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: $gradient-brand;
+  box-shadow: $shadow-brand;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  cursor: pointer;
+
+  &:active {
+    transform: scale(0.92);
+  }
+}
+
+.fab-icon {
+  color: white;
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1;
 }
 
 /* 空状态 */
