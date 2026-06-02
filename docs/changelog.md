@@ -156,6 +156,22 @@
 
 ---
 
-*文档版本：v3.0*
-*更新时间：2026-05-29 22:13:21*
+## 2026-05-29 11:11:19
+
+**需求**: [R-034]
+**问题**: [ISS-019]（已解决）
+**修改文件**:
+- `src/components/RecordSheet.vue` — 新增标签选择弹窗（预设标签网格 + 自定义输入 + 多选）
+- `src/pages/detail/detail.vue` — 交易项显示标签
+- `src/pages/search/search.vue` — 搜索结果显示标签
+- `src/stores/transaction.ts` — `addTransaction` / `updateTransaction` 支持 `tags` 参数
+- `src/types/transaction.ts` — `Transaction` 接口已有 `tags?: string[]`
+
+**变更摘要**:
+- 标签功能完整实现：记账时可选/可自定义标签，明细/搜索/首页显示标签
+
+---
+
+*文档版本：v3.1*
+*更新时间：2026-05-29 11:11:19*
 *格式说明：每次提交一批写一条，必须关联 [R-xxx] / [ISS-xxx]*

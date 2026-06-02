@@ -10,6 +10,22 @@ GoldenPaw（金爪）是一款个人资产管理APP，使用 uni-app (Vue3 + Vit
 
 ---
 
+## 规则路由（按需加载）
+
+复杂规则通过路由按需加载，避免 CLAUDE.md 过于臃肿：
+
+| 场景 | 规则文件 | 何时加载 |
+|------|---------|---------|
+| 技能利用 | `docs/rules/skills.md` | 开始任何开发任务前 |
+| 文档工作流 | `docs/rules/docs-workflow.md` | 每次开发时（强制） |
+| 测试策略 | `docs/rules/testing.md` | 涉及测试时 |
+| Git 工作流 | `docs/rules/git-workflow.md` | Git 操作时 |
+| 常见陷阱 | `docs/rules/common-pitfalls.md` | 遇到问题时参考 |
+
+**加载方式**: 在 Claude Code 中读取对应文件，如 `Read docs/rules/skills.md`
+
+---
+
 ## 文档体系（强制）
 
 > **所有文档中的时间必须精确到秒**，格式：`YYYY-MM-DD HH:MM:SS`。
@@ -258,5 +274,5 @@ git add -A && git commit -m "描述"
 
 ---
 
-*项目规则版本：v2.0*
-*更新时间：2026-05-29 22:13:21*
+*项目规则版本：v2.1*
+*更新时间：2026-06-01 00:00:00*

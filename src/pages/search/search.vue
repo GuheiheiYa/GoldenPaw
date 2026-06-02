@@ -66,11 +66,13 @@ const results = computed(() => {
     const amountYuan = String(tx.amount / 100)
     const amountCents = String(tx.amount)
     const amountFormatted = (tx.amount / 100).toFixed(2)
+    const tagsMatch = (tx.tags || []).some(t => t.toLowerCase().includes(kw))
     return note.toLowerCase().includes(kw) ||
            catName.toLowerCase().includes(kw) ||
            amountYuan.includes(kw) ||
            amountCents.includes(kw) ||
-           amountFormatted.includes(kw)
+           amountFormatted.includes(kw) ||
+           tagsMatch
   })
 })
 

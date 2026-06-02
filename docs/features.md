@@ -492,6 +492,33 @@
 
 ---
 
+## [F-034] 记账 BottomSheet - 标签选择 ← [R-034]
+
+**状态**: 已完成  **实现时间**: 2026-05-29 00:00:00
+
+**实现方式**:
+- 底部弹窗展示 10 个常用预设标签（午餐/晚餐/加班/出差/报销/投资/人情/娱乐/AA/家庭）
+- 支持多选/取消，已选标签高亮显示
+- 自定义输入框 + 添加按钮，新建标签即时加入已选列表
+- 标签展示区域用 `flex-wrap` 换行，溢出时自动滚动
+- 明细页和搜索页显示标签（`tx.tags.join(' ')`）
+
+**关联文件**:
+- `src/components/RecordSheet.vue`
+- `src/pages/detail/detail.vue`
+- `src/pages/search/search.vue`
+- `src/types/transaction.ts`
+
+**数据来源**:
+- 预设标签：RecordSheet 内部常量 `presetTags`
+- 已选标签：`tags` ref，编辑时从 `tx.tags || []` 加载
+- 保存时：`transactionStore.addTransaction()` / `updateTransaction()` 传入 `tags`
+
+**已知问题**:
+- [ISS-019] 已解决：标签字段已有但 UI 未提供选择和展示
+
+---
+
 ## [F-035] 收支报表 - 时间周期选择 ← [R-035]
 
 **状态**: 已完成  **实现时间**: 2026-05-28 00:00:00
@@ -1319,5 +1346,5 @@
 ---
 
 *文档版本：v3.0*
-*更新时间：2026-05-29 22:13:21*
+*更新时间：2026-05-29 11:11:19*
 *格式说明：每个功能按 [F-xxx] 编号，与 requirements.md 的 [R-xxx] 一一对应*

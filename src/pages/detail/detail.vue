@@ -60,6 +60,9 @@
               <text class="tx-meta">
                 {{ tx.time }} · {{ getCatName(tx.categoryId) }}
               </text>
+              <view v-if="tx.tags && tx.tags.length > 0" class="tx-tags">
+                <text class="tx-tag" v-for="t in tx.tags" :key="t">{{ t }}</text>
+              </view>
             </view>
             <view class="tx-right">
               <text
@@ -768,6 +771,22 @@ function onLongPressTransaction(tx: Transaction) {
 
 .tx-amount-in {
   color: $success-500;
+}
+
+.tx-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.tx-tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--brand-50, #FAF0E6);
+  color: var(--brand-600, #A67B5B);
+  font-size: 10px;
+  line-height: 1.4;
 }
 
 /* 删除按钮 */

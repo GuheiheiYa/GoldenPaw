@@ -36,7 +36,7 @@
         </view>
         <view class="info-item" @tap="onTagTap">
           <text class="info-icon">🏷️</text>
-          <text class="info-text">标签</text>
+          <text class="info-text">{{ selectedTags.length > 0 ? selectedTags.join(' ') : '标签' }}</text>
         </view>
       </view>
 
@@ -67,6 +67,32 @@
         v-model="amountStr"
         @confirm="onConfirm"
       />
+
+      <!-- 标签选择弹窗 -->
+      <view v-if="showTagModal" class="tag-modal-overlay" @tap="closeTagModal">
+        <view class="tag-modal" @tap.stop>
+          <text class="tag-modal-title">选择标签</text>
+          <view class="tag-list">
+            <view
+              class="tag-item"
+              :class="{ active: selectedTags.includes(tag) }"
+              v-for="tag in presetTags"
+              :key="tag"
+              @tap="toggleTag(tag)"
+            >
+              <text>{{ tag }}</text>
+            </view>
+          </view>
+          <view class="tag-modal-actions">
+            <view class="tag-modal-btn secondary" @tap="closeTagModal">
+              <text>取消</text>
+            </view>
+            <view class="tag-modal-btn primary" @tap="closeTagModal">
+              <text>确定</text>
+            </view>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -97,6 +123,10 @@ const note = ref('')
 const merchant = ref('')
 const selectedDate = ref(getToday())
 const selectedAccountId = ref('')
+const selectedTags = ref<string[]>([])
+const showTagModal = ref(false)
+
+const presetTags = ['工作', '生活', '旅行', '餐饮', '娱乐', '学习', '家庭', '健康', '购物', '投资']
 
 /** 是否为编辑模式 */
 const isEditMode = computed(() => !!appStore.editTransactionId)
@@ -179,6 +209,7 @@ function loadTransaction(txId: string) {
   }
   selectedDate.value = tx.date
   selectedAccountId.value = tx.accountId
+  selectedTags.value = tx.tags || []
 }
 
 /** 点击遮罩关闭 */
@@ -212,7 +243,22 @@ function onAccountTap() {
 
 /** 点击标签 */
 function onTagTap() {
-  uni.showToast({ title: '标签功能开发中', icon: 'none' })
+  showTagModal.value = true
+}
+
+/** 切换标签选中状态 */
+function toggleTag(tag: string) {
+  const idx = selectedTags.value.indexOf(tag)
+  if (idx >= 0) {
+    selectedTags.value.splice(idx, 1)
+  } else {
+    selectedTags.value.push(tag)
+  }
+}
+
+/** 关闭标签弹窗 */
+function closeTagModal() {
+  showTagModal.value = false
 }
 
 /** 确认保存 */
@@ -253,6 +299,7 @@ function onConfirm() {
         accountId: selectedAccountId.value,
         note: composedNote.value,
         date: selectedDate.value,
+        tags: selectedTags.value,
       })
     }
   } else {
@@ -268,6 +315,7 @@ function onConfirm() {
       accountId: selectedAccountId.value,
       note: composedNote.value,
       date: selectedDate.value,
+      tags: selectedTags.value,
     })
   }
 
@@ -285,6 +333,8 @@ function resetForm() {
   merchant.value = ''
   selectedDate.value = getToday()
   selectedAccountId.value = accountStore.getDefaultAccount()?.id || ''
+  selectedTags.value = []
+  showTagModal.value = false
 }
 </script>
 
@@ -400,6 +450,84 @@ function resetForm() {
   &:focus {
     border-color: $brand-300;
     background: $surface;
+  }
+}
+
+/* 标签弹窗 */
+.tag-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.tag-modal {
+  width: 100%;
+  max-width: 430px;
+  background: $surface;
+  border-radius: $radius-lg $radius-lg 0 0;
+  padding: $space-5 $space-5 40px;
+}
+
+.tag-modal-title {
+  @include text-h3;
+  display: block;
+  text-align: center;
+  margin-bottom: $space-4;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  margin-bottom: $space-4;
+}
+
+.tag-item {
+  padding: $space-2 $space-4;
+  border-radius: $radius-full;
+  background: $bg-primary;
+  border: 1px solid $border;
+  cursor: pointer;
+  @include text-small;
+  color: $text-secondary;
+
+  &:active {
+    background: $brand-50;
+  }
+
+  &.active {
+    background: $gradient-brand;
+    color: white;
+    border-color: transparent;
+  }
+}
+
+.tag-modal-actions {
+  display: flex;
+  gap: $space-3;
+}
+
+.tag-modal-btn {
+  flex: 1;
+  padding: $space-3;
+  border-radius: $radius-lg;
+  text-align: center;
+  @include text-body;
+  font-weight: 700;
+  cursor: pointer;
+
+  &.secondary {
+    background: $bg-primary;
+    color: $text-secondary;
+  }
+
+  &.primary {
+    background: $gradient-brand;
+    color: white;
   }
 }
 </style>
