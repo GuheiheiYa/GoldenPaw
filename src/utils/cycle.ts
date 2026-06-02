@@ -10,7 +10,20 @@ export function getCycleRange(type: CycleType): { start: string; end: string } {
   const day = now.getDate()
 
   if (type === 'salary') {
-    // 工资周期：上月25日 ~ 本月24日
+    // 工资周期：每月25日 ~ 次月24日
+    if (day >= 25) {
+      // 本月25日 ~ 下月24日
+      let endYear = year
+      let endMonth = month + 1
+      if (endMonth > 11) {
+        endMonth = 0
+        endYear += 1
+      }
+      const start = formatDate(year, month, 25)
+      const end = formatDate(endYear, endMonth, 24)
+      return { start, end }
+    }
+    // 上月25日 ~ 本月24日
     let startYear = year
     let startMonth = month - 1
     if (startMonth < 0) {
