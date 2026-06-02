@@ -298,7 +298,7 @@
           </view>
           <view class="modal-field">
             <text class="modal-label">图标</text>
-            <input class="modal-input" v-model="accountForm.icon" placeholder="例如：💳" />
+            <EmojiGrid v-model="accountForm.icon" />
           </view>
           <view class="modal-actions">
             <view class="modal-btn secondary" @tap="closeAccountModal">

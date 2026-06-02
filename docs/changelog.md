@@ -172,6 +172,23 @@
 
 ---
 
-*文档版本：v3.1*
-*更新时间：2026-05-29 11:11:19*
+## 2026-06-02 10:33:56
+
+**需求**: [R-040]
+**问题**: [ISS-018]（已解决）
+**修改文件**:
+- `src/components/DateRangePicker.vue` — 新建通用日期范围选择弹窗组件（从 detail.vue 提取）
+- `src/pages/detail/detail.vue` — 移除内嵌日期弹窗，改用 DateRangePicker 组件
+- `src/pages/report/report.vue` — 周期 chip 栏新增「自定义」选项，接入 DateRangePicker；自定义范围 ≤31天按天显示折线图，>31天按月聚合
+- `src/pages/settings/index.vue` — 账户管理弹窗图标输入框改为 EmojiGrid 组件
+
+**变更摘要**:
+- 日期选择统一为 DateRangePicker 通用组件，支持快捷标签 + 双 picker + v-model
+- 报表页支持自定义日期范围（关闭 ISS-018）
+- 账户图标选择统一使用 EmojiGrid（与分类管理一致）
+
+---
+
+*文档版本：v3.2*
+*更新时间：2026-06-02 10:33:56*
 *格式说明：每次提交一批写一条，必须关联 [R-xxx] / [ISS-xxx]*

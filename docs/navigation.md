@@ -53,12 +53,14 @@ GoldenPaw/
 │   │   ├── 使用 → RecordSheet.vue
 │   │   └── 跳转 → settings/index, help/help
 │   │
-│   ├── report/report.vue            # 收支报表（动态数据 + 周期切换）
+│   ├── report/report.vue            # 收支报表（动态数据 + 周期切换 + 自定义范围）
+│   │   ├── 使用 → DateRangePicker.vue (自定义周期)
 │   │   └── 数据 → stores/transaction.ts, stores/category.ts
 │   │
 │   ├── detail/detail.vue            # 明细（筛选/编辑/删除/高亮）
 │   │   ├── 使用 → SegmentedControl.vue (筛选)
 │   │   ├── 使用 → RecordSheet.vue (编辑)
+│   │   ├── 使用 → DateRangePicker.vue (日期范围筛选)
 │   │   └── 数据 → stores/transaction.ts, stores/category.ts, stores/app.ts
 │   │
 │   ├── goals/goals.vue              # 存钱与预算（目标CRUD + 预算管理）
@@ -124,8 +126,14 @@ GoldenPaw/
 │   ├── EmptyState.vue               # 统一空状态组件
 │   │   └── 使用于 → detail, goals
 │   │
-│   └── EmojiGrid.vue                # 统一 emoji 选择器（40个emoji）
-│       └── 使用于 → goals.vue（新建目标）, settings/index.vue（分类/账户图标）
+│   ├── EmojiGrid.vue                # 统一 emoji 选择器（40个emoji）
+│   │   └── 使用于 → goals.vue（新建目标）, settings/index.vue（分类/账户图标）
+│   │
+│   └── DateRangePicker.vue          # 通用日期范围选择弹窗
+│       ├── 快捷标签：今天/昨天/近7天/近30天/本月
+│       ├── 双 picker 选择开始/结束日期
+│       ├── 支持 slot 触发 或 ref.open() 调用
+│       └── 使用于 → detail.vue（日期筛选）, report.vue（自定义周期）
 │
 ├── stores/
 │   ├── app.ts                       # 全局UI状态（持久化）
@@ -232,4 +240,4 @@ AI记账 (Tab 1)
 ---
 
 *文档版本：v4.0*
-*更新时间：2026-05-29 11:11:19*
+*更新时间：2026-06-02 10:33:56*

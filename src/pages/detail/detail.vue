@@ -7,9 +7,11 @@
       </view>
       <text class="header-title">明细</text>
       <view class="header-actions">
-        <view class="icon-btn" @tap="openDatePicker">
-          <uni-icons class="icon-text" type="search" size="18" color="#999" />
-        </view>
+        <DateRangePicker ref="datePickerRef" v-model="filterDate" @clear="filterDate = ''">
+          <view class="icon-btn">
+            <uni-icons class="icon-text" type="search" size="18" color="#999" />
+          </view>
+        </DateRangePicker>
       </view>
     </view>
 
@@ -87,51 +89,7 @@
     <!-- 记账/编辑面板 -->
     <RecordSheet />
 
-    <!-- 日期选择弹窗 -->
-    <view class="date-picker-overlay" v-if="showDatePicker" @tap="showDatePicker = false">
-      <view class="date-picker-card" @tap.stop>
-        <text class="date-picker-title">选择日期范围</text>
 
-        <!-- 快捷标签 -->
-        <view class="date-quick-tags">
-          <view
-            class="date-quick-tag"
-            v-for="tag in quickDateTags"
-            :key="tag.label"
-            :class="{ active: activeQuickTag === tag.label }"
-            @tap="selectQuickTag(tag)"
-          >
-            <text>{{ tag.label }}</text>
-          </view>
-        </view>
-
-        <!-- 日期范围 -->
-        <view class="date-range-row">
-          <view class="date-range-item">
-            <text class="date-range-label">开始日期</text>
-            <picker mode="date" :value="pickerStartDate" @change="onStartDateChange">
-              <view class="date-range-display">{{ pickerStartDate }}</view>
-            </picker>
-          </view>
-          <text class="date-range-sep">~</text>
-          <view class="date-range-item">
-            <text class="date-range-label">结束日期</text>
-            <picker mode="date" :value="pickerEndDate" @change="onEndDateChange">
-              <view class="date-range-display">{{ pickerEndDate }}</view>
-            </picker>
-          </view>
-        </view>
-
-        <view class="date-picker-actions">
-          <view class="date-picker-btn secondary" @tap="clearDateFilter">
-            <text>清空筛选</text>
-          </view>
-          <view class="date-picker-btn primary" @tap="confirmDateRange">
-            <text>确定</text>
-          </view>
-        </view>
-      </view>
-    </view>
   </view>
 </template>
 
@@ -145,6 +103,7 @@ import { useAppStore } from '@/stores/app'
 import { formatAmount, formatDate, getToday } from '@/utils/format'
 import SegmentedControl from '@/components/SegmentedControl.vue'
 import RecordSheet from '@/components/RecordSheet.vue'
+import DateRangePicker from '@/components/DateRangePicker.vue'
 import type { Transaction } from '@/types/transaction'
 
 const transactionStore = useTransactionStore()
@@ -154,14 +113,6 @@ const appStore = useAppStore()
 
 /** URL 参数中的日期筛选（单日期或 start,end 范围） */
 const filterDate = ref('')
-/** 日期选择弹窗显示 */
-const showDatePicker = ref(false)
-/** 开始日期 */
-const pickerStartDate = ref(getToday())
-/** 结束日期 */
-const pickerEndDate = ref(getToday())
-/** 当前选中的快捷标签 */
-const activeQuickTag = ref('')
 /** 高亮交易ID */
 const highlightId = ref('')
 /** 当前左滑展开的交易ID */
@@ -314,92 +265,6 @@ function formatDaySummary(group: DayGroup): string {
   return parts.join(' · ') || '暂无数据'
 }
 
-/** 打开日期范围选择弹窗 */
-function openDatePicker() {
-  const today = getToday()
-  if (filterDate.value) {
-    if (filterDate.value.includes(',')) {
-      const [start, end] = filterDate.value.split(',')
-      pickerStartDate.value = start
-      pickerEndDate.value = end
-    } else {
-      pickerStartDate.value = filterDate.value
-      pickerEndDate.value = filterDate.value
-    }
-  } else {
-    pickerStartDate.value = today
-    pickerEndDate.value = today
-  }
-  activeQuickTag.value = ''
-  showDatePicker.value = true
-}
-
-/** 快捷日期标签 */
-interface QuickTag {
-  label: string
-  getValue: () => string
-}
-const quickDateTags: QuickTag[] = [
-  {
-    label: '今天',
-    getValue: () => {
-      const t = getToday()
-      return `${t},${t}`
-    },
-  },
-  {
-    label: '昨天',
-    getValue: () => {
-      const t = getToday()
-      const d = new Date(t)
-      d.setDate(d.getDate() - 1)
-      const y = d.toISOString().slice(0, 10)
-      return `${y},${y}`
-    },
-  },
-  {
-    label: '近7天',
-    getValue: () => {
-      const t = getToday()
-      const d = new Date(t)
-      d.setDate(d.getDate() - 6)
-      return `${d.toISOString().slice(0, 10)},${t}`
-    },
-  },
-  {
-    label: '近30天',
-    getValue: () => {
-      const t = getToday()
-      const d = new Date(t)
-      d.setDate(d.getDate() - 29)
-      return `${d.toISOString().slice(0, 10)},${t}`
-    },
-  },
-  {
-    label: '本月',
-    getValue: () => {
-      const t = getToday()
-      return `${t.slice(0, 7)}-01,${t}`
-    },
-  },
-]
-
-/** 选择快捷标签 */
-function selectQuickTag(tag: QuickTag) {
-  activeQuickTag.value = tag.label
-  const range = tag.getValue()
-  const [start, end] = range.split(',')
-  pickerStartDate.value = start
-  pickerEndDate.value = end
-}
-
-/** 清空日期筛选 */
-function clearDateFilter() {
-  filterDate.value = ''
-  activeQuickTag.value = ''
-  showDatePicker.value = false
-}
-
 /** 当前日期筛选标签 */
 const filterDateLabel = computed(() => {
   if (!filterDate.value) return ''
@@ -425,32 +290,6 @@ const filterDateLabel = computed(() => {
   }
   return filterDate.value
 })
-
-/** 开始日期变更 */
-function onStartDateChange(e: any) {
-  if (e.detail?.value) {
-    pickerStartDate.value = e.detail.value
-    activeQuickTag.value = ''
-  }
-}
-
-/** 结束日期变更 */
-function onEndDateChange(e: any) {
-  if (e.detail?.value) {
-    pickerEndDate.value = e.detail.value
-    activeQuickTag.value = ''
-  }
-}
-
-/** 确认日期范围 */
-function confirmDateRange() {
-  if (pickerStartDate.value === pickerEndDate.value) {
-    filterDate.value = pickerStartDate.value
-  } else {
-    filterDate.value = `${pickerStartDate.value},${pickerEndDate.value}`
-  }
-  showDatePicker.value = false
-}
 
 /** 点击删除按钮 */
 function onDeleteTap(tx: Transaction) {
@@ -836,127 +675,5 @@ function onLongPressTransaction(tx: Transaction) {
   display: block;
 }
 
-/* 日期选择弹窗 */
-.date-picker-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 200;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
 
-.date-picker-card {
-  width: 100%;
-  max-width: 430px;
-  max-height: 85vh;
-  overflow-y: auto;
-  background: $surface;
-  border-radius: $radius-lg $radius-lg 0 0;
-  padding: 24px;
-  padding-bottom: 40px;
-  animation: slideUp 0.25s ease;
-}
-
-.date-picker-title {
-  @include text-h2;
-  display: block;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-/* 快捷标签 */
-.date-quick-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-
-.date-quick-tag {
-  padding: 6px 14px;
-  border-radius: $radius-full;
-  background: $bg-primary;
-  border: 1px solid $border;
-  cursor: pointer;
-  @include text-small;
-  color: $text-secondary;
-
-  &.active {
-    background: $brand-50;
-    border-color: $brand-500;
-    color: $brand-600;
-    font-weight: 600;
-  }
-}
-
-/* 日期范围 */
-.date-range-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.date-range-item {
-  flex: 1;
-}
-
-.date-range-label {
-  @include text-caption;
-  color: $text-secondary;
-  display: block;
-  margin-bottom: 6px;
-}
-
-.date-range-display {
-  height: 48px;
-  background: $bg-primary;
-  border-radius: $radius-sm;
-  border: 1px solid $border;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  @include text-body;
-  color: $text-primary;
-}
-
-.date-range-sep {
-  @include text-body;
-  color: $text-tertiary;
-  padding-bottom: 12px;
-}
-
-.date-picker-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.date-picker-btn {
-  flex: 1;
-  padding: 14px;
-  border-radius: $radius-sm;
-  text-align: center;
-  cursor: pointer;
-
-  &.primary {
-    background: $gradient-brand;
-    box-shadow: $shadow-brand;
-    color: white;
-    font-weight: 700;
-  }
-
-  &.secondary {
-    background: $bg-primary;
-    border: 1px solid $border;
-    color: $text-secondary;
-    font-weight: 700;
-  }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
 </style>

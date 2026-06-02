@@ -521,14 +521,17 @@
 
 ## [F-035] 收支报表 - 时间周期选择 ← [R-035]
 
-**状态**: 已完成  **实现时间**: 2026-05-28 00:00:00
+**状态**: 已完成  **实现时间**: 2026-05-28  **最后更新**: 2026-06-02（新增自定义周期）
 
 **实现方式**:
-- SegmentedControl 切换：本周/本月/本季/本年
-- `filteredTransactions` computed 动态过滤
+- Chip 标签栏：本周/本月/本季/本年/自定义
+- 前四项固定周期，通过 `switch` 计算日期范围后过滤交易
+- **自定义**：点击打开 `DateRangePicker`，选择任意日期范围
+- 自定义范围 ≤ 31 天：折线图按天显示（稀疏标签）；> 31 天：按月聚合
 
 **关联文件**:
 - `src/pages/report/report.vue`
+- `src/components/DateRangePicker.vue`
 - `src/stores/transaction.ts`
 
 ---
@@ -1050,16 +1053,18 @@
 
 ## [F-074] 我的/设置 - 账户管理 ← [R-074]
 
-**状态**: 已完成  **实现时间**: 2026-05-29 00:00:00
+**状态**: 已完成  **实现时间**: 2026-05-29  **最后更新**: 2026-06-02（图标改用 EmojiGrid）
 
 **实现方式**:
 - 展示账户列表（图标、名称、类型/银行、余额）
 - 点击账户项打开编辑弹窗（修改名称/类型/银行/图标）
 - 左滑弹出删除确认
 - 底部「+ 添加账户」按钮打开新增弹窗
+- 图标选择使用 `EmojiGrid` 组件（与分类管理统一）
 
 **关联文件**:
 - `src/pages/settings/index.vue`
+- `src/components/EmojiGrid.vue`
 - `src/stores/account.ts`
 
 ---
@@ -1345,6 +1350,32 @@
 
 ---
 
-*文档版本：v3.0*
-*更新时间：2026-05-29 11:11:19*
+## [F-099] 组件 - DateRangePicker ← [R-040]
+
+**状态**: 已完成  **实现时间**: 2026-06-02 10:33:56
+
+**实现方式**:
+- 从 `detail.vue` 提取的日期范围选择弹窗，封装为通用组件
+- 支持 slot 触发（包裹任意元素点击即打开）
+- 内置 5 个快捷标签：今天/昨天/近7天/近30天/本月
+- 双 `picker mode="date"` 选择开始/结束日期
+- 支持 `v-model` 绑定（单日期或范围字符串）
+- 暴露 `open()` / `close()` 方法供父组件调用
+- 已应用于：`detail.vue`（日期筛选）、`report.vue`（自定义周期）
+
+**Props**:
+- `modelValue`: string — 当前值（`YYYY-MM-DD` 或 `YYYY-MM-DD,YYYY-MM-DD`）
+
+**Emits**:
+- `update:modelValue`: 值变更
+- `confirm`: 用户点击确定
+- `clear`: 用户点击清空筛选
+
+**关联文件**:
+- `src/components/DateRangePicker.vue`
+
+---
+
+*文档版本：v3.2*
+*更新时间：2026-06-02 10:33:56*
 *格式说明：每个功能按 [F-xxx] 编号，与 requirements.md 的 [R-xxx] 一一对应*

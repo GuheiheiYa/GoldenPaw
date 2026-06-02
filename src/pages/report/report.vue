@@ -15,10 +15,15 @@
         :key="period"
         class="period-chip"
         :class="{ active: activePeriod === period }"
-        @tap="activePeriod = period"
+        @tap="onPeriodTap(period)"
       >
         <text class="period-chip-text">{{ period }}</text>
       </view>
+      <DateRangePicker
+        ref="customDatePicker"
+        v-model="customRange"
+        @confirm="onCustomRangeConfirm"
+      />
     </view>
 
     <!-- 收支汇总 -->
@@ -112,6 +117,7 @@ import { useCategoryStore } from '@/stores/category'
 import { formatAmount, getToday } from '@/utils/format'
 import type { Transaction } from '@/types/transaction'
 import LineChart from '@/components/LineChart.vue'
+import DateRangePicker from '@/components/DateRangePicker.vue'
 
 const txStore = useTransactionStore()
 const catStore = useCategoryStore()
@@ -125,7 +131,28 @@ function goBack() {
 const activePeriod = ref('本月')
 
 /** 可选时间周期 */
-const periods = ['本周', '本月', '本季', '本年']
+const periods = ['本周', '本月', '本季', '本年', '自定义']
+
+/** 自定义日期范围 */
+const customRange = ref('')
+
+/** 自定义日期选择器引用 */
+const customDatePicker = ref<InstanceType<typeof DateRangePicker>>()
+
+/** 点击周期芯片 */
+function onPeriodTap(period: string) {
+  if (period === '自定义') {
+    customDatePicker.value?.open()
+  } else {
+    activePeriod.value = period
+  }
+}
+
+/** 自定义范围确认 */
+function onCustomRangeConfirm(value: string) {
+  customRange.value = value
+  activePeriod.value = '自定义'
+}
 
 /** 饼图标签切换 */
 const pieTab = ref<'支出' | '收入'>('支出')
@@ -243,6 +270,40 @@ const lineChartData = computed(() => {
         const val = monthTxs.reduce((s, t) => s + t.amount, 0)
         labels.push(`${i + 1}月`)
         values.push(val)
+      }
+      break
+    }
+    case '自定义': {
+      if (!customRange.value) break
+      const [start, end] = customRange.value.split(',')
+      const days = getDaysDiff(start, end)
+      if (days <= 31) {
+        // 按天显示
+        for (let i = 0; i <= days; i++) {
+          const d = new Date(start)
+          d.setDate(d.getDate() + i)
+          const dateStr = d.toISOString().slice(0, 10)
+          const dayTxs = txs.filter(t => t.date === dateStr && t.type === typeFilter)
+          const val = dayTxs.reduce((s, t) => s + t.amount, 0)
+          // 稀疏标签：只显示每隔5天和首尾
+          const showLabel = i % 5 === 0 || i === days
+          const label = showLabel ? `${d.getMonth() + 1}/${d.getDate()}` : ''
+          labels.push(label)
+          values.push(val)
+        }
+      } else {
+        // 按月聚合
+        const startDate = new Date(start)
+        const endDate = new Date(end)
+        let cur = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
+        while (cur <= endDate) {
+          const monthStr = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}`
+          const monthTxs = txs.filter(t => t.date.startsWith(monthStr) && t.type === typeFilter)
+          const val = monthTxs.reduce((s, t) => s + t.amount, 0)
+          labels.push(`${cur.getMonth() + 1}月`)
+          values.push(val)
+          cur.setMonth(cur.getMonth() + 1)
+        }
       }
       break
     }
