@@ -3,6 +3,10 @@ import { onLaunch, onShow } from '@dcloudio/uni-app'
 import { ref, watch } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { seedAllStores } from '@/mock/seed'
+import { useRecurringStore } from '@/stores/recurring'
+import { useTransactionStore } from '@/stores/transaction'
+import { useAccountStore } from '@/stores/account'
+import { getCurrentTime } from '@/utils/format'
 
 const appStore = useAppStore()
 const locked = ref(false)
@@ -11,6 +15,9 @@ const lockInput = ref('')
 onLaunch(() => {
   console.log('GoldenPaw App Launched')
   seedAllStores()
+
+  // 执行到期的定期交易
+  executeRecurringTransactions()
 
   // #ifdef H5
   if (typeof document !== 'undefined') {
@@ -80,6 +87,46 @@ function onLockConfirm() {
   } else {
     uni.showToast({ title: '密码错误', icon: 'none' })
     lockInput.value = ''
+  }
+}
+
+/** 执行到期的定期交易 */
+function executeRecurringTransactions() {
+  const recurringStore = useRecurringStore()
+  const txStore = useTransactionStore()
+  const accStore = useAccountStore()
+  const dueRules = recurringStore.getDueRules()
+
+  if (dueRules.length === 0) return
+
+  let executed = 0
+  for (const rule of dueRules) {
+    // 创建交易记录
+    txStore.addTransaction({
+      type: rule.type,
+      amount: rule.amount,
+      categoryId: rule.categoryId,
+      accountId: rule.accountId,
+      note: `[定期] ${rule.name}${rule.note ? ' - ' + rule.note : ''}`,
+      date: rule.nextDate,
+      time: getCurrentTime(),
+      tags: rule.tags,
+    })
+
+    // 更新账户余额
+    if (rule.type === 'expense') {
+      accStore.updateBalance(rule.accountId, -rule.amount)
+    } else if (rule.type === 'income') {
+      accStore.updateBalance(rule.accountId, rule.amount)
+    }
+
+    // 推进下次执行日期
+    recurringStore.advanceNextDate(rule.id)
+    executed++
+  }
+
+  if (executed > 0) {
+    console.log(`[Recurring] 自动执行了 ${executed} 条定期交易`)
   }
 }
 </script>

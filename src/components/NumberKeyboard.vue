@@ -11,7 +11,7 @@
         <text class="key-text">9</text>
       </view>
       <view class="key key-func" @tap="onBackspace">
-        <uni-icons class="key-text" type="arrow-left" size="18" color="#fff" />
+        <text class="key-text" style="color:#fff;font-size:16px;">⌫</text>
       </view>
     </view>
     <view class="keyboard-row">

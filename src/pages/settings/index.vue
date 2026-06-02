@@ -187,6 +187,155 @@
         </view>
       </template>
 
+      <!-- 定期记账 -->
+      <template v-else-if="type === 'recurring'">
+        <view v-if="recurringStore.rules.length === 0" class="empty-tip">
+          <text class="empty-tip-icon">🔄</text>
+          <text class="empty-tip-title">暂无定期记账规则</text>
+          <text class="empty-tip-desc">设置后系统会在指定日期自动创建交易记录</text>
+        </view>
+        <view class="recurring-list">
+          <view
+            class="recurring-item"
+            v-for="rule in recurringStore.rules"
+            :key="rule.id"
+            :class="{ disabled: !rule.enabled }"
+          >
+            <view class="recurring-main">
+              <view class="recurring-info">
+                <text class="recurring-name">{{ rule.name }}</text>
+                <text class="recurring-meta">{{ formatAmount(rule.amount) }} · {{ cycleLabel(rule.cycle) }} · 下次 {{ rule.nextDate }}</text>
+              </view>
+              <view class="toggle" :class="{ on: rule.enabled }" @tap="recurringStore.toggleEnabled(rule.id)">
+                <view class="toggle-knob"></view>
+              </view>
+            </view>
+            <view class="recurring-actions">
+              <view class="recurring-action-btn" @tap="openRecurringModal(rule)">
+                <text>编辑</text>
+              </view>
+              <view class="recurring-action-btn danger" @tap="deleteRecurring(rule.id)">
+                <text>删除</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="add-btn" @tap="openRecurringModal()">
+          <text class="add-btn-text">+ 添加定期记账</text>
+        </view>
+
+        <!-- 添加/编辑弹窗 -->
+        <view class="modal-overlay" v-if="showRecurringModal" @tap="closeRecurringModal">
+          <view class="modal-card" @tap.stop>
+            <text class="modal-title">{{ editingRecurringId ? '编辑定期记账' : '添加定期记账' }}</text>
+            <view class="modal-field">
+              <text class="modal-label">名称</text>
+              <input class="modal-input" v-model="recurringForm.name" placeholder="例如：车贷、房租" />
+            </view>
+            <view class="modal-field">
+              <text class="modal-label">金额（元）</text>
+              <input class="modal-input" v-model="recurringForm.amount" type="digit" placeholder="0.00" />
+            </view>
+            <view class="modal-field">
+              <text class="modal-label">类型</text>
+              <view class="modal-options">
+                <view class="modal-option" :class="{ active: recurringForm.type === 'expense' }" @tap="recurringForm.type = 'expense'">支出</view>
+                <view class="modal-option" :class="{ active: recurringForm.type === 'income' }" @tap="recurringForm.type = 'income'">收入</view>
+              </view>
+            </view>
+            <view class="modal-field">
+              <text class="modal-label">周期</text>
+              <view class="modal-options">
+                <view class="modal-option" :class="{ active: recurringForm.cycle === 'daily' }" @tap="recurringForm.cycle = 'daily'">每天</view>
+                <view class="modal-option" :class="{ active: recurringForm.cycle === 'weekly' }" @tap="recurringForm.cycle = 'weekly'">每周</view>
+                <view class="modal-option" :class="{ active: recurringForm.cycle === 'monthly' }" @tap="recurringForm.cycle = 'monthly'">每月</view>
+                <view class="modal-option" :class="{ active: recurringForm.cycle === 'yearly' }" @tap="recurringForm.cycle = 'yearly'">每年</view>
+              </view>
+            </view>
+            <view class="modal-field" v-if="recurringForm.cycle === 'monthly'">
+              <text class="modal-label">每月几号</text>
+              <input class="modal-input" v-model.number="recurringForm.dayOfMonth" type="number" placeholder="1-31" />
+            </view>
+            <view class="modal-field">
+              <text class="modal-label">分类</text>
+              <view class="modal-select" @tap="showRecurringCategoryModal = true">
+                <text>{{ getCategoryName(recurringForm.categoryId) || '请选择分类' }}</text>
+              </view>
+            </view>
+            <view class="modal-field">
+              <text class="modal-label">账户</text>
+              <view class="modal-select" @tap="showRecurringAccountModal = true">
+                <text>{{ getAccountName(recurringForm.accountId) || '请选择账户' }}</text>
+              </view>
+            </view>
+            <view class="modal-field">
+              <text class="modal-label">首次执行日期</text>
+              <picker mode="date" :value="recurringForm.nextDate" @change="onRecurringDateChange">
+                <view class="modal-select">{{ recurringForm.nextDate }}</view>
+              </picker>
+            </view>
+            <view class="modal-actions">
+              <view class="modal-btn secondary" @tap="closeRecurringModal">
+                <text>取消</text>
+              </view>
+              <view class="modal-btn primary" @tap="confirmRecurring">
+                <text>确定</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 分类选择弹窗 -->
+        <view class="modal-overlay" v-if="showRecurringCategoryModal" @tap="showRecurringCategoryModal = false">
+          <view class="modal-card category-modal-card" @tap.stop>
+            <text class="modal-title">选择分类</text>
+            <view class="category-list">
+              <view
+                class="category-item"
+                :class="{ active: recurringForm.categoryId === cat.id }"
+                v-for="cat in categoryStore.getCategoriesByType(recurringForm.type === 'income' ? 'income' : 'expense')"
+                :key="cat.id"
+                @tap="recurringForm.categoryId = cat.id; showRecurringCategoryModal = false"
+              >
+                <text class="category-icon">{{ cat.icon }}</text>
+                <text class="category-name">{{ cat.name }}</text>
+                <text v-if="recurringForm.categoryId === cat.id" class="category-check">✓</text>
+              </view>
+            </view>
+            <view class="modal-actions">
+              <view class="modal-btn secondary" @tap="showRecurringCategoryModal = false">
+                <text>取消</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 账户选择弹窗 -->
+        <view class="modal-overlay" v-if="showRecurringAccountModal" @tap="showRecurringAccountModal = false">
+          <view class="modal-card category-modal-card" @tap.stop>
+            <text class="modal-title">选择账户</text>
+            <view class="category-list">
+              <view
+                class="category-item"
+                :class="{ active: recurringForm.accountId === acc.id }"
+                v-for="acc in accountStore.accounts"
+                :key="acc.id"
+                @tap="recurringForm.accountId = acc.id; showRecurringAccountModal = false"
+              >
+                <text class="category-icon">{{ acc.icon }}</text>
+                <text class="category-name">{{ acc.name }}</text>
+                <text v-if="recurringForm.accountId === acc.id" class="category-check">✓</text>
+              </view>
+            </view>
+            <view class="modal-actions">
+              <view class="modal-btn secondary" @tap="showRecurringAccountModal = false">
+                <text>取消</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </template>
+
       <!-- 数据导出 -->
       <template v-else-if="type === 'export'">
         <view class="setting-list">
@@ -367,15 +516,17 @@ import { useCategoryStore } from '@/stores/category'
 import { useAccountStore } from '@/stores/account'
 import { useTransactionStore } from '@/stores/transaction'
 import { useAppStore, type CycleType } from '@/stores/app'
-import { formatAmount } from '@/utils/format'
+import { useRecurringStore } from '@/stores/recurring'
+import { formatAmount, getToday } from '@/utils/format'
 import { parseAndImportCsv } from '@/utils/csvImport'
 import EmojiGrid from '@/components/EmojiGrid.vue'
-import type { Account } from '@/types/transaction'
+import type { Account, RecurringCycle } from '@/types/transaction'
 
 const categoryStore = useCategoryStore()
 const accountStore = useAccountStore()
 const transactionStore = useTransactionStore()
 const appStore = useAppStore()
+const recurringStore = useRecurringStore()
 
 const type = ref('')
 
@@ -453,6 +604,7 @@ const pageTitle = computed(() => {
     security: '密码/指纹锁',
     currency: '币种设置',
     cycle: '记账周期',
+    recurring: '定期记账',
     export: '导出数据',
     import: '导入数据',
     sync: '云同步',
@@ -906,6 +1058,143 @@ function onClearData() {
     }
   })
 }
+
+/* ===== 定期记账 ===== */
+const showRecurringModal = ref(false)
+const editingRecurringId = ref('')
+const showRecurringCategoryModal = ref(false)
+const showRecurringAccountModal = ref(false)
+const recurringForm = ref({
+  name: '',
+  amount: '',
+  type: 'expense' as 'expense' | 'income',
+  cycle: 'monthly' as RecurringCycle,
+  dayOfMonth: 1,
+  categoryId: '',
+  accountId: '',
+  nextDate: getToday(),
+})
+
+function cycleLabel(cycle: RecurringCycle): string {
+  const map: Record<string, string> = { daily: '每天', weekly: '每周', monthly: '每月', yearly: '每年' }
+  return map[cycle] || cycle
+}
+
+function getCategoryName(id: string): string {
+  return categoryStore.getCategoryById(id)?.name || ''
+}
+
+function getAccountName(id: string): string {
+  return accountStore.getAccountById(id)?.name || ''
+}
+
+function openRecurringModal(rule?: any) {
+  if (rule) {
+    editingRecurringId.value = rule.id
+    recurringForm.value = {
+      name: rule.name,
+      amount: (rule.amount / 100).toFixed(2),
+      type: rule.type,
+      cycle: rule.cycle,
+      dayOfMonth: rule.dayOfMonth,
+      categoryId: rule.categoryId,
+      accountId: rule.accountId,
+      nextDate: rule.nextDate,
+    }
+  } else {
+    editingRecurringId.value = ''
+    recurringForm.value = {
+      name: '',
+      amount: '',
+      type: 'expense',
+      cycle: 'monthly',
+      dayOfMonth: 1,
+      categoryId: '',
+      accountId: '',
+      nextDate: getToday(),
+    }
+  }
+  showRecurringModal.value = true
+}
+
+function closeRecurringModal() {
+  showRecurringModal.value = false
+  showRecurringCategoryModal.value = false
+  showRecurringAccountModal.value = false
+  editingRecurringId.value = ''
+}
+
+function confirmRecurring() {
+  const amountYuan = parseFloat(recurringForm.value.amount)
+  if (!amountYuan || amountYuan <= 0) {
+    uni.showToast({ title: '请输入有效金额', icon: 'none' })
+    return
+  }
+  if (!recurringForm.value.name.trim()) {
+    uni.showToast({ title: '请输入名称', icon: 'none' })
+    return
+  }
+  if (!recurringForm.value.categoryId) {
+    uni.showToast({ title: '请选择分类', icon: 'none' })
+    return
+  }
+  if (!recurringForm.value.accountId) {
+    uni.showToast({ title: '请选择账户', icon: 'none' })
+    return
+  }
+
+  const amountCents = Math.round(amountYuan * 100)
+
+  if (editingRecurringId.value) {
+    recurringStore.updateRule(editingRecurringId.value, {
+      name: recurringForm.value.name.trim(),
+      amount: amountCents,
+      type: recurringForm.value.type,
+      cycle: recurringForm.value.cycle,
+      dayOfMonth: recurringForm.value.dayOfMonth,
+      categoryId: recurringForm.value.categoryId,
+      accountId: recurringForm.value.accountId,
+      nextDate: recurringForm.value.nextDate,
+    })
+    uni.showToast({ title: '修改成功', icon: 'success' })
+  } else {
+    recurringStore.addRule({
+      name: recurringForm.value.name.trim(),
+      amount: amountCents,
+      type: recurringForm.value.type,
+      cycle: recurringForm.value.cycle,
+      dayOfMonth: recurringForm.value.dayOfMonth,
+      categoryId: recurringForm.value.categoryId,
+      accountId: recurringForm.value.accountId,
+      nextDate: recurringForm.value.nextDate,
+      enabled: true,
+      note: '',
+      tags: [],
+    })
+    uni.showToast({ title: '添加成功', icon: 'success' })
+  }
+  closeRecurringModal()
+}
+
+function onRecurringDateChange(e: any) {
+  if (e.detail?.value) {
+    recurringForm.value.nextDate = e.detail.value
+  }
+}
+
+function deleteRecurring(id: string) {
+  uni.showModal({
+    title: '删除规则',
+    content: '确定删除这条定期记账规则吗？',
+    confirmColor: '#C06C5F',
+    success: (res) => {
+      if (res.confirm) {
+        recurringStore.deleteRule(id)
+        uni.showToast({ title: '已删除', icon: 'success' })
+      }
+    },
+  })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -1315,5 +1604,116 @@ function onClearData() {
   }
 }
 
+/* 定期记账 */
+.empty-tip {
+  text-align: center;
+  padding: 60px 24px;
+}
+
+.empty-tip-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.empty-tip-title {
+  @include text-h3;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.empty-tip-desc {
+  @include text-body;
+  color: $text-secondary;
+  display: block;
+}
+
+.recurring-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 24px;
+  margin-bottom: 16px;
+}
+
+.recurring-item {
+  background: $surface;
+  border-radius: $radius-lg;
+  padding: 16px;
+  border: 1px solid $border;
+  box-shadow: $shadow-sm;
+
+  &.disabled {
+    opacity: 0.6;
+  }
+}
+
+.recurring-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.recurring-info {
+  flex: 1;
+}
+
+.recurring-name {
+  @include text-body;
+  font-weight: 700;
+  color: $text-primary;
+  display: block;
+}
+
+.recurring-meta {
+  @include text-small;
+  color: $text-secondary;
+  display: block;
+  margin-top: 4px;
+}
+
+.recurring-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.recurring-action-btn {
+  flex: 1;
+  padding: 8px;
+  border-radius: $radius-sm;
+  background: $bg-primary;
+  border: 1px solid $border;
+  text-align: center;
+  cursor: pointer;
+  @include text-small;
+  color: $text-secondary;
+
+  &.danger {
+    color: $danger-500;
+  }
+}
+
+.modal-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.modal-option {
+  padding: 8px 16px;
+  border-radius: $radius-full;
+  background: $bg-primary;
+  border: 1px solid $border;
+  cursor: pointer;
+  @include text-small;
+  color: $text-secondary;
+
+  &.active {
+    background: $gradient-brand;
+    color: white;
+    border-color: transparent;
+  }
+}
 
 </style>

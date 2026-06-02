@@ -26,17 +26,17 @@
 
       <!-- 附加信息行 -->
       <view class="info-row">
-        <picker class="info-item" mode="date" :value="selectedDate" @change="onDateChange">
+        <view class="info-item" @tap="showDateModal = true">
           <text class="info-icon">📅</text>
           <text class="info-text">{{ displayDate }}</text>
-        </picker>
-        <view class="info-item" @tap="onAccountTap">
+        </view>
+        <view class="info-item" @tap="showAccountModal = true">
           <text class="info-icon">💳</text>
-          <text class="info-text">{{ currentAccountName }}</text>
+          <text class="info-text" :class="{ 'text-placeholder': !selectedAccountId }">{{ currentAccountName }}</text>
         </view>
         <view class="info-item" @tap="onTagTap">
           <text class="info-icon">🏷️</text>
-          <text class="info-text">{{ selectedTags.length > 0 ? selectedTags.join(' ') : '标签' }}</text>
+          <text class="info-text" :class="{ 'text-placeholder': selectedTags.length === 0 }">{{ selectedTags.length > 0 ? selectedTags.join(' ') : '标签' }}</text>
         </view>
       </view>
 
@@ -67,6 +67,53 @@
         v-model="amountStr"
         @confirm="onConfirm"
       />
+
+      <!-- 标签选择弹窗 -->
+      <!-- 日期选择弹窗 -->
+      <view v-if="showDateModal" class="picker-modal-overlay" @tap="showDateModal = false">
+        <view class="picker-modal" @tap.stop>
+          <text class="picker-modal-title">选择日期</text>
+          <picker mode="date" :value="selectedDate" @change="onDateChange">
+            <view class="picker-display">{{ selectedDate }}</view>
+          </picker>
+          <view class="picker-actions">
+            <view class="picker-btn secondary" @tap="showDateModal = false">
+              <text>取消</text>
+            </view>
+            <view class="picker-btn primary" @tap="showDateModal = false">
+              <text>确定</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 账户选择弹窗 -->
+      <view v-if="showAccountModal" class="picker-modal-overlay" @tap="showAccountModal = false">
+        <view class="picker-modal" @tap.stop>
+          <text class="picker-modal-title">选择账户</text>
+          <view class="account-list">
+            <view
+              class="account-item"
+              :class="{ active: selectedAccountId === acc.id }"
+              v-for="acc in accountStore.accounts"
+              :key="acc.id"
+              @tap="selectAccount(acc.id)"
+            >
+              <text class="account-icon">{{ acc.icon }}</text>
+              <text class="account-name">{{ acc.name }}</text>
+              <text v-if="selectedAccountId === acc.id" class="account-check">✓</text>
+            </view>
+            <view v-if="accountStore.accounts.length === 0" class="account-empty">
+              <text>暂无账户，请先添加</text>
+            </view>
+          </view>
+          <view class="picker-actions">
+            <view class="picker-btn secondary" @tap="showAccountModal = false">
+              <text>取消</text>
+            </view>
+          </view>
+        </view>
+      </view>
 
       <!-- 标签选择弹窗 -->
       <view v-if="showTagModal" class="tag-modal-overlay" @tap="closeTagModal">
@@ -125,6 +172,8 @@ const selectedDate = ref(getToday())
 const selectedAccountId = ref('')
 const selectedTags = ref<string[]>([])
 const showTagModal = ref(false)
+const showDateModal = ref(false)
+const showAccountModal = ref(false)
 
 const presetTags = ['工作', '生活', '旅行', '餐饮', '娱乐', '学习', '家庭', '健康', '购物', '投资']
 
@@ -222,23 +271,14 @@ function onOverlayTap() {
 function onDateChange(e: any) {
   if (e.detail && e.detail.value) {
     selectedDate.value = e.detail.value
+    showDateModal.value = false
   }
 }
 
-/** 点击账户 */
-function onAccountTap() {
-  const accounts = accountStore.accounts
-  if (accounts.length === 0) {
-    uni.showToast({ title: '请先添加账户', icon: 'none' })
-    return
-  }
-  const names = accounts.map(a => `${a.icon} ${a.name}`)
-  uni.showActionSheet({
-    itemList: names,
-    success: (res) => {
-      selectedAccountId.value = accounts[res.tapIndex].id
-    }
-  })
+/** 选择账户 */
+function selectAccount(id: string) {
+  selectedAccountId.value = id
+  showAccountModal.value = false
 }
 
 /** 点击标签 */
@@ -430,6 +470,126 @@ function resetForm() {
 .info-text {
   font: 600 13px/1.4 $font-sans;
   color: $text-secondary;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &.text-placeholder {
+    color: $text-placeholder;
+  }
+}
+
+/* 选择弹窗统一风格 */
+.picker-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.picker-modal {
+  width: 100%;
+  max-width: 430px;
+  background: $surface;
+  border-radius: $radius-lg $radius-lg 0 0;
+  padding: $space-5 $space-5 40px;
+}
+
+.picker-modal-title {
+  @include text-h3;
+  display: block;
+  text-align: center;
+  margin-bottom: $space-4;
+}
+
+.picker-display {
+  height: 48px;
+  background: $bg-primary;
+  border-radius: $radius-sm;
+  border: 1px solid $border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  @include text-body;
+  color: $text-primary;
+  margin-bottom: $space-4;
+}
+
+.account-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  margin-bottom: $space-4;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.account-item {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-3 $space-4;
+  border-radius: $radius-sm;
+  background: $bg-primary;
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:active,
+  &.active {
+    background: $brand-50;
+    border: 1px solid $brand-200;
+  }
+}
+
+.account-icon {
+  font-size: 20px;
+}
+
+.account-name {
+  flex: 1;
+  @include text-body;
+  color: $text-primary;
+}
+
+.account-check {
+  color: $brand-500;
+  font-weight: 700;
+}
+
+.account-empty {
+  text-align: center;
+  padding: $space-6;
+  @include text-body;
+  color: $text-secondary;
+}
+
+.picker-actions {
+  display: flex;
+  gap: $space-3;
+}
+
+.picker-btn {
+  flex: 1;
+  padding: $space-3;
+  border-radius: $radius-lg;
+  text-align: center;
+  @include text-body;
+  font-weight: 700;
+  cursor: pointer;
+
+  &.secondary {
+    background: $bg-primary;
+    color: $text-secondary;
+  }
+
+  &.primary {
+    background: $gradient-brand;
+    color: white;
+  }
 }
 
 .note-row {

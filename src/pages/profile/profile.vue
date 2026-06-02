@@ -147,6 +147,7 @@ const menuTypeMap: Record<string, string> = {
   '导入数据': 'import',
   '云同步': 'sync',
   '清空数据': 'clear',
+  '定期记账': 'recurring',
   '主题颜色': 'theme',
   '提醒设置': 'reminder',
   '密码/指纹锁': 'security',
@@ -207,6 +208,7 @@ const basicMenus = [
   { icon: '💳', name: '账户管理', desc: '管理资产账户', iconClass: 'blue' },
   { icon: '💰', name: '币种设置', desc: 'CNY（人民币）', iconClass: 'green' },
   { icon: '📅', name: '记账周期', desc: '自然月', iconClass: 'gray' },
+  { icon: '🔄', name: '定期记账', desc: '自动记账规则', iconClass: 'accent' },
 ]
 
 /** 关于菜单 */

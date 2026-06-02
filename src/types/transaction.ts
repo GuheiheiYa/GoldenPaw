@@ -46,3 +46,31 @@ export interface Account {
   /** 余额（单位：分） */
   balance: number
 }
+
+/** 定期交易周期 */
+export type RecurringCycle = 'daily' | 'weekly' | 'monthly' | 'yearly'
+
+/** 定期交易规则 */
+export interface RecurringTransaction {
+  id: string
+  /** 名称，如"车贷" */
+  name: string
+  type: TransactionType
+  /** 金额（单位：分） */
+  amount: number
+  categoryId: string
+  accountId: string
+  /** 周期 */
+  cycle: RecurringCycle
+  /** 每月几号（1-31，monthly 时有效） */
+  dayOfMonth: number
+  /** 下次执行日期 YYYY-MM-DD */
+  nextDate: string
+  /** 是否启用 */
+  enabled: boolean
+  /** 备注 */
+  note: string
+  /** 标签 */
+  tags: string[]
+  createdAt: number
+}

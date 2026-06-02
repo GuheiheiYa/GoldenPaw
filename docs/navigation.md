@@ -77,6 +77,8 @@ GoldenPaw/
 │   │   ├── type=security            # 密码锁（设置/修改/关闭）
 │   │   ├── type=currency            # 币种设置（占位）
 │   │   ├── type=cycle               # 记账周期（自然月/工资/自定义）
+│   │   ├── type=recurring           # 定期记账（自动创建交易规则）
+│   │   ├── type=recurring           # 定期记账（自动创建交易规则）
 │   │   ├── type=export              # 导出数据（CSV导出）
 │   │   ├── type=import              # 导入数据（CSV 智能识别 GoldenPaw/微信/支付宝）
 │   │   ├── type=sync                # 云同步（占位）
@@ -143,6 +145,8 @@ GoldenPaw/
 │   │   └── actions: openRecordSheet, closeRecordSheet, setCurrentTab, editTransaction, clearEdit
 │   │
 │   ├── transaction.ts               # 交易记录 store（持久化）
+│   ├── recurring.ts                 # 定期交易 store（持久化）
+│   ├── recurring.ts                 # 定期交易 store（持久化）
 │   │   ├── state: transactions[]
 │   │   ├── actions: addTransaction, deleteTransaction, updateTransaction
 │   │   └── getters: monthlyExpense, monthlyIncome, monthlyBalance

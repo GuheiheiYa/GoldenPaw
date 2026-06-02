@@ -98,7 +98,9 @@
         </view>
         <view class="modal-field">
           <text class="modal-label">分类</text>
-          <input class="modal-input" v-model="editForm.category" placeholder="分类名称" />
+          <view class="modal-select" @tap="showCategoryModal = true">
+            <text>{{ editForm.category || '请选择分类' }}</text>
+          </view>
         </view>
         <view class="modal-actions">
           <view class="modal-btn secondary" @tap="closeEditModal">
@@ -106,6 +108,31 @@
           </view>
           <view class="modal-btn primary" @tap="confirmEdit">
             <text>确定</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 分类选择弹窗 -->
+    <view class="modal-overlay" v-if="showCategoryModal" @tap="showCategoryModal = false">
+      <view class="modal-card category-modal-card" @tap.stop>
+        <text class="modal-title">选择分类</text>
+        <view class="category-list">
+          <view
+            class="category-item"
+            :class="{ active: editForm.category === cat.name }"
+            v-for="cat in categoryStore.getCategoriesByType('expense')"
+            :key="cat.id"
+            @tap="selectCategory(cat.name)"
+          >
+            <text class="category-icon">{{ cat.icon }}</text>
+            <text class="category-name">{{ cat.name }}</text>
+            <text v-if="editForm.category === cat.name" class="category-check">✓</text>
+          </view>
+        </view>
+        <view class="modal-actions">
+          <view class="modal-btn secondary" @tap="showCategoryModal = false">
+            <text>取消</text>
           </view>
         </view>
       </view>
@@ -179,6 +206,7 @@ function onConfirm(id: number) {
 
 /** 编辑记录 */
 const showEditModal = ref(false)
+const showCategoryModal = ref(false)
 const editingItem = ref<any>(null)
 const editForm = ref({ amount: '', merchant: '', category: '' })
 
@@ -208,8 +236,14 @@ function confirmEdit() {
   editingItem.value = null
 }
 
+function selectCategory(name: string) {
+  editForm.value.category = name
+  showCategoryModal.value = false
+}
+
 function closeEditModal() {
   showEditModal.value = false
+  showCategoryModal.value = false
   editingItem.value = null
 }
 
@@ -646,6 +680,66 @@ const sourceList = reactive([
   &::placeholder {
     color: $text-placeholder;
   }
+}
+
+.modal-select {
+  width: 100%;
+  height: 48px;
+  background: $bg-primary;
+  border-radius: $radius-sm;
+  padding: 0 14px;
+  border: 1px solid $border;
+  display: flex;
+  align-items: center;
+  @include text-body;
+  color: $text-primary;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.category-modal-card {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: $radius-sm;
+  background: $bg-primary;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:active,
+  &.active {
+    background: $brand-50;
+    border: 1px solid $brand-200;
+  }
+}
+
+.category-icon {
+  font-size: 20px;
+}
+
+.category-name {
+  flex: 1;
+  @include text-body;
+}
+
+.category-check {
+  color: $brand-500;
+  font-weight: 700;
 }
 
 .modal-actions {
