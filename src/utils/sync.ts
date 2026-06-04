@@ -3,11 +3,10 @@
  * 通过 Supabase 实现多设备数据同步
  *
  * 同步策略：
- * - 每个 store 的数据独立存储为 JSON 快照
+ * - 所有 store 数据合成一条 JSON 快照
  * - 使用 syncKey 标识用户（存储在 appStore）
- * - 上传：将本地 store 数据序列化为 JSON，upsert 到云端
+ * - 上传：将本地全部数据序列化为 JSON，upsert 到云端
  * - 下载：从云端读取 JSON，反序列化后覆盖本地 store
- * - 冲突处理：以 updated_at 时间戳为准，云端更新则覆盖本地
  */
 
 import { supabase, isSupabaseConfigured } from './supabase'
@@ -19,16 +18,6 @@ import { useGoalBudgetStore } from '@/stores/goalBudget'
 import { useRecurringStore } from '@/stores/recurring'
 
 export type SyncStatus = 'idle' | 'uploading' | 'downloading' | 'success' | 'error'
-
-/** 所有可同步的 store 名称 */
-const SYNC_STORES = [
-  'transactions',
-  'accounts',
-  'categories',
-  'goalBudget',
-  'recurring',
-  'appSettings',
-] as const
 
 /** 生成同步码 */
 export function generateSyncKey(): string {
@@ -44,6 +33,55 @@ function getSyncKey(): string {
   return appStore.syncKey
 }
 
+/** 打包本地全部数据 */
+function packLocalData() {
+  const txStore = useTransactionStore()
+  const accStore = useAccountStore()
+  const catStore = useCategoryStore()
+  const gbStore = useGoalBudgetStore()
+  const recStore = useRecurringStore()
+  const appStore = useAppStore()
+
+  return {
+    transactions: txStore.transactions,
+    accounts: accStore.accounts,
+    expenseCategories: catStore.expenseCategories,
+    incomeCategories: catStore.incomeCategories,
+    goals: gbStore.goals,
+    budgets: gbStore.budgets,
+    rules: recStore.rules,
+    theme: appStore.theme,
+    cycle: appStore.cycle,
+    currency: appStore.currency,
+    reminderEnabled: appStore.reminderEnabled,
+    budgetAlertEnabled: appStore.budgetAlertEnabled,
+    syncKey: appStore.syncKey,
+  }
+}
+
+/** 解包云端数据覆盖本地 */
+function unpackCloudData(json: any) {
+  const txStore = useTransactionStore()
+  const accStore = useAccountStore()
+  const catStore = useCategoryStore()
+  const gbStore = useGoalBudgetStore()
+  const recStore = useRecurringStore()
+  const appStore = useAppStore()
+
+  if (json.transactions) txStore.transactions = json.transactions
+  if (json.accounts) accStore.accounts = json.accounts
+  if (json.expenseCategories) catStore.expenseCategories = json.expenseCategories
+  if (json.incomeCategories) catStore.incomeCategories = json.incomeCategories
+  if (json.goals) gbStore.goals = json.goals
+  if (json.budgets) gbStore.budgets = json.budgets
+  if (json.rules) recStore.rules = json.rules
+  if (json.theme) appStore.theme = json.theme
+  if (json.cycle) appStore.cycle = json.cycle
+  if (json.currency) appStore.setCurrency(json.currency)
+  if (json.reminderEnabled !== undefined) appStore.reminderEnabled = json.reminderEnabled
+  if (json.budgetAlertEnabled !== undefined) appStore.budgetAlertEnabled = json.budgetAlertEnabled
+}
+
 /**
  * 上传本地数据到云端
  */
@@ -54,37 +92,21 @@ export async function uploadToCloud(): Promise<{ success: boolean; message: stri
 
   try {
     const syncKey = getSyncKey()
-    const txStore = useTransactionStore()
-    const accStore = useAccountStore()
-    const catStore = useCategoryStore()
-    const gbStore = useGoalBudgetStore()
-    const recStore = useRecurringStore()
-    const appStore = useAppStore()
+    const payload = packLocalData()
 
-    const snapshots = [
-      { store_name: 'transactions', data: { transactions: txStore.transactions } },
-      { store_name: 'accounts', data: { accounts: accStore.accounts } },
-      { store_name: 'categories', data: { expenseCategories: catStore.expenseCategories, incomeCategories: catStore.incomeCategories } },
-      { store_name: 'goalBudget', data: { goals: gbStore.goals, budgets: gbStore.budgets } },
-      { store_name: 'recurring', data: { rules: recStore.rules } },
-      { store_name: 'appSettings', data: { theme: appStore.theme, cycle: appStore.cycle, currency: appStore.currency, reminderEnabled: appStore.reminderEnabled, budgetAlertEnabled: appStore.budgetAlertEnabled } },
-    ]
+    const { error } = await supabase
+      .from('sync_data')
+      .upsert(
+        {
+          sync_key: syncKey,
+          store_name: 'all',
+          data_json: payload,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'sync_key,store_name' }
+      )
 
-    for (const snap of snapshots) {
-      const { error } = await supabase
-        .from('sync_data')
-        .upsert(
-          {
-            sync_key: syncKey,
-            store_name: snap.store_name,
-            data_json: snap.data,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: 'sync_key,store_name' }
-        )
-      if (error) throw error
-    }
-
+    if (error) throw error
     return { success: true, message: '同步成功！数据已上传到云端' }
   } catch (err: any) {
     console.error('[Sync] 上传失败:', err)
@@ -108,52 +130,20 @@ export async function downloadFromCloud(syncKey?: string): Promise<{ success: bo
   try {
     const { data, error } = await supabase
       .from('sync_data')
-      .select('store_name, data_json, updated_at')
+      .select('data_json')
       .eq('sync_key', key)
+      .eq('store_name', 'all')
+      .single()
 
     if (error) throw error
-    if (!data || data.length === 0) {
+    if (!data) {
       return { success: false, message: '云端无数据，请先在其他设备上同步' }
     }
 
-    const txStore = useTransactionStore()
-    const accStore = useAccountStore()
-    const catStore = useCategoryStore()
-    const gbStore = useGoalBudgetStore()
-    const recStore = useRecurringStore()
-    const appStore = useAppStore()
-
-    for (const row of data) {
-      const json = row.data_json as any
-      switch (row.store_name) {
-        case 'transactions':
-          if (json.transactions) txStore.transactions = json.transactions
-          break
-        case 'accounts':
-          if (json.accounts) accStore.accounts = json.accounts
-          break
-        case 'categories':
-          if (json.expenseCategories) catStore.expenseCategories = json.expenseCategories
-          if (json.incomeCategories) catStore.incomeCategories = json.incomeCategories
-          break
-        case 'goalBudget':
-          if (json.goals) gbStore.goals = json.goals
-          if (json.budgets) gbStore.budgets = json.budgets
-          break
-        case 'recurring':
-          if (json.rules) recStore.rules = json.rules
-          break
-        case 'appSettings':
-          if (json.theme) appStore.theme = json.theme
-          if (json.cycle) appStore.cycle = json.cycle
-          if (json.currency) appStore.setCurrency(json.currency)
-          if (json.reminderEnabled !== undefined) appStore.reminderEnabled = json.reminderEnabled
-          if (json.budgetAlertEnabled !== undefined) appStore.budgetAlertEnabled = json.budgetAlertEnabled
-          break
-      }
-    }
+    unpackCloudData(data.data_json)
 
     // 如果使用了新的 syncKey，保存到本地
+    const appStore = useAppStore()
     if (syncKey && syncKey !== appStore.syncKey) {
       appStore.setSyncKey(syncKey)
     }
@@ -177,11 +167,11 @@ export async function getCloudLastUpdate(): Promise<string | null> {
       .from('sync_data')
       .select('updated_at')
       .eq('sync_key', key)
-      .order('updated_at', { ascending: false })
-      .limit(1)
+      .eq('store_name', 'all')
+      .single()
 
-    if (error || !data || data.length === 0) return null
-    return data[0].updated_at
+    if (error || !data) return null
+    return data.updated_at
   } catch {
     return null
   }
