@@ -7,6 +7,37 @@
 
 ---
 
+## 2026-06-04 16:45:00
+
+**需求**: [R-087], [R-088], [R-089]
+**问题**: [ISS-022]（用户卡片硬编码问题已解决）
+**修改文件**:
+- `src/utils/supabase.ts` — 启用 `autoRefreshToken`/`persistSession`；新增 `getCurrentSession`/`signUpWithEmail`/`signInWithEmail`/`signOut`/`getProfile`/`updateProfile`（upsert 兜底）/`createProfile`/`Profile` 接口
+- `src/stores/user.ts` — 新建用户 Store：管理登录状态、恢复 session、监听 Auth 变化、拉取/更新 profile（username/avatarUrl/syncKey）
+- `src/pages/login/login.vue` — 新建登录/注册页面：邮箱+密码+用户名输入，支持登录/注册模式切换
+- `src/pages/profile/profile.vue` — 用户卡片动态显示：未登录显示「点击登录」，已登录显示用户名/头像/ID；新增「账号设置」菜单（修改用户名、上传头像）；新增退出登录确认弹窗
+- `src/App.vue` — `onLaunch` 时调用 `userStore.restoreSession()` 恢复登录状态，并订阅 Auth 变化
+- `src/pages.json` — 注册 `/pages/login/login` 路由
+- `src/utils/sync.ts` — 已登录用户上传时自动将 syncKey 写入 profile；下载时优先使用 profile 中的 syncKey
+- `docs/supabase-auth-setup.sql` — 新建：profiles 建表 + RLS 策略 + 触发器 + auth.users 查询说明
+- `docs/supabase-auth-queries.sql` — 新建：auth.users 常用查询语句集合
+- `src/env.d.ts` — 新建：Vite 环境变量类型声明（消除 IDE 爆红）
+
+**变更摘要**:
+- 新增 Supabase Auth 完整登录体系：邮箱注册/登录/退出、session 自动恢复、Token 自动刷新
+- 新增 profiles 表扩展用户信息：用户名、头像 URL、syncKey（与云同步绑定）
+- 实现头像上传：跨端图片选择 → 压缩裁剪 → base64 存入 profile
+- 修复修改用户名失败：updateProfile 改为 upsert，profile 不存在时自动插入
+- 登录用户云同步自动绑定账号，换设备登录后自动恢复同步数据
+- 解决 profile 页面用户信息硬编码问题（关闭 ISS-022）
+
+---
+*文档版本：v6.0*
+*更新时间：2026-06-04 16:45:00*
+*格式说明：每次提交一批写一条，必须关联 [R-xxx] / [ISS-xxx]*
+
+---
+
 ## 2026-05-29 23:45:00
 
 **需求**: [R-016], [R-023], [R-072] ~ [R-074], [R-078] ~ [R-079], [R-082]
@@ -336,11 +367,6 @@
 - 安全：DeepSeek API Key 不再硬编码
 - 性能：report.vue 分类聚合结果缓存；category.ts 使用 Map 索引
 - 代码质量：移除 6 个组件未使用的 props 变量、1 个未使用的 import、2 个未声明的 ref
-
----
-*文档版本：v5.0*
-*更新时间：2026-06-04 11:26:45*
-*格式说明：每次提交一批写一条，必须关联 [R-xxx] / [ISS-xxx]*
 
 ---
 

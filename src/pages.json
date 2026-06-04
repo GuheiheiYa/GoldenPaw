@@ -17,7 +17,8 @@
     { "path": "pages/settings/index", "style": { "navigationStyle": "custom" } },
     { "path": "pages/search/search", "style": { "navigationStyle": "custom" } },
     { "path": "pages/help/help", "style": { "navigationStyle": "custom" } },
-    { "path": "pages/agreement/agreement", "style": { "navigationStyle": "custom" } }
+    { "path": "pages/agreement/agreement", "style": { "navigationStyle": "custom" } },
+    { "path": "pages/login/login", "style": { "navigationStyle": "custom" } }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",

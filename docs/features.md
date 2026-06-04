@@ -1019,14 +1019,17 @@
 **实现方式**:
 - 头像、昵称、ID、统计数据（记账天数/笔数/目标数）
 - 记账天数和笔数使用真实 store（computed）
+- 存钱目标数从 `goalBudgetStore.goals.length` 动态读取
+- 登录用户：头像/昵称/ID 从 `userStore` 动态读取；未登录显示默认占位信息
 
 **关联文件**:
 - `src/pages/profile/profile.vue`
 - `src/stores/transaction.ts`
+- `src/stores/goalBudget.ts`
+- `src/stores/user.ts`
 
 **已知问题**:
-- [ISS-022] 存钱目标数硬编码为 `3`，应从 `goalBudgetStore.goals.length` 动态读取
-- 用户头像、昵称、ID 全部硬编码，无用户设置入口
+- [ISS-022] 已解决：存钱目标数、用户信息全部改为动态读取
 
 ---
 
@@ -1522,6 +1525,76 @@
 
 ---
 
+## [F-090] 用户认证 - Supabase Auth 邮箱登录/注册 ← [R-087]
+
+**状态**: 已完成  **实现时间**: 2026-06-04
+
+**实现方式**:
+- 基于 `@supabase/supabase-js` Auth 模块实现邮箱+密码登录/注册
+- `signUpWithEmail(email, password, username)` — 注册，username 存入 `user_metadata`
+- `signInWithEmail(email, password)` — 登录
+- `signOut()` — 退出登录
+- `getCurrentSession()` — 获取当前会话（启动时恢复登录状态）
+- `supabase.auth.onAuthStateChange()` — 监听登录/登出/Token刷新事件
+- Supabase 内置 `auth.users` 表自动管理用户，无需手动建用户表
+
+**关联文件**:
+- `src/utils/supabase.ts` — Auth API 封装
+- `src/pages/login/login.vue` — 登录/注册页面
+- `src/stores/user.ts` — 用户状态管理
+
+**注意事项**:
+- 需要在 Supabase Dashboard 开启「Email」提供商
+- 若开启「Confirm email」，注册后需验证邮箱才能登录
+
+---
+
+## [F-091] 用户认证 - Profile 扩展信息（头像、用户名） ← [R-088]
+
+**状态**: 已完成  **实现时间**: 2026-06-04
+
+**实现方式**:
+- 在 Supabase `public` schema 创建 `profiles` 表：
+  - `id` (uuid, PK, 关联 auth.users)
+  - `username` (text)
+  - `avatar_url` (text)
+  - `sync_key` (text, 绑定云同步码)
+  - `created_at` / `updated_at` (timestamptz)
+- RLS 策略：用户只能 CRUD 自己的 profile 行
+- PostgreSQL 触发器：`on_auth_user_created` — 用户注册后自动在 profiles 插入记录
+- `getProfile(userId)` — 读取 profile
+- `updateProfile(userId, updates)` — 更新 username/avatar_url/sync_key
+- `createProfile(userId, username)` — 兜底创建（触发器未生效时使用）
+
+**关联文件**:
+- `src/utils/supabase.ts` — Profile API
+- `src/stores/user.ts` — `setAuthUser()` 登录时自动拉取 profile
+- `src/pages/profile/profile.vue` — 显示用户名、头像；支持修改用户名
+- `docs/supabase-auth-setup.sql` — 建表+触发器+RLS SQL 脚本
+
+**注意事项**:
+- 执行 `docs/supabase-auth-setup.sql` 后才可使用 profile 功能
+- 前端无法直接查询 `auth.users`，所有用户信息通过 `profiles` 表间接获取
+
+---
+
+## [F-092] 用户认证 - 登录状态自动恢复 ← [R-089]
+
+**状态**: 已完成  **实现时间**: 2026-06-04
+
+**实现方式**:
+- `App.vue` `onLaunch` 时调用 `userStore.restoreSession()`
+- `restoreSession()` → `supabase.auth.getSession()` → 若存在有效 session，调用 `setAuthUser()` 拉取 profile
+- 同时调用 `subscribeAuthChanges()` 监听后续 Auth 状态变化
+- `supabase` 客户端配置 `autoRefreshToken: true` + `persistSession: true`，Token 过期自动刷新
+
+**关联文件**:
+- `src/App.vue`
+- `src/stores/user.ts`
+- `src/utils/supabase.ts`
+
+---
+
 ## [F-084] 我的/设置 - 云同步 ← [R-084]
 
 **状态**: 已完成  **实现时间**: 2026-06-04 11:26:45
@@ -1529,6 +1602,8 @@
 **实现方式**:
 - 基于 **Supabase** 实现云端数据存储
 - 每张 store 的数据存储为 JSON 快照（`sync_data` 表：`sync_key` + `store_name` + `data_json`）
+- **已登录用户**：`syncKey` 存入 `profiles.sync_key`，换设备登录后自动恢复该用户的同步数据
+- **未登录用户**：`syncKey` 存储在 `appStore.syncKey`，通过同步码在多设备间共享
 - 同步策略：
   - **上传**：将本地 transactions/accounts/categories/goalBudget/recurring/appSettings 序列化为 JSON，upsert 到云端
   - **下载**：从云端读取 JSON，反序列化后覆盖本地 store
@@ -1557,6 +1632,6 @@
 
 ---
 
-*文档版本：v5.0*
-*更新时间：2026-06-04 11:26:45*
+*文档版本：v6.0*
+*更新时间：2026-06-04 16:45:00*
 *格式说明：每个功能按 [F-xxx] 编号，与 requirements.md 的 [R-xxx] 一一对应*

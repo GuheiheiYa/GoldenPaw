@@ -7,11 +7,18 @@
 
     <!-- 用户卡片 -->
     <view class="user-card">
-      <view class="user-avatar">
-        <text class="user-avatar-text">👤</text>
+      <view class="user-avatar" @tap="onAvatarTap">
+        <image v-if="displayAvatar" class="user-avatar-img" :src="displayAvatar" mode="aspectFill" />
+        <text v-else class="user-avatar-text">{{ userStore.isLoggedIn ? '✅' : '👤' }}</text>
       </view>
-      <text class="user-name">GoldenPaw用户</text>
-      <text class="user-id">ID: goldenpaw_001</text>
+      <text class="user-name">{{ displayName }}</text>
+      <text class="user-id">{{ displayId }}</text>
+      <view v-if="userStore.isLoggedIn" class="login-badge" @tap.stop="onLogout">
+        <text>退出登录</text>
+      </view>
+      <view v-else class="login-badge" @tap.stop="goLogin">
+        <text>点击登录</text>
+      </view>
       <view class="user-stats">
         <view class="user-stat">
           <text class="stat-value">{{ recordDays }}</text>
@@ -24,6 +31,23 @@
         <view class="user-stat">
           <text class="stat-value">{{ goalBudgetStore.goals.length }}</text>
           <text class="stat-label">存钱目标</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 账号设置 -->
+    <view v-if="userStore.isLoggedIn" class="menu-section">
+      <text class="menu-title">账号设置</text>
+      <view class="menu-list">
+        <view class="menu-item" @tap="openEditNameModal">
+          <view class="menu-icon gold">
+            <text class="menu-icon-text">✏️</text>
+          </view>
+          <view class="menu-info">
+            <text class="menu-name">修改用户名</text>
+            <text class="menu-desc">{{ userStore.user?.username || '未设置' }}</text>
+          </view>
+          <uni-icons class="menu-arrow" type="arrow-right" size="14" color="#C8B8A8" />
         </view>
       </view>
     </view>
@@ -112,23 +136,44 @@
       </view>
     </view>
 
+    <!-- 修改用户名弹窗 -->
+    <view class="modal-overlay" v-if="showEditName" @tap="closeEditNameModal">
+      <view class="modal-card" @tap.stop>
+        <text class="modal-title">修改用户名</text>
+        <view class="modal-field">
+          <input class="modal-input" v-model="editNameValue" placeholder="输入新用户名" />
+        </view>
+        <view class="modal-actions">
+          <view class="modal-btn secondary" @tap="closeEditNameModal">
+            <text>取消</text>
+          </view>
+          <view class="modal-btn primary" @tap="confirmEditName">
+            <text>保存</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
     <TabBar />
     <RecordSheet />
   </view>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app'
 import { useTransactionStore } from '@/stores/transaction'
 import { useGoalBudgetStore } from '@/stores/goalBudget'
+import { useUserStore } from '@/stores/user'
+import { signOut } from '@/utils/supabase'
 import TabBar from '@/components/TabBar.vue'
 import RecordSheet from '@/components/RecordSheet.vue'
 
 const appStore = useAppStore()
 const txStore = useTransactionStore()
 const goalBudgetStore = useGoalBudgetStore()
+const userStore = useUserStore()
 
 onShow(() => {
   appStore.setCurrentTab(4)
@@ -142,6 +187,177 @@ const recordDays = computed(() => {
 
 /** 记账笔数 */
 const recordCount = computed(() => txStore.transactions.length)
+
+/** 用户显示名称 */
+const displayName = computed(() => {
+  if (userStore.isLoggedIn) {
+    return userStore.user?.username || userStore.user?.email?.split('@')[0] || '用户'
+  }
+  return 'GoldenPaw用户'
+})
+
+/** 用户ID显示 */
+const displayId = computed(() => {
+  if (userStore.isLoggedIn) {
+    return `ID: ${userStore.user?.id?.slice(0, 8) || '...'}`
+  }
+  return 'ID: goldenpaw_001'
+})
+
+/** 头像 */
+const displayAvatar = computed(() => {
+  return userStore.user?.avatarUrl || ''
+})
+
+/** 跳转到登录 */
+function goLogin() {
+  if (!userStore.isLoggedIn) {
+    uni.navigateTo({ url: '/pages/login/login' })
+  }
+}
+
+/** 退出登录 */
+async function onLogout() {
+  uni.showModal({
+    title: '退出登录',
+    content: '确定要退出当前账号吗？',
+    confirmColor: '#C06C5F',
+    success: async (res) => {
+      if (res.confirm) {
+        const { error } = await signOut()
+        if (error) {
+          uni.showToast({ title: '退出失败', icon: 'none' })
+          return
+        }
+        userStore.setUser(null)
+        uni.showToast({ title: '已退出登录', icon: 'success' })
+      }
+    },
+  })
+}
+
+/** 选择并上传头像 */
+function onAvatarTap() {
+  if (!userStore.isLoggedIn) {
+    goLogin()
+    return
+  }
+
+  uni.chooseImage({
+    count: 1,
+    sizeType: ['compressed'],
+    sourceType: ['album', 'camera'],
+    success: (res: any) => {
+      const tempPath = res.tempFilePaths?.[0] || res.tempFiles?.[0]?.path
+      if (!tempPath) {
+        uni.showToast({ title: '选择图片失败', icon: 'none' })
+        return
+      }
+      compressAndUploadAvatar(tempPath)
+    },
+    fail: () => {
+      uni.showToast({ title: '选择图片失败', icon: 'none' })
+    },
+  })
+}
+
+/** 压缩图片并转为 base64 上传 */
+function compressAndUploadAvatar(filePath: string) {
+  uni.showLoading({ title: '处理中...' })
+
+  // #ifdef H5
+  // H5: tempFilePaths 是 blob URL，直接用 Image + Canvas 压缩
+  const img = new Image()
+  img.crossOrigin = 'anonymous'
+  img.onload = () => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')!
+    const size = 200
+    canvas.width = size
+    canvas.height = size
+    // 居中裁剪填充
+    const min = Math.min(img.width, img.height)
+    const sx = (img.width - min) / 2
+    const sy = (img.height - min) / 2
+    ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size)
+    const base64 = canvas.toDataURL('image/jpeg', 0.7)
+    uploadAvatarBase64(base64)
+  }
+  img.onerror = () => {
+    uni.hideLoading()
+    uni.showToast({ title: '图片处理失败', icon: 'none' })
+  }
+  img.src = filePath
+  // #endif
+
+  // #ifndef H5
+  // 小程序/APP: 先用 uni.compressImage 压缩，再读文件转 base64
+  uni.compressImage({
+    src: filePath,
+    quality: 70,
+    success: (compressRes: any) => {
+      const fs = uni.getFileSystemManager()
+      fs.readFile({
+        filePath: compressRes.tempFilePath,
+        encoding: 'base64',
+        success: (readRes: any) => {
+          const base64 = `data:image/jpeg;base64,${readRes.data}`
+          uploadAvatarBase64(base64)
+        },
+        fail: () => {
+          uni.hideLoading()
+          uni.showToast({ title: '图片读取失败', icon: 'none' })
+        },
+      })
+    },
+    fail: () => {
+      uni.hideLoading()
+      uni.showToast({ title: '图片压缩失败', icon: 'none' })
+    },
+  })
+  // #endif
+}
+
+/** 上传 base64 头像到 profile */
+async function uploadAvatarBase64(base64: string) {
+  const ok = await userStore.updateAvatarUrl(base64)
+  uni.hideLoading()
+  if (ok) {
+    uni.showToast({ title: '头像已更新', icon: 'success' })
+  } else {
+    uni.showToast({ title: '头像保存失败', icon: 'none' })
+  }
+}
+
+/* ===== 修改用户名 ===== */
+const showEditName = ref(false)
+const editNameValue = ref('')
+
+function openEditNameModal() {
+  editNameValue.value = userStore.user?.username || ''
+  showEditName.value = true
+}
+
+function closeEditNameModal() {
+  showEditName.value = false
+}
+
+async function confirmEditName() {
+  const name = editNameValue.value.trim()
+  if (!name) {
+    uni.showToast({ title: '用户名不能为空', icon: 'none' })
+    return
+  }
+  uni.showLoading({ title: '保存中...' })
+  const ok = await userStore.updateUsername(name)
+  uni.hideLoading()
+  if (ok) {
+    uni.showToast({ title: '修改成功', icon: 'success' })
+    closeEditNameModal()
+  } else {
+    uni.showToast({ title: '修改失败', icon: 'none' })
+  }
+}
 
 /** 菜单名称到设置类型的映射 */
 const menuTypeMap: Record<string, string> = {
@@ -277,6 +493,13 @@ const aboutMenus = [
   justify-content: center;
   margin: 0 auto 16px;
   box-shadow: $shadow-brand;
+  overflow: hidden;
+}
+
+.user-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: $radius-circle;
 }
 
 .user-avatar-text {
@@ -293,7 +516,21 @@ const aboutMenus = [
   @include text-caption;
   color: $text-tertiary;
   display: block;
+  margin-bottom: 8px;
+}
+
+.login-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  background: $gradient-brand;
+  border-radius: 999px;
   margin-bottom: 16px;
+
+  text {
+    font-size: 12px;
+    color: white;
+    font-weight: 600;
+  }
 }
 
 .user-stats {
@@ -389,6 +626,10 @@ const aboutMenus = [
   &.gray {
     background: linear-gradient(135deg, #F0F0F0, #E0E0E0);
   }
+
+  &.accent {
+    background: linear-gradient(135deg, #F5E6C8, #E8D5B0);
+  }
 }
 
 .menu-icon-text {
@@ -416,5 +657,78 @@ const aboutMenus = [
   font-weight: 700;
   font-size: 14px;
   color: $text-tertiary;
+}
+
+/* ===== Modal ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+}
+
+.modal-card {
+  background: $surface;
+  border-radius: $radius-lg;
+  padding: 24px;
+  width: 100%;
+  max-width: 320px;
+  box-shadow: $shadow-lg;
+}
+
+.modal-title {
+  @include text-h3;
+  display: block;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.modal-field {
+  margin-bottom: 16px;
+}
+
+.modal-input {
+  width: 100%;
+  height: 48px;
+  background: $bg-secondary;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  padding: 0 14px;
+  font-size: 16px;
+  color: $text-primary;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 44px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+
+  &.secondary {
+    background: $bg-secondary;
+    color: $text-secondary;
+  }
+
+  &.primary {
+    background: $gradient-brand;
+    color: white;
+  }
 }
 </style>

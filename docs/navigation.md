@@ -91,8 +91,11 @@ GoldenPaw/
 │   └── help/help.vue                # 帮助页面
 │       └── FAQ + 联系方式
 │
-│   └── agreement/agreement.vue      # 用户协议页面
-│       └── 服务条款、隐私政策、免责声明
+│   ├── agreement/agreement.vue      # 用户协议页面
+│   │   └── 服务条款、隐私政策、免责声明
+│   │
+│   └── login/login.vue              # 登录/注册页面
+│       └── 邮箱+密码登录、注册、用户名设置、头像上传
 │
 ├── components/
 │   ├── TabBar.vue                   # 自定义底部导航栏
@@ -169,6 +172,11 @@ GoldenPaw/
 │       ├── actions: addBudget, updateBudget, deleteBudget
 │       └── getters: budgetUsage, totalBudget, totalBudgetUsed
 │
+│   ├── user.ts                      # 用户认证 store（非持久化，session 驱动）
+│   │   ├── state: user, profile, loading
+│   │   ├── actions: restoreSession, setAuthUser, subscribeAuthChanges
+│   │   └── actions: updateUsername, updateAvatarUrl, updateSyncKey
+│   │
 │   └── pending.ts                   # 待确认记录 store（持久化）
 │       ├── state: items[], sources[]
 │       ├── actions: addItem, confirmItem, editItem, removeItem
@@ -180,6 +188,8 @@ GoldenPaw/
 ├── utils/
 │   ├── format.ts                    # formatAmount(支持多币种符号), formatDate, getToday, getCurrentTime
 │   ├── csvImport.ts                 # CSV 智能导入：识别 GoldenPaw/微信/支付宝格式
+│   ├── supabase.ts                  # Supabase 客户端 + Auth API + Profile API
+│   ├── sync.ts                      # 云同步：上传/下载/打包/解包
 │   ├── id.ts                        # generateId
 │   └── date.ts                      # getDaysAgo
 │
@@ -241,6 +251,7 @@ AI记账 (Tab 1)
   └── 点击 + 号按钮 → 弹出 RecordSheet
 
 我的 (Tab 4)
+  ├── 点击用户卡片 → /pages/login/login（未登录）
   ├── 点击设置菜单 → /pages/settings/index?type=xxx
   ├── 点击帮助 → /pages/help/help
   └── 点击 + 号按钮 → 弹出 RecordSheet
@@ -254,5 +265,5 @@ AI记账 (Tab 1)
 
 ---
 
-*文档版本：v4.0*
-*更新时间：2026-06-02 10:33:56*
+*文档版本：v5.0*
+*更新时间：2026-06-04 16:45:00*

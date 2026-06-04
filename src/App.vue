@@ -2,6 +2,7 @@
 import { onLaunch, onShow } from '@dcloudio/uni-app'
 import { ref, watch } from 'vue'
 import { useAppStore } from '@/stores/app'
+import { useUserStore } from '@/stores/user'
 import { seedAllStores } from '@/mock/seed'
 import { useRecurringStore } from '@/stores/recurring'
 import { useTransactionStore } from '@/stores/transaction'
@@ -9,6 +10,7 @@ import { useAccountStore } from '@/stores/account'
 import { getCurrentTime } from '@/utils/format'
 
 const appStore = useAppStore()
+const userStore = useUserStore()
 const locked = ref(false)
 const lockInput = ref('')
 
@@ -17,6 +19,11 @@ onLaunch(() => {
 
   // 执行到期的定期交易
   executeRecurringTransactions()
+
+  // 恢复 Supabase 登录会话
+  userStore.restoreSession().then(() => {
+    userStore.subscribeAuthChanges()
+  })
 
   // #ifdef H5
   if (typeof document !== 'undefined') {

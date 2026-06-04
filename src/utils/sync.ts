@@ -9,8 +9,9 @@
  * - 下载：从云端读取 JSON，反序列化后覆盖本地 store
  */
 
-import { supabase, isSupabaseConfigured } from './supabase'
+import { supabase, isSupabaseConfigured, updateProfile } from './supabase'
 import { useAppStore } from '@/stores/app'
+import { useUserStore } from '@/stores/user'
 import { useTransactionStore } from '@/stores/transaction'
 import { useAccountStore } from '@/stores/account'
 import { useCategoryStore } from '@/stores/category'
@@ -27,6 +28,13 @@ export function generateSyncKey(): string {
 /** 获取当前 syncKey */
 function getSyncKey(): string {
   const appStore = useAppStore()
+  const userStore = useUserStore()
+
+  // 已登录用户优先使用 profile 中的 sync_key
+  if (userStore.isLoggedIn && userStore.user?.syncKey) {
+    return userStore.user.syncKey
+  }
+
   if (!appStore.syncKey) {
     appStore.setSyncKey(generateSyncKey())
   }
@@ -107,6 +115,14 @@ export async function uploadToCloud(): Promise<{ success: boolean; message: stri
       )
 
     if (error) throw error
+
+    // 已登录用户将 syncKey 写入 profile，换设备登录自动恢复
+    const userStore = useUserStore()
+    if (userStore.isLoggedIn) {
+      await updateProfile(userStore.user.id, { sync_key: syncKey })
+      userStore.user.syncKey = syncKey
+    }
+
     return { success: true, message: '同步成功！数据已上传到云端' }
   } catch (err: any) {
     console.error('[Sync] 上传失败:', err)
