@@ -26,7 +26,8 @@ GoldenPaw/
 │   ├── pages/pending/pending        # 待确认 (二级)
 │   ├── pages/settings/index         # 设置页面 (二级，根据type参数显示不同内容)
 │   ├── pages/search/search          # 搜索页面 (二级)
-│   └── pages/help/help              # 帮助页面 (二级)
+│   ├── pages/help/help              # 帮助页面 (二级)
+│   └── pages/agreement/agreement    # 用户协议 (二级)
 │
 ├── pages/
 │   ├── index/index.vue              # 首页
@@ -67,7 +68,8 @@ GoldenPaw/
 │   │   └── 数据 → stores/goalBudget.ts, stores/category.ts, stores/transaction.ts
 │   │
 │   ├── pending/pending.vue          # 待确认
-│   │   └── 3条示例待确认记录（mock数据，实际从本地存储读取）
+│   │   ├── 使用 → EmptyState.vue (空状态)
+│   │   └── 数据 → stores/pending.ts, stores/transaction.ts, stores/category.ts, stores/account.ts
 │   │
 │   ├── settings/index.vue           # 设置页面（通用）
 │   │   ├── type=category            # 分类管理（添加/编辑/删除，默认分类不可删）
@@ -88,6 +90,9 @@ GoldenPaw/
 │   │
 │   └── help/help.vue                # 帮助页面
 │       └── FAQ + 联系方式
+│
+│   └── agreement/agreement.vue      # 用户协议页面
+│       └── 服务条款、隐私政策、免责声明
 │
 ├── components/
 │   ├── TabBar.vue                   # 自定义底部导航栏
@@ -163,6 +168,11 @@ GoldenPaw/
 │       ├── actions: addGoal, updateGoal, deleteGoal, depositToGoal
 │       ├── actions: addBudget, updateBudget, deleteBudget
 │       └── getters: budgetUsage, totalBudget, totalBudgetUsed
+│
+│   └── pending.ts                   # 待确认记录 store（持久化）
+│       ├── state: items[], sources[]
+│       ├── actions: addItem, confirmItem, editItem, removeItem
+│       └── actions: toggleSource
 │
 ├── types/
 │   └── transaction.ts               # Transaction, Category, Account, Goal, Budget 接口

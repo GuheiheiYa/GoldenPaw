@@ -15,13 +15,18 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { usePendingStore } from '@/stores/pending'
+
+const pendingStore = usePendingStore()
+
 /** 快捷操作配置 */
-const actions = [
+const actions = computed(() => [
   { icon: '📊', label: '报表', cls: 'capsule-green', path: '/pages/report/report' },
   { icon: '📋', label: '明细', cls: 'capsule-blue', path: '/pages/detail/detail' },
   { icon: '💰', label: '存钱', cls: 'capsule-warm', path: '/pages/goals/goals' },
-  { icon: '⚡', label: '待确认', cls: 'capsule-gold', path: '/pages/pending/pending', badge: 3 },
-]
+  { icon: '⚡', label: '待确认', cls: 'capsule-gold', path: '/pages/pending/pending', badge: pendingStore.items.length || undefined },
+])
 
 /** 导航到对应页面 */
 function handleTap(action: { path: string }) {

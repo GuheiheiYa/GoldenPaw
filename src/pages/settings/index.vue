@@ -364,12 +364,50 @@
 
       <!-- 云同步 -->
       <template v-else-if="type === 'sync'">
+        <!-- 未配置提示 -->
+        <view v-if="!isSupabaseConfigured()" class="warning-box" style="margin-bottom: 24px;">
+          <text class="warning-icon">⚙️</text>
+          <text class="warning-title">未配置云服务</text>
+          <text class="warning-desc">请在项目根目录 .env 文件中配置 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY，然后重新编译。</text>
+        </view>
+
+        <!-- 同步码卡片 -->
         <view class="sync-status">
           <text class="sync-icon">☁️</text>
           <text class="sync-title">云同步</text>
-          <text class="sync-desc">上次同步：从未同步</text>
-          <view class="sync-btn" @tap="showToast('云同步功能开发中')">
-            <text class="sync-btn-text">立即同步</text>
+          <text class="sync-desc">使用同步码在多设备间共享数据</text>
+
+          <view class="sync-key-card">
+            <text class="sync-key-label">你的同步码</text>
+            <view class="sync-key-row">
+              <text class="sync-key-value">{{ appStore.syncKey || '未生成' }}</text>
+              <view class="sync-key-action" @tap="copySyncKey">
+                <text>📋</text>
+              </view>
+            </view>
+            <text class="sync-key-hint">请妥善保存，换设备时输入此码即可恢复数据</text>
+          </view>
+
+          <view class="sync-action-row">
+            <view class="sync-action-btn upload" @tap="onUpload">
+              <text>⬆️ 上传到云端</text>
+            </view>
+            <view class="sync-action-btn download" @tap="onDownload">
+              <text>⬇️ 从云端恢复</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 从其他设备恢复 -->
+        <view class="sync-restore-card">
+          <text class="sync-restore-title">从其他设备恢复</text>
+          <input
+            class="sync-restore-input"
+            v-model="restoreKey"
+            placeholder="输入其他设备的同步码"
+          />
+          <view class="sync-restore-btn" @tap="onRestore">
+            <text>恢复数据</text>
           </view>
         </view>
       </template>
@@ -495,6 +533,8 @@ import { useAppStore, type CycleType } from '@/stores/app'
 import { useRecurringStore } from '@/stores/recurring'
 import { formatAmount, getToday, dateToString } from '@/utils/format'
 import { parseAndImportCsv } from '@/utils/csvImport'
+import { isSupabaseConfigured } from '@/utils/supabase'
+import { generateSyncKey, uploadToCloud, downloadFromCloud } from '@/utils/sync'
 import EmojiGrid from '@/components/EmojiGrid.vue'
 import type { Account, RecurringCycle } from '@/types/transaction'
 
@@ -1171,6 +1211,57 @@ function deleteRecurring(id: string) {
     },
   })
 }
+
+/* ===== 云同步 ===== */
+const restoreKey = ref('')
+
+function copySyncKey() {
+  if (!appStore.syncKey) {
+    appStore.setSyncKey(generateSyncKey())
+  }
+  // #ifdef H5
+  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    navigator.clipboard.writeText(appStore.syncKey)
+    uni.showToast({ title: '同步码已复制', icon: 'success' })
+    return
+  }
+  // #endif
+  uni.setClipboardData({
+    data: appStore.syncKey,
+    success: () => uni.showToast({ title: '同步码已复制', icon: 'success' }),
+  })
+}
+
+async function onUpload() {
+  if (!appStore.syncKey) {
+    appStore.setSyncKey(generateSyncKey())
+  }
+  uni.showLoading({ title: '正在上传...' })
+  const { uploadToCloud } = await import('@/utils/sync')
+  const res = await uploadToCloud()
+  uni.hideLoading()
+  uni.showToast({ title: res.message, icon: res.success ? 'success' : 'none' })
+}
+
+async function onDownload() {
+  uni.showLoading({ title: '正在恢复...' })
+  const { downloadFromCloud } = await import('@/utils/sync')
+  const res = await downloadFromCloud()
+  uni.hideLoading()
+  uni.showToast({ title: res.message, icon: res.success ? 'success' : 'none' })
+}
+
+async function onRestore() {
+  if (!restoreKey.value.trim()) {
+    uni.showToast({ title: '请输入同步码', icon: 'none' })
+    return
+  }
+  uni.showLoading({ title: '正在恢复...' })
+  const { downloadFromCloud } = await import('@/utils/sync')
+  const res = await downloadFromCloud(restoreKey.value.trim())
+  uni.hideLoading()
+  uni.showToast({ title: res.message, icon: res.success ? 'success' : 'none' })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -1683,6 +1774,135 @@ function deleteRecurring(id: string) {
 }
 
 .picker-btn {
+  padding: 14px;
+  border-radius: $radius-sm;
+  text-align: center;
+  cursor: pointer;
+  background: $gradient-brand;
+  box-shadow: $shadow-brand;
+  color: white;
+  font-weight: 700;
+}
+
+/* ===== 云同步样式 ===== */
+.sync-key-card {
+  background: $bg-primary;
+  border-radius: $radius-md;
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid $border;
+}
+
+.sync-key-label {
+  @include text-caption;
+  color: $text-secondary;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.sync-key-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.sync-key-value {
+  flex: 1;
+  @include text-body;
+  font-weight: 700;
+  color: $text-primary;
+  background: $surface;
+  padding: 12px 14px;
+  border-radius: $radius-sm;
+  border: 1px solid $border;
+  word-break: break-all;
+}
+
+.sync-key-action {
+  width: 44px;
+  height: 44px;
+  border-radius: $radius-sm;
+  background: $surface;
+  border: 1px solid $border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:active {
+    background: $brand-50;
+  }
+}
+
+.sync-key-hint {
+  @include text-small;
+  color: $text-tertiary;
+  display: block;
+}
+
+.sync-action-row {
+  display: flex;
+  gap: 12px;
+}
+
+.sync-action-btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: $radius-sm;
+  text-align: center;
+  cursor: pointer;
+  @include text-body;
+  font-weight: 700;
+
+  &.upload {
+    background: $gradient-brand;
+    box-shadow: $shadow-brand;
+    color: white;
+  }
+
+  &.download {
+    background: $bg-primary;
+    border: 1px solid $border;
+    color: $text-secondary;
+  }
+}
+
+.sync-restore-card {
+  margin: 24px;
+  padding: 20px;
+  background: $surface;
+  border-radius: $radius-lg;
+  border: 1px solid $border;
+  box-shadow: $shadow-sm;
+}
+
+.sync-restore-title {
+  @include text-body;
+  font-weight: 700;
+  color: $text-primary;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.sync-restore-input {
+  width: 100%;
+  height: 48px;
+  background: $bg-primary;
+  border-radius: $radius-sm;
+  padding: 0 14px;
+  border: 1px solid $border;
+  @include text-body;
+  color: $text-primary;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+
+  &::placeholder {
+    color: $text-placeholder;
+  }
+}
+
+.sync-restore-btn {
   padding: 14px;
   border-radius: $radius-sm;
   text-align: center;

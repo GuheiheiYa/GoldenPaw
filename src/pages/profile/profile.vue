@@ -22,7 +22,7 @@
           <text class="stat-label">记账笔数</text>
         </view>
         <view class="user-stat">
-          <text class="stat-value">3</text>
+          <text class="stat-value">{{ goalBudgetStore.goals.length }}</text>
           <text class="stat-label">存钱目标</text>
         </view>
       </view>
@@ -122,11 +122,13 @@ import { computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useAppStore } from '@/stores/app'
 import { useTransactionStore } from '@/stores/transaction'
+import { useGoalBudgetStore } from '@/stores/goalBudget'
 import TabBar from '@/components/TabBar.vue'
 import RecordSheet from '@/components/RecordSheet.vue'
 
 const appStore = useAppStore()
 const txStore = useTransactionStore()
+const goalBudgetStore = useGoalBudgetStore()
 
 onShow(() => {
   appStore.setCurrentTab(4)
@@ -169,7 +171,7 @@ function onMenuTap(name: string) {
     return
   }
   if (name === '用户协议') {
-    uni.showToast({ title: '用户协议页面开发中', icon: 'none' })
+    uni.navigateTo({ url: '/pages/agreement/agreement' })
     return
   }
   if (name === 'GoldenPaw') {
@@ -185,9 +187,9 @@ function onMenuTap(name: string) {
 
 /** 数据管理菜单 */
 const dataMenus = [
-  { icon: '📤', name: '导出数据', desc: 'CSV / Excel 格式', iconClass: 'gold' },
+  { icon: '📤', name: '导出数据', desc: 'CSV 格式', iconClass: 'gold' },
   { icon: '📥', name: '导入数据', desc: '微信 / 支付宝账单', iconClass: 'green' },
-  { icon: '☁️', name: '云同步', desc: '上次同步: 5分钟前', iconClass: 'blue' },
+  { icon: '☁️', name: '云同步', desc: '从未同步', iconClass: 'blue' },
   { icon: '🗑️', name: '清空数据', desc: '谨慎操作，不可恢复', iconClass: 'red' },
 ]
 

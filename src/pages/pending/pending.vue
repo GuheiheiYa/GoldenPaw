@@ -6,8 +6,8 @@
         <uni-icons class="back-icon" type="arrow-left" size="20" color="#7A6B5D" />
       </view>
       <text class="header-title">待确认</text>
-      <view class="header-badge">
-        <text class="badge-text">{{ pendingItems.length }}</text>
+      <view class="header-badge" v-if="pendingStore.items.length > 0">
+        <text class="badge-text">{{ pendingStore.items.length }}</text>
       </view>
     </view>
 
@@ -16,8 +16,15 @@
       <text class="info-banner-text">系统自动监听到的消费记录，确认后会自动记入明细。您可以在设置中管理监听来源。</text>
     </view>
 
+    <!-- 空状态 -->
+    <view v-if="pendingStore.items.length === 0" class="empty-wrap">
+      <text class="empty-icon">✅</text>
+      <text class="empty-title">没有待确认记录</text>
+      <text class="empty-desc">当系统监听到消费信息时，会在这里显示</text>
+    </view>
+
     <!-- 待确认列表 -->
-    <view class="pending-item" v-for="item in pendingItems" :key="item.id">
+    <view class="pending-item" v-for="item in pendingStore.items" :key="item.id">
       <view class="pending-source">
         <view class="pending-source-icon" :style="{ background: item.sourceIconBg }">
           <text class="pending-source-icon-text">{{ item.sourceIcon }}</text>
@@ -67,7 +74,7 @@
     <view class="source-section">
       <text class="source-title">监听来源设置</text>
       <view class="source-list">
-        <view class="source-item" v-for="source in sourceList" :key="source.name">
+        <view class="source-item" v-for="source in pendingStore.sources" :key="source.name">
           <view class="source-icon" :style="{ background: source.iconBg }">
             <text class="source-icon-text">{{ source.icon }}</text>
           </view>
@@ -77,7 +84,7 @@
               {{ source.enabled ? '● 监听中' : '○ 已关闭' }}
             </text>
           </view>
-          <view class="source-toggle" :class="{ off: !source.enabled }" @tap="toggleSource(source)">
+          <view class="source-toggle" :class="{ off: !source.enabled }" @tap="pendingStore.toggleSource(source.name)">
             <view class="source-toggle-thumb"></view>
           </view>
         </view>
@@ -124,12 +131,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
+import { usePendingStore } from '@/stores/pending'
 import { useTransactionStore } from '@/stores/transaction'
 import { useAccountStore } from '@/stores/account'
 import { useCategoryStore } from '@/stores/category'
 import { getToday, getCurrentTime } from '@/utils/format'
 
+const pendingStore = usePendingStore()
 const transactionStore = useTransactionStore()
 const accountStore = useAccountStore()
 const categoryStore = useCategoryStore()
@@ -160,12 +169,12 @@ function parseAmount(amountStr: string): number {
 }
 
 /** 确认记录 — 创建真实交易 */
-function onConfirm(id: number) {
-  const item = pendingItems.find(i => i.id === id)
+function onConfirm(id: string) {
+  const item = pendingStore.items.find(i => i.id === id)
   if (!item) return
 
   const amount = parseAmount(item.amount)
-  const categoryId = CATEGORY_MAP[item.category] || 'cat-other-expense'
+  const categoryId = item.categoryId || CATEGORY_MAP[item.category] || 'cat-other-expense'
   const defaultAccount = accountStore.accounts[0]
   if (!defaultAccount) {
     uni.showToast({ title: '请先添加账户', icon: 'none' })
@@ -183,115 +192,63 @@ function onConfirm(id: number) {
   })
   accountStore.updateBalance(defaultAccount.id, -amount)
 
-  pendingItems.splice(pendingItems.findIndex(i => i.id === id), 1)
+  pendingStore.confirmItem(id)
   uni.showToast({ title: '已入账', icon: 'success' })
 }
 
 /** 编辑记录 */
 const showEditModal = ref(false)
-const editingItem = ref<any>(null)
+const editingId = ref<string | null>(null)
 const editForm = ref({ amount: '', merchant: '', categoryId: '' })
 
-function onEdit(id: number) {
-  const item = pendingItems.find(i => i.id === id)
+function onEdit(id: string) {
+  const item = pendingStore.items.find(i => i.id === id)
   if (!item) return
-  editingItem.value = item
+  editingId.value = id
   editForm.value = {
     amount: item.amount.replace(/[¥,-\s]/g, ''),
     merchant: item.merchant,
-    categoryId: CATEGORY_MAP[item.category] || '',
+    categoryId: item.categoryId || CATEGORY_MAP[item.category] || '',
   }
   showEditModal.value = true
 }
 
 function confirmEdit() {
-  if (!editingItem.value) return
+  if (!editingId.value) return
   const amountNum = parseFloat(editForm.value.amount)
   if (isNaN(amountNum) || amountNum <= 0) {
     uni.showToast({ title: '请输入有效金额', icon: 'none' })
     return
   }
   const cat = categoryStore.getCategoryById(editForm.value.categoryId)
-  editingItem.value.amount = `-¥${amountNum.toFixed(2)}`
-  editingItem.value.merchant = editForm.value.merchant
-  editingItem.value.category = cat?.name || editingItem.value.category
+  pendingStore.editItem(editingId.value, {
+    amount: `-¥${amountNum.toFixed(2)}`,
+    merchant: editForm.value.merchant,
+    category: cat?.name || '',
+    categoryId: editForm.value.categoryId,
+  })
   showEditModal.value = false
-  editingItem.value = null
+  editingId.value = null
 }
 
 function closeEditModal() {
   showEditModal.value = false
-  editingItem.value = null
+  editingId.value = null
 }
 
 /** 忽略记录 */
-function onIgnore(id: number) {
+function onIgnore(id: string) {
   uni.showModal({
     title: '忽略记录',
     content: '确定忽略这条记录吗？',
     confirmColor: '#C06C5F',
     success: (res) => {
       if (res.confirm) {
-        pendingItems.splice(pendingItems.findIndex(item => item.id === id), 1)
+        pendingStore.removeItem(id)
       }
     },
   })
 }
-
-/** 切换来源开关 */
-function toggleSource(source: typeof sourceList[number]) {
-  source.enabled = !source.enabled
-}
-
-/** 待确认数据 */
-const pendingItems = reactive([
-  {
-    id: 1,
-    sourceIcon: '🏦',
-    sourceName: '招商银行',
-    sourceIconBg: 'linear-gradient(135deg, #E8F1F5, #D6E5EC)',
-    time: '2分钟前',
-    rawText: '您尾号8888的账户于05-26 14:32支出人民币35.00元，商户：瑞幸咖啡。',
-    amount: '-¥35.00',
-    merchant: '瑞幸咖啡',
-    parsedTime: '05-26 14:32',
-    category: '餐饮美食',
-    account: '招商银行储蓄卡',
-  },
-  {
-    id: 2,
-    sourceIcon: '💳',
-    sourceName: '支付宝',
-    sourceIconBg: 'linear-gradient(135deg, #E8F0E8, #D4E6D4)',
-    time: '15分钟前',
-    rawText: '支付宝-花呗账单：05-26 12:15 美团外卖 -¥28.50',
-    amount: '-¥28.50',
-    merchant: '美团外卖',
-    parsedTime: '05-26 12:15',
-    category: '餐饮美食',
-    account: '支付宝花呗',
-  },
-  {
-    id: 3,
-    sourceIcon: '💬',
-    sourceName: '微信支付',
-    sourceIconBg: 'linear-gradient(135deg, #FAF0E6, #F5E6D3)',
-    time: '1小时前',
-    rawText: '微信支付凭证：05-26 09:08 滴滴出行 -¥15.00',
-    amount: '-¥15.00',
-    merchant: '滴滴出行',
-    parsedTime: '05-26 09:08',
-    category: '交通出行',
-    account: '微信零钱',
-  },
-])
-
-/** 监听来源列表 */
-const sourceList = reactive([
-  { icon: '🏦', name: '招商银行', iconBg: 'linear-gradient(135deg, #E8F1F5, #D6E5EC)', enabled: true },
-  { icon: '💳', name: '支付宝', iconBg: 'linear-gradient(135deg, #E8F0E8, #D4E6D4)', enabled: true },
-  { icon: '💬', name: '微信支付', iconBg: 'linear-gradient(135deg, #FAF0E6, #F5E6D3)', enabled: false },
-])
 </script>
 
 <style lang="scss" scoped>
@@ -337,6 +294,31 @@ const sourceList = reactive([
   @include text-caption;
   color: white;
   font-weight: 700;
+}
+
+/* ===== 空状态 ===== */
+.empty-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px $space-6 40px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.empty-title {
+  @include text-h3;
+  color: $text-secondary;
+  margin-bottom: 8px;
+}
+
+.empty-desc {
+  @include text-caption;
+  color: $text-tertiary;
+  text-align: center;
 }
 
 /* ===== 信息提示 ===== */

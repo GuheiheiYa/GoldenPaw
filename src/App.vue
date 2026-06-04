@@ -13,7 +13,6 @@ const locked = ref(false)
 const lockInput = ref('')
 
 onLaunch(() => {
-  console.log('GoldenPaw App Launched')
   seedAllStores()
 
   // 执行到期的定期交易
@@ -126,7 +125,7 @@ function executeRecurringTransactions() {
   }
 
   if (executed > 0) {
-    console.log(`[Recurring] 自动执行了 ${executed} 条定期交易`)
+    uni.showToast({ title: `已自动执行 ${executed} 条定期交易`, icon: 'none' })
   }
 }
 </script>
