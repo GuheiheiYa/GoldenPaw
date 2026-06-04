@@ -1237,7 +1237,6 @@ async function onUpload() {
     appStore.setSyncKey(generateSyncKey())
   }
   uni.showLoading({ title: '正在上传...' })
-  const { uploadToCloud } = await import('@/utils/sync')
   const res = await uploadToCloud()
   uni.hideLoading()
   uni.showToast({ title: res.message, icon: res.success ? 'success' : 'none' })
@@ -1245,7 +1244,6 @@ async function onUpload() {
 
 async function onDownload() {
   uni.showLoading({ title: '正在恢复...' })
-  const { downloadFromCloud } = await import('@/utils/sync')
   const res = await downloadFromCloud()
   uni.hideLoading()
   uni.showToast({ title: res.message, icon: res.success ? 'success' : 'none' })
@@ -1257,7 +1255,6 @@ async function onRestore() {
     return
   }
   uni.showLoading({ title: '正在恢复...' })
-  const { downloadFromCloud } = await import('@/utils/sync')
   const res = await downloadFromCloud(restoreKey.value.trim())
   uni.hideLoading()
   uni.showToast({ title: res.message, icon: res.success ? 'success' : 'none' })
